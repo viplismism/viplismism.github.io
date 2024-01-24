@@ -1,1 +1,0 @@
-# vipul-maheshwari.github.io

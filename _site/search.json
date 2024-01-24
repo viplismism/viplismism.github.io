@@ -1,0 +1,25 @@
+[
+  
+    {
+
+      "title"    : "Create LLM apps using RAG",
+      "description" : "RAG and Langcahin for creating the personalized bots",
+      "url"      : "/2024/01/23/rag-application-with-langchain",
+      "category" : "",
+      "tags"     : "LLM, Deep Learning",
+      "date"     : "2024-01-23 00:00:00 +0530"
+
+    } ,
+  
+    {
+
+      "title"    : "ML Fine Print",
+      "description" : "Take a look at the fonts in this post that can make your text editor or terminal emulator look little bit nicer",
+      "url"      : "/2024/01/14/ml-fine-print",
+      "category" : "",
+      "tags"     : "Machine Learning, Deep Learning",
+      "date"     : "2024-01-14 00:00:00 +0530"
+
+    } 
+  
+]
