@@ -6,6 +6,10 @@ summary: This blog post shows how you can create RAG applications with Langchain
 tags: [LLM,  Deep Learning]
 ---
 
+Last updated : 25/01/2024
+<br>
+Status: In progress
+
 *If you've ever thought about creating a custom bot for your documents or website that interacts based on specific data, you're in the right place. I'm here to assist you in developing a bot that leverages Langchain and RAG strategies for this purpose.*
 
 ### Limitation of ChatGPT and LLMs
@@ -28,4 +32,9 @@ Let's take an example of company policies again. Suppose you have an HR bot that
 7. Pass the relevant documents to the LLM with the specific prompt
 8. Get the response.
 
-We will do all this with LangChain, a framework for interfacing with LLMs to create chains of operations and autonomous agents.
+We will do all this with LangChain, a framework for interfacing with LLMs to create chains of operations and autonomous agents. Basically it's like a wrapper which lets you talk and manage your LLM responses better. Let's get started then..
+
+### Extracting the relevant information
+
+To get your RAG application running, the first thing we need to do is to extract the relevant information from the various data sources. It can be a website page, a PDF file, a notion link,  whatever it is, it needs to be extracted from it's original source which we will use later on as a reference for our LLM responses. For the sake of simplicity, we will start with a website link and a PDF file.  
+
