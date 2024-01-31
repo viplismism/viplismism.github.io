@@ -47,11 +47,12 @@ pre {
 }
 
 code,pre {
-	background: rgb(255, 255, 255);
+	background: #f5f5f5;  // Change the background color
 }
 
 code {
 	padding: .1rem;
+    font-size: 0.85rem;  // Increase the font size
 }
 
 pre code {

@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-01-30T22:28:42+05:30</updated>
+ <updated>2024-01-31T16:06:45+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -80,7 +80,10 @@ But let’s say this distant friend becomes closer to you over time, he comes at
     &lt;p&gt;Along with it we will be using  &lt;u&gt;&lt;a href=&quot;https://huggingface.co/&quot;&gt;Hugging Face&lt;/a&gt;&lt;/u&gt;, it is like an open-source library for building, training, and deploying state-of-the-art machine learning models, especially about NLP. To use the HuggingFace we need the access token, Get your access token &lt;u&gt;&lt;a href=&quot;https://huggingface.co/docs/hub/security-tokens&quot;&gt;here&lt;/a&gt;&lt;/u&gt;&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;For our models, we’ll need two key components: an LLM (Large Language Model) and an embedding model. While paid sources like OpenAI offer these, we’ll be utilizing open-source models to ensure accessibility for everyone.&lt;/p&gt;
+    &lt;p&gt;For our models, we’ll need two key components: a LLM (Large Language Model) and an embedding model. While paid sources like OpenAI offer these, we’ll be utilizing open-source models to ensure accessibility for everyone.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;To keep things simple, our data ingestion process will involve using a URL and some PDFs. While you can incorporate additional data sources if needed, we’ll concentrate solely on these two for now.&lt;/p&gt;
   &lt;/li&gt;
 &lt;/ol&gt;
 
@@ -100,7 +103,11 @@ pip3 install dotenv langchain langchain_community
 &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;HUGGINGFACEHUB_API_TOKEN = hf_KKNWfBqgwCUOHdHFrBwQ.....
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Ensure the name “HUGGINGFACEHUB_API_TOKEN” remains unchanged, as it is crucial for authentication purposes. It seems like everything is in order, and we’re all set!&lt;/p&gt;
+&lt;p&gt;Ensure the name “HUGGINGFACEHUB_API_TOKEN” remains unchanged, as it is crucial for authentication purposes.&lt;/p&gt;
+
+&lt;p&gt;Finally create a data folder in the project’s root directory, designated as the central repository for storing PDF documents. You can add some sample PDFs for testing purposes; for instance, I am using the  &lt;u&gt;&lt;a href=&quot;https://arxiv.org/pdf/2207.02696.pdf&quot;&gt;Yolo V7&lt;/a&gt;&lt;/u&gt; and &lt;u&gt;&lt;a href=&quot;https://arxiv.org/abs/1706.03762&quot;&gt;Transformers&lt;/a&gt;&lt;/u&gt; paper for demonstration. It’s important to note that this designated folder will function as our primary source for data ingestion.&lt;/p&gt;
+
+&lt;p&gt;It seems like everything is in order, and we’re all set!&lt;/p&gt;
 
 &lt;h3 id=&quot;step-1--extracting-the-relevant-information&quot;&gt;Step 1 : Extracting the relevant information&lt;/h3&gt;
 
@@ -108,15 +115,32 @@ pip3 install dotenv langchain langchain_community
 
 &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from langchain.document_loaders import PyPDFLoader
 from langchain_community.document_loaders import WebBaseLoader
+
+# Loading the environment variables
+load_dotenv()
+HF_TOKEN = os.getenv(&quot;HUGGINGFACEHUB_API_TOKEN&quot;)
+
+# Loading the web url and data 
+url_loader = WebBaseLoader(&quot;https://docs.smith.langchain.com/overview&quot;)
+documents_loader = DirectoryLoader(&apos;../data/&apos;, glob=&quot;./*.pdf&quot;, loader_cls=PyPDFLoader)
+
+# Creating the instances
+url_docs = url_loader.load()
+data_docs = documents_loader.load()
+
+# Combining all the data that we ingested
+docs = url_docs + data_docs
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This will ingest all the data from the URL link and the PDFs.&lt;/p&gt;
 
 &lt;h3 id=&quot;step-2--breaking-the-information-into-smaller-chunks&quot;&gt;Step 2 : Breaking the information into smaller chunks&lt;/h3&gt;
 
-&lt;p&gt;We already have the data or the information that we need for creating our RAG application, now comes the time we break down the information into smaller chunks as we will be using the embedding model later on to convert these chunks into there specific embeddings. But why it’s important?&lt;/p&gt;
+&lt;p&gt;We’ve all the necessary data for developing our RAG application. Now, it’s time to break down this information into smaller chunks. Later, we’ll utilize an embedding model to convert these chunks into their respective embeddings. But why it’s important?&lt;/p&gt;
 
-&lt;p&gt;To understand this, think of it like this : If someone tells you to ingest a 100 page book in one go and ask you a relevant question about that book, it would be very difficult for you to gather the pieces of information from the book and give the answer, instead if you are allowed to break down the information into smaller chunks of 10 pages and each page have an index from 0 to 9 or a numbering,  and then same question is asked again, it would be easy for you to search for the relevant chunk and then based on that chunk of information you can easily answer the question.&lt;/p&gt;
+&lt;p&gt;Think of it like this: If you’re tasked with digesting a 100-page book all at once and then asked a specific question about it, it would be challenging to retrieve the necessary information from the entire book to provide an answer. However, if you’re permitted to break the book into smaller, manageable chunks—let’s say 10 pages each—and each chunk is labeled with an index or numbering from 0 to 9, the process becomes much simpler. When the same question is posed after this breakdown, you can easily locate the relevant chunk based on its index and then extract the information needed to answer the question accurately.&lt;/p&gt;
 
-&lt;p&gt;Now images that book as your extracted information, those 10 pages as your small chunks of information and those index as the embedding. In a nutshell we will be using an embedding model on our chunks to convert the information into there embeedings, as a human we might not relate or understand those embeddings but those embeddings are just numeric representation of those chunks.&lt;/p&gt;
+&lt;p&gt;Picture the book as your extracted information, with each 10-page segment representing a small chunk of data, and the index as the embedding. Essentially, we’ll apply an embedding model to these chunks to transform the information into their respective embeddings. While as humans, we may not directly comprehend or relate to these embeddings, they serve as numeric representations of the chunks to our application.&lt;/p&gt;
 
 &lt;h3 id=&quot;step-3--creating-the-embeddings-and-store-them-into-a-vectordatabase&quot;&gt;Step 3 : Creating the embeddings and store them into a vectordatabase&lt;/h3&gt;
 

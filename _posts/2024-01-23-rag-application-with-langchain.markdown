@@ -56,7 +56,9 @@ Similarly, an LLM, when provided with additional information or access to your u
 
 2. Along with it we will be using  <u><a href="https://huggingface.co/">Hugging Face</a></u>, it is like an open-source library for building, training, and deploying state-of-the-art machine learning models, especially about NLP. To use the HuggingFace we need the access token, Get your access token <u><a href="https://huggingface.co/docs/hub/security-tokens">here</a></u>
 
-3. For our models, we'll need two key components: an LLM (Large Language Model) and an embedding model. While paid sources like OpenAI offer these, we'll be utilizing open-source models to ensure accessibility for everyone.
+3. For our models, we'll need two key components: a LLM (Large Language Model) and an embedding model. While paid sources like OpenAI offer these, we'll be utilizing open-source models to ensure accessibility for everyone.
+
+4. To keep things simple, our data ingestion process will involve using a URL and some PDFs. While you can incorporate additional data sources if needed, we'll concentrate solely on these two for now.
 
 With Langchain for the interface, Hugging Face for fetching the models, along with open-source components, we're all set to go! This way, we save some bucks while still having everything we need. Let's move to the next steps
 
@@ -76,7 +78,11 @@ Now create a .env file in the same directory to place your Hugging face api cred
 HUGGINGFACEHUB_API_TOKEN = hf_KKNWfBqgwCUOHdHFrBwQ.....
 ```
 
-Ensure the name "HUGGINGFACEHUB_API_TOKEN" remains unchanged, as it is crucial for authentication purposes. It seems like everything is in order, and we're all set!
+Ensure the name "HUGGINGFACEHUB_API_TOKEN" remains unchanged, as it is crucial for authentication purposes.
+
+Finally create a data folder in the project's root directory, designated as the central repository for storing PDF documents. You can add some sample PDFs for testing purposes; for instance, I am using the  <u><a href="https://arxiv.org/pdf/2207.02696.pdf">Yolo V7</a></u> and <u><a href="https://arxiv.org/abs/1706.03762">Transformers</a></u> paper for demonstration. It's important to note that this designated folder will function as our primary source for data ingestion. 
+
+It seems like everything is in order, and we're all set!
 
 ### Step 1 : Extracting the relevant information
 
@@ -85,15 +91,32 @@ To get your RAG application running, the first thing we need to do is to extract
 ```python
 from langchain.document_loaders import PyPDFLoader
 from langchain_community.document_loaders import WebBaseLoader
+
+# Loading the environment variables
+load_dotenv()
+HF_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+
+# Loading the web url and data 
+url_loader = WebBaseLoader("https://docs.smith.langchain.com/overview")
+documents_loader = DirectoryLoader('../data/', glob="./*.pdf", loader_cls=PyPDFLoader)
+
+# Creating the instances
+url_docs = url_loader.load()
+data_docs = documents_loader.load()
+
+# Combining all the data that we ingested
+docs = url_docs + data_docs
 ```
+
+This will ingest all the data from the URL link and the PDFs.
 
 ### Step 2 : Breaking the information into smaller chunks
 
-We already have the data or the information that we need for creating our RAG application, now comes the time we break down the information into smaller chunks as we will be using the embedding model later on to convert these chunks into there specific embeddings. But why it's important?
+We've all the necessary data for developing our RAG application. Now, it's time to break down this information into smaller chunks. Later, we'll utilize an embedding model to convert these chunks into their respective embeddings. But why it's important?
 
-To understand this, think of it like this : If someone tells you to ingest a 100 page book in one go and ask you a relevant question about that book, it would be very difficult for you to gather the pieces of information from the book and give the answer, instead if you are allowed to break down the information into smaller chunks of 10 pages and each page have an index from 0 to 9 or a numbering,  and then same question is asked again, it would be easy for you to search for the relevant chunk and then based on that chunk of information you can easily answer the question. 
+Think of it like this: If you're tasked with digesting a 100-page book all at once and then asked a specific question about it, it would be challenging to retrieve the necessary information from the entire book to provide an answer. However, if you're permitted to break the book into smaller, manageable chunks—let's say 10 pages each—and each chunk is labeled with an index or numbering from 0 to 9, the process becomes much simpler. When the same question is posed after this breakdown, you can easily locate the relevant chunk based on its index and then extract the information needed to answer the question accurately.
 
-Now images that book as your extracted information, those 10 pages as your small chunks of information and those index as the embedding. In a nutshell we will be using an embedding model on our chunks to convert the information into there embeedings, as a human we might not relate or understand those embeddings but those embeddings are just numeric representation of those chunks.
+Picture the book as your extracted information, with each 10-page segment representing a small chunk of data, and the index as the embedding. Essentially, we'll apply an embedding model to these chunks to transform the information into their respective embeddings. While as humans, we may not directly comprehend or relate to these embeddings, they serve as numeric representations of the chunks to our application. 
 
 ### Step 3 : Creating the embeddings and store them into a vectordatabase
 
