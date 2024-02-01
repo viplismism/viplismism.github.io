@@ -116,40 +116,61 @@ We've all the necessary data for developing our RAG application. Now, it's time 
 
 Think of it like this: If you're tasked with digesting a 100-page book all at once and then asked a specific question about it, it would be challenging to retrieve the necessary information from the entire book to provide an answer. However, if you're permitted to break the book into smaller, manageable chunks—let's say 10 pages each—and each chunk is labeled with an index or numbering from 0 to 9, the process becomes much simpler. When the same question is posed after this breakdown, you can easily locate the relevant chunk based on its index and then extract the information needed to answer the question accurately.
 
-Picture the book as your extracted information, with each 10-page segment representing a small chunk of data, and the index as the embedding. Essentially, we'll apply an embedding model to these chunks to transform the information into their respective embeddings. While as humans, we may not directly comprehend or relate to these embeddings, they serve as numeric representations of the chunks to our application. 
+Picture the book as your extracted information, with each 10-page segment representing a small chunk of data, and the index as the embedding. Essentially, we'll apply an embedding model to these chunks to transform the information into their respective embeddings. While as humans, we may not directly comprehend or relate to these embeddings, they serve as numeric representations of the chunks to our application.  This is how you can do this in Python
+
+```python
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+text_splitter = RecursiveCharacterTextSplitter(chunk_size = 1000, chunk_overlap = 50)
+documents = text_splitter.split_documents(docs)
+```
+
+Now the chunk_size parameter specifies the maximum number of characters that a chunk can contain, while the chunk_overlap parameter specifies the number of characters that should overlap between two adjacent chunks. With the chunk_overlap set to 50, the last 50 characters of the adjacent chunks will be shared between each other. This approach helps to prevent important information from being split across two chunks, ensuring that each chunk contains sufficient contextual information for the subsequent processing or analysis. As the shared information at the boundary of neighboring chunks enables a more seamless transition and understanding of the text's content. The best strategy for choosing the chunk_size and chunk_overlap parameters largely depends on the nature of the documents and the purpose of the application.
 
 ### Step 3 : Creating the embeddings and store them into a vectordatabase
 
-Now we are just going to pass those chunks to our embedding model and the embedding model will convert the chunks into their corresponding embeddings. There are two options for doing this, either you can download an embedding model in your local, manage the preprocessing and perform compuations locally and use it for the embedding creation,  or you can use Huggingface hub which hosts a vast collection of pre-trained models for various natural language processing (NLP) tasks, including embeddings. 
+We have two ways to get embeddings from these chunks. First, we can download a model, handle preprocessing, and do computations on our own. Or, we can use Hugging Face's model hub. They've got lots of pre-trained models for different NLP tasks, including embeddings. With this approach, we'll use one of their embedding models. We'll just give our chunks to this model, and Hugging Face's servers will do the hard work like preprocessing and computing. This saves us from doing it all on our own machines.
 
-So what we are going to do is we will create an instance of an embedding model which is provided by Hugging Face, then we will pass the chunks to the embedding model and all the heavy stuff like handling preprocessing, offloading comupatation will be done on the Huggingface servers.
-
-There are so many options for choosing a right embedding model, you can look at the ![https://huggingface.co/spaces/mteb/leaderboard]leaderboard here and choose the right embedding model according to your needs. For now, we will just use the "bge-base-en-v1.5" which works amazinglly well for creating the embeddings for english texts and it's compartively small so it's fast enough to load and do it's tasks. 
-
-
-
-Ok so the embeddings are created. You could see how many number of embeddings are there for each chunk like this:
+We have a bunch of options for embedding models, and you can check out the leaderboard [here](https://huggingface.co/spaces/mteb/leaderboard). But for now, we'll go with "bge-base-en-v1.5". It's great for making embeddings for English text, plus it's smaller, so it loads quickly and gets the job done fast.
 
 ```python
+from langchain.embeddings import HuggingFaceInferenceAPIEmbeddings
 
+# Creating the embeddings object
+embeddings = HuggingFaceInferenceAPIEmbeddings(
+    api_key=HF_TOKEN, model_name="BAAI/bge-base-en-v1.5"
+)
 ```
 
-Now comes the vectordatabase. There are ton of different vector databases available in the market, some of them are paid like Pinecone which works fast and have additional features over the ones which are open source like FAISS, Chroma. But to be honest, if you are not looking for anything like scaling your database to few hundred users who are fetching and storing the data from your database every minute, you are good to go with opensource ones. They works amazingingly well. So what we are going to do is we will create an instance of Chroma vector database, and will store our embeddins in it. That's it. No rocekt science here.
+Here's a way to see the number of embeddings for each chunk
 
+```python
+query = "Hello I want to see the length of the embeddings for this document."
+embeddings.embed_documents([query])[0]
+
+# 768
+```
+
+When it comes to vector databases, there are plenty of options out there. Some, like Pinecone, are paid but offer fast performance and extra features compared to open-source alternatives like FAISS or Chroma. However, if you don't need to scale your database to handle hundreds of users fetching and storing data every minute, open-source options are more than sufficient. They work really well. So, what we'll do is create an instance of FAISS vector database and store our embeddings in it. It's straightforward and doesn't require any rocket science.
+
+```python
+from langchain_community.vectorstores import FAISS
+
+# Creating a vectorstore object
+vectorstore = FAISS.from_documents(documents, embeddings)
+```
 
 ### Step 4 : Create a prompt template which will be fed to the LLM
 
-Ok now comes the prompt template. So when you write a question to the ChatGPT and it answers that question, you are basically providing a prompt to the model so that it can understand what's the question is. When companies train the models, they decide what kind of prompt they are going to use for invoking the model and ask the question. So for example,if you are working with Mistral 7B instruct and you want the optimal results it's recommended to use the following chat template:
+Ok now comes the prompt template. So when you write a question to the ChatGPT and it answers that question, you are basically providing a prompt to the model so that it can understand what's the question is. When companies train the models, they decide what kind of prompt they are going to use for invoking the model and ask the question. So for example,if you are working with "Mistral 7B instruct" and you want the optimal results it's recommended to use the following chat template:
 
 ```python
 <s>[INST] Instruction [/INST] Model answer</s>[INST] Follow-up instruction [/INST]
 ```
 
-Note that <s> and </s> are special tokens for beginning of string (BOS) and end of string (EOS) while [INST] and [/INST] are regular strings. It's just that the Mistral 7B instruct is made in such a way that the model look for those special tokens to understand the question better. Different types of LLMs have different kinds of instructed prompts. For our case we will be working with zephyer and it's prompt is like as this:
+Note that <s> and </s> are special tokens for beginning of string (BOS) and end of string (EOS) while [INST] and [/INST] are regular strings. It's just that the Mistral 7B instruct is made in such a way that the model look for those special tokens to understand the question better. Different types of LLMs have different kinds of instructed prompts. 
 
-```python
-
-```
+Now for our case we are going to use "huggingfaceh4/zephyr-7b-alpha" which is a text generation model. Just to make it clear, Zephyr-7B-α has not been aligned or formated to human preferences with techniques like RLHF (Reinforcement Learning with Human Feedback) or deployed with in-the-loop filtering of responses like ChatGPT, so the model can produce problematic outputs (especially when prompted to do so). Instead of writing a Prompt on our own, 
 
 ### Step 5 : Convert the query to it's relevant embedding using same embedding model.
 
