@@ -52,9 +52,9 @@ Similarly, an LLM, when provided with additional information or access to your u
 
 ### FAQs
 
-1. We will be using  <u><a href="https://python.langchain.com/docs/get_started/introduction">Langchain</a></u> for this task, Basically it's like a wrapper which lets you talk and manage to your LLM operations better. 
+1. We will be using [Langchain](https://python.langchain.com/docs/get_started/introduction) for this task, Basically it's like a wrapper which lets you talk and manage to your LLM operations better. 
 
-2. Along with it we will be using  <u><a href="https://huggingface.co/">Hugging Face</a></u>, it is like an open-source library for building, training, and deploying state-of-the-art machine learning models, especially about NLP. To use the HuggingFace we need the access token, Get your access token <u><a href="https://huggingface.co/docs/hub/security-tokens">here</a></u>
+2. Along with it we will be using [Hugging Face](https://huggingface.co/),  it is like an open-source library for building, training, and deploying state-of-the-art machine learning models, especially about NLP. To use the HuggingFace we need the access token, Get your access token [here](https://huggingface.co/docs/hub/security-tokens)
 
 3. For our models, we'll need two key components: a LLM (Large Language Model) and an embedding model. While paid sources like OpenAI offer these, we'll be utilizing open-source models to ensure accessibility for everyone.
 
@@ -80,7 +80,7 @@ HUGGINGFACEHUB_API_TOKEN = hf_KKNWfBqgwCUOHdHFrBwQ.....
 
 Ensure the name "HUGGINGFACEHUB_API_TOKEN" remains unchanged, as it is crucial for authentication purposes.
 
-Finally create a data folder in the project's root directory, designated as the central repository for storing PDF documents. You can add some sample PDFs for testing purposes; for instance, I am using the  <u><a href="https://arxiv.org/pdf/2207.02696.pdf">Yolo V7</a></u> and <u><a href="https://arxiv.org/abs/1706.03762">Transformers</a></u> paper for demonstration. It's important to note that this designated folder will function as our primary source for data ingestion. 
+Finally create a data folder in the project's root directory, designated as the central repository for storing PDF documents. You can add some sample PDFs for testing purposes; for instance, I am using the [Yolo V7](https://arxiv.org/pdf/2207.02696.pdf) and [Transformers](https://arxiv.org/abs/1706.03762) paper for demonstration. It's important to note that this designated folder will function as our primary source for data ingestion. 
 
 It seems like everything is in order, and we're all set!
 
@@ -170,27 +170,223 @@ Ok now comes the prompt template. So when you write a question to the ChatGPT an
 
 Note that <s> and </s> are special tokens for beginning of string (BOS) and end of string (EOS) while [INST] and [/INST] are regular strings. It's just that the Mistral 7B instruct is made in such a way that the model look for those special tokens to understand the question better. Different types of LLMs have different kinds of instructed prompts. 
 
-Now for our case we are going to use "huggingfaceh4/zephyr-7b-alpha" which is a text generation model. Just to make it clear, Zephyr-7B-α has not been aligned or formated to human preferences with techniques like RLHF (Reinforcement Learning with Human Feedback) or deployed with in-the-loop filtering of responses like ChatGPT, so the model can produce problematic outputs (especially when prompted to do so). Instead of writing a Prompt on our own, 
+Now for our case we are going to use "huggingfaceh4/zephyr-7b-alpha" which is a text generation model. Just to make it clear, Zephyr-7B-α has not been aligned or formated to human preferences with techniques like RLHF (Reinforcement Learning with Human Feedback) or deployed with in-the-loop filtering of responses like ChatGPT, so the model can produce problematic outputs (especially when prompted to do so). Instead of writing a Prompt on our own, I will use ChatPromptTemplate class which creates a prompt template for the chat models. Basically, instead of writing a specified prompt I am letting ChatPromptTemplate to do it for me. Here is an example prompt template that is being generated from the manual messsages.
+
+```python
+
+from langchain_core.prompts import ChatPromptTemplate
+
+template = ChatPromptTemplate.from_messages([
+    ("system", "You are a helpful AI bot. Your name is {name}."),
+    ("human", "Hello, how are you doing?"),
+    ("ai", "I'm doing well, thanks!"),
+    ("human", "{user_input}"),
+])
+
+messages = template.format_messages(
+    name="Bob",
+    user_input="What is your name?"
+)
+```
+
+If you don't want to write the manual instructions, you can just use the *from_template* function to generate a more generic prompt template which I used for this project. Here it is..
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+
+template = """
+{query}
+"""
+
+prompt = ChatPromptTemplate.from_template(template)
+
+```
+
+Our prompt is set! We've crafted a single message, assuming it's from a human or you xD . If you're not using the from_messages function, the ChatPromptTemplate will ensure your prompt works seamlessly with the language model by reserving some additional system messages. While there's always room for improvement with more generic prompts to achieve better results, this setup should work for now!
 
 ### Step 5 : Convert the query to it's relevant embedding using same embedding model.
 
-Ok so far we have converted our textual information into chunks, then we embedded those chunks into there specific embeddings and further more we have stored our embedded chunks into the vector database. Now comes the query or the question that we want to ask to our RAG application. We just can't pass the query to our model and ask for the information, instead the query will be passed to the same embedding model that is being used for chunks earlier and then only we can do the next set of tasks. Why it's important? Wel by embedding queries, we enable models to efficiently compare them with previously processed chunks of text, as then only we can do tasks like finding similar documents or generating relevant responses. It's like translating language into a language computers understand. Imagine you are English Speaker and your friend is a Hindi Speaker, no one understands each other language. Now you give a 1 page document written in Hindi to your English Speaker friend, now your friend will convert that document into the Hindi one first and then will understand the information.
+Now, let's talk about the query or question we want to ask our RAG application. We can't just pass the query to our model and expect information in return. Instead, we need to pass the query through the same embedding model used for the chunks earlier. Why is this important? Well, by embedding queries, we allow models to compare them efficiently with previously processed chunks of text. This enables tasks like finding similar documents or generating relevant responses. It's like translating language into a language computers understand.
 
-Now you asks a question to your english speaking friend in Hindi which is related to that documet. Now what would happen is, your friend will convert that question into the english first and then only will be able to understand the question and find relevant response from that information which you have shared earlier. 
+It's like translating language into a language computers understand. Imagine you're an English speaker and your friend speaks Hindi. Neither of you understands each other's language. You hand your English-speaking friend a one-page document written in Hindi. Your friend has to translate that document into English before they can understand its content. Now, if you ask a question in Hindi related to that document, your friend has to translate the question into English first to understand it and find a relevant response from the information you shared earlier. In this scenario, your friend acts like an embedding model. They converted your previous texts into embeddings. Now, when you ask a query or question, it will be translated into the relevant embeddings using the same embedding model used for the chunks. Then, a search operation will be performed to find the relevant response to your query. I hope this clarifies why we converted our query into embeddings first.
 
-Ok so your friend is an embedding model which converted your previous texts into the embeddings. Now when you asks a query or a question, it will be converted into the relevant embeddings from the same embedding model that is being used ealier for chunks and then some search operation will be performed to find the relevant response to your query. 
-
-I hope you get it why we did convert our query into the embeddings first.
+That being said, any query or a question that you want to ask will first be collectilevy used for creating a generic prompt then the whole piece of text will be embedded using the same embedding model that you used earlier for the chunks. As the embedding is done, we can process further 
 
 ### Step 6 : Fetch K number of documents.
 
-Now comes the retriver. What it does is, it goes into the vector database, performs *somekind of search* to find the relevant documents (chunks) and return k number of relevant documents which are ranked accordingly based on which one is more contextually related to the query or the question that you asked. We can set k as a parameter which means if you want 2 relevant documents or 5 or 10. Genearlly, if you have less amount of data, it's advisable to keep k to 2 and for longer documents, it's recommended to keep k in bewteen 10 - 20
+Now, let's talk about the retriever. Its job is to dive into the vector database and perform a search to find relevant documents. It returns a set number, let's call it "k", of these documents, which are ranked based on their contextual relevance to the query or question you asked. You can set "k" as a parameter, indicating how many relevant documents you want - whether it's 2, 5, or 10. Generally, if you have a smaller amount of data, it's best to stick with a lower "k", around 2. For longer documents or larger datasets, a "k" between 10 and 20 is recommended.
+
+Different [search techniques](https://python.langchain.com/docs/modules/data_connection/retrievers/vectorstore) can be employed to fetch relevant documents more effectively and quickly from a vector database. The choice depends on various factors such as your specific use case, the amount of data you have, what kind of vector database you are using and the context of your problem.
+
+```python
+retriever = vectorstore.as_retriever(search_type = "mmr", search_kwargs={"k": 3})
+docs = retriever.get_relevant_documents("what did you know about Yolo V7?")
+print(docs)
+```
+
+When you run this code, the retriever will fetch 3 most most relevant documents from the vector database based on the mmr search criteria. All these documents will be the contexts for our LLM model to generate the response for our query.
 
 
 ### Step 7 : Pass the relevant documents to the LLM and get the response.
 
-Now comes the last step. So to make things more robust, we will ask our retriever to fetch the k number of relevant documents from the database. We will then pass those k number of documents to our LLM as the context and will ask the LLM to generate a relevant response from that context. That's it. 
+So far, we've asked our retriever to fetch a set number of relevant documents from the database. Now, we need a language model (LLM) to generate a relevant response based on that context. To ensure robustness, let's remember that at the beginning of this blog, I mentioned that LLMs like ChatGPT can sometimes generate irrelevant responses, especially when asked about specific use cases or contexts. However, this time, we're providing the context from our own data to the LLM as a reference. So, it will consider this reference along with its general capabilities to answer the question. That's the whole idea behind using RAG!
 
+Now, let's dive into implementing the language model (LLM) aspect of our RAG setup. We'll be using a powerful model architecture from the Hugging Face Hub. Here's how we do it in Python:
+
+```python
+from langchain.llms import HuggingFaceHub
+
+# Model architecture
+model =  HuggingFaceHub(
+    repo_id="huggingfaceh4/zephyr-7b-alpha",
+    model_kwargs={"temperature": 0.5, "max_length": 4096 ,"max_new_tokens": 2048 }
+)
+```
+
+In this code snippet, we're instantiating our language model using the Hugging Face Hub. Specifically, we're selecting the Zephyr 7 billion model which is placed in this repository ID "huggingfaceh4/zephyr-7b-alpha". Choice of choosing this model isn't arbitrary; it's based on the model's suitability for our specific task and requirements. As we are already implementing only Open Source components, Zephyr 7 billion works good enough to generate the useful response with minimal overhead and low latency.
+
+This model comes with some additional parameters to fine-tune its behavior. We've set the temperature to 0.5, which controls the randomness of the generated text. As a lower temperature tends to result in more conservative and predictable outputs and    when the temperature is set to max which is 1, the model tries to be as much creative as it could, so based on what type of output you want for your use case, you can tweak this parameter. For the sake of the simplicity and demonstration purposes, I set it to 0.5 to make sure we get decent results. Next is max_length parameter, it defines the maximum length of the generated text which includes the size of your prompt as well as the response, and max_new_tokens which sets the maximum number of new tokens that can be generated. As a general rule of thumb, the max_new_tokens should always be less than or equal to the max_length parameter. Why? Think about it..
+
+### Step 8 : Create a chain for invoking the LLM.
+
+We have everything we want for our RAG application, last thing we need to do is to create a chain for invoking the LLM on our query to generate the response. There are different types of chains for the different types of use cases, if you like your LLM to remember the context of the chat over the time like the ChatGPT , you would need a memory instance which can be shared among multiple conversation pieces, for such cases, there are conversational chains available. 
+
+For now we just need a chain which can combine our retrieved contexts and pass it with the query to the LLM to generate the response. 
+
+```python
+rag_chain = (
+    {"context": retriever,  "query": RunnablePassthrough()}
+    | prompt
+    | model
+    | StrOutputParser()
+)
+```
+
+We have our Prompt, model, context and the query! All of them are combined into a single chain. It's pretty much what all the chains does! Now before running the final code, I want to give a quick check on these two helper functions: 
+`RunnablePassthrough()` and `StrOutputParser()`.  
+
+The `RunnablePassthrough` class in `LangChain` serves to pass inputs unchanged or with additional keys. In our chain, a prompt expects input in the form of a map with keys "context" and "question." However, user input only includes the "question." or the "query".  Here, `RunnablePassthrough` is utilized to pass the user's question under the "question" key while retrieving the context using a retriever. It just ensures that the input to the prompt conforms to the expected format. 
+
+Secondally, `StrOutputParser` is typically employed in RAG chains to parse the output of the model into a human-readable string. In the layman terms, It is responsible for transforming the model's output into a more coherent and grammatically correct sentence, which is generally better readable by Humans! That's it! 
+
+### D-Day
+
+To make sure we get the entire idea even if the response gets cut off, I've implemented a function called `get_complete_sentence()`. Basically this function helps extract the last complete sentence from the text. So, even if the response hits the maximum token limit that we set upon and it gets truncated midway, we will still get a coherent understanding of the message.
+
+For practical testing, I suggest storing some low sized PDFs in the data folder of your project. You can choose PDFs related to various topics or domains that you want the chatbot to interact with. Additionally, providing a URL as a reference for the chatbot can be helpful for testing. For example, you could use a Wikipedia page, a research paper, or any other online document relevant to your testing goals. During my testing, I used a URL containing information about Jon Snow from Game of Thrones,  and PDFs of Transformers paper, and the YOLO V7 paper to evaluate the bot's performance. Let's see how our bot performs in varied content.
+
+
+```python
+import os
+from dotenv import load_dotenv
+
+from langchain.llms import HuggingFaceHub
+from langchain.embeddings import HuggingFaceInferenceAPIEmbeddings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+from langchain_community.document_loaders import WebBaseLoader
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain.document_loaders import PyPDFLoader
+from langchain.document_loaders import DirectoryLoader
+
+# Loading the environment variables
+load_dotenv()
+HF_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+
+# Loading the web url and breaking down the information into chunks
+loader = WebBaseLoader("https://gameofthrones.fandom.com/wiki/Jon_Snow")
+documents_loader = DirectoryLoader('../data/', glob="./*.pdf", loader_cls=PyPDFLoader)
+
+# URL loader
+url_docs = loader.load()
+
+# Document loader
+data_docs = documents_loader.load()
+
+# Combining all the information into single variable
+docs = url_docs + data_docs
+
+text_splitter = RecursiveCharacterTextSplitter(chunk_size = 1000, chunk_overlap = 50)
+documents = text_splitter.split_documents(docs)
+
+# Creating the embeddings object
+embeddings = HuggingFaceInferenceAPIEmbeddings(
+    api_key=HF_TOKEN, model_name="BAAI/bge-base-en-v1.5"
+)
+
+# Creating a vectorstore object
+vectorstore = FAISS.from_documents(documents, embeddings)
+
+# Defining a retriever 
+retriever = vectorstore.as_retriever(search_type = "mmr", search_kwargs={"k": 3})
+
+# Model architecture
+model =  HuggingFaceHub(
+    repo_id="huggingfaceh4/zephyr-7b-alpha",
+    model_kwargs={"temperature": 0.5, "max_length": 4096 ,"max_new_tokens": 2048 }
+)
+
+template = """
+Question : {query}
+"""
+
+prompt = ChatPromptTemplate.from_template(template)
+
+rag_chain = (
+    {"context": retriever,  "query": RunnablePassthrough()}
+    | prompt
+    | model
+    | StrOutputParser()
+)
+
+def get_complete_sentence(response):
+    """
+    Extracts the last complete sentence from a given text.
+    
+    Args: response (str): The input text from which the last complete 
+    sentence will be extracted.
+    
+    Returns: str: The last complete sentence found in the input text. 
+    If no complete sentence is found, returns the entire input text.
+    """
+
+    # Find the last occurrence of a period (.)
+    last_period_index = response.rfind('.') 
+
+    # If a period is found, return the text up to that point
+    if last_period_index != -1: return response[:last_period_index + 1]  
+    
+    # If no period is found, return the entire response
+    else: return response  
+
+        
+# Invoke the RAG chain and retrieve the response
+response = rag_chain.invoke("Who killed Jon Snow?")
+
+# Get the complete sentence
+complete_sentence = get_complete_sentence(response)
+
+print(complete_sentence)
+```
+
+This is the response I received after 10 seconds, which is quite good. The time it takes can vary depending on your system's configuration, but I believe you'll get decent results in just a few minutes. So, please be patient if it's taking a bit longer.
+
+```python
+Human: 
+Question : Who killed Jon Snow?
+
+Answer: 
+In the TV series Game of Thrones, Jon Snow was stabbed by his 
+fellow Night's Watch members in season 5, episode 9, 
+"The Dance of Dragons." However, he was later resurrected by Melisandre 
+in season 6, episode 3, "Oathbreaker." So, technically, 
+no one killed Jon Snow in the show.
+```
+
+Have fun experimenting with various data sources! You can try changing the website addresses, adding new PDF files or maybe change the template a bit. LLMs are fun, you never know what you get! 
 
 ### What's next?
-So there are so many things which can be tweaked here. We can change our embedding model for something more better and better in terms of indexing, searching technique for retriever can be changed too, as well as a better LLM to generate the relevant response. 
+There are plenty of things we can adjust here. We could switch to a more effective embedding model for better indexing, try different searching techniques for the retriever, add a reranker to improve the ranking of documents, or use a more advanced LLM with a larger context window and faster response times. Essentially, every RAG application is just an enhanced version based on these factors. However, the fundamental concept of how RAG applications function always stays the same.
