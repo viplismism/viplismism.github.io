@@ -6,9 +6,6 @@ summary: This blog post shows how you can create RAG applications with Langchain
 tags: [LLM,  Deep Learning]
 ---
 
-Last Updated: 30/01/2024
-<br>
-Status: Working in progress
 
 *If you've ever thought about creating a custom bot for your documents or website that interacts based on specific data, you're in the right place. I'm here to assist you in developing a bot that leverages Langchain and RAG strategies for this purpose.*
 
