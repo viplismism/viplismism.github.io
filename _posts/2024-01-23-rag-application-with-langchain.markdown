@@ -15,7 +15,7 @@ ChatGPTs and other Large Language Models (LLMs) are extensively trained on text 
 
 Imagine requesting the model to enhance your company policies; in such scenarios, ChatGPTs and other Large Language Models might struggle to provide factual responses because they lack training on your company's specific policies. Instead, they may generate nonsensical or irrelevant responses, which can be unhelpful. So, how can we ensure that an LLM comprehends our specific data and generates responses accordingly? This is where techniques like Retrieval Augmentation Generation (RAG) come to the rescue.
 
-![RAG](../_images/2024-01-23-rag-application-with-langchain/rag1.png)
+![RAG](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/_images/2024-01-23-rag-application-with-langchain/rag1.png?raw=true)
 
 ### What is RAG?
 RAG or Retrieval Augmented Generation uses three main workflows to generate and give the better response
