@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-02-04T12:13:15+05:30</updated>
+ <updated>2024-02-04T13:44:18+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -25,7 +25,7 @@
 
 &lt;p&gt;Imagine requesting the model to enhance your company policies; in such scenarios, ChatGPTs and other Large Language Models might struggle to provide factual responses because they lack training on your company’s specific policies. Instead, they may generate nonsensical or irrelevant responses, which can be unhelpful. So, how can we ensure that an LLM comprehends our specific data and generates responses accordingly? This is where techniques like Retrieval Augmentation Generation (RAG) come to the rescue.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/rag.png?raw=true&quot; alt=&quot;RAG&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/LLM_without_RAG.png?raw=true&quot; alt=&quot;RAG&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;what-is-rag&quot;&gt;What is RAG?&lt;/h3&gt;
 &lt;p&gt;RAG or Retrieval Augmented Generation uses three main workflows to generate and give the better response&lt;/p&gt;
