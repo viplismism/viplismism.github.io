@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-02-05T21:47:21+05:30</updated>
+ <updated>2024-02-05T22:42:06+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -17,7 +17,9 @@
    <link href="http://localhost:4000/2024/01/23/rag-application-with-langchain"/>
    <updated>2024-01-23T00:00:00+05:30</updated>
    <id>http://localhost:4000/2024/01/23/rag-application-with-langchain</id>
-   <content type="html">&lt;p&gt;&lt;em&gt;If you’ve ever thought about creating a custom bot for your documents or website that interacts based on specific data, you’re in the right place. I’m here to assist you in developing a bot that leverages Langchain and RAG strategies for this purpose.&lt;/em&gt;&lt;/p&gt;
+   <content type="html">&lt;p&gt;&lt;img src=&quot;&quot; alt=&quot;cat&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;If you’ve ever thought about creating a custom bot for your documents or website that interacts based on specific data, you’re in the right place. I’m here to assist you in developing a bot that leverages Langchain and RAG strategies for this purpose.&lt;/em&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;understanding-the-limitations-of-chatgpt-and-llms&quot;&gt;Understanding the Limitations of ChatGPT and LLMs&lt;/h3&gt;
 
@@ -189,8 +191,7 @@ vectorstore = FAISS.from_documents(documents, embeddings)
 
 &lt;p&gt;Now for our case we are going to use “huggingfaceh4/zephyr-7b-alpha” which is a text generation model. Just to make it clear, Zephyr-7B-α has not been aligned or formated to human preferences with techniques like RLHF (Reinforcement Learning with Human Feedback) or deployed with in-the-loop filtering of responses like ChatGPT, so the model can produce problematic outputs (especially when prompted to do so). Instead of writing a Prompt on our own, I will use ChatPromptTemplate class which creates a prompt template for the chat models. Basically, instead of writing a specified prompt I am letting ChatPromptTemplate to do it for me. Here is an example prompt template that is being generated from the manual messsages.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;
-from langchain_core.prompts import ChatPromptTemplate
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from langchain_core.prompts import ChatPromptTemplate
 
 template = ChatPromptTemplate.from_messages([
     (&quot;system&quot;, &quot;You are a helpful AI bot. Your name is {name}.&quot;),
@@ -214,7 +215,6 @@ template = &quot;&quot;&quot;
 &quot;&quot;&quot;
 
 prompt = ChatPromptTemplate.from_template(template)
-
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Our prompt is set! We’ve crafted a single message, assuming it’s from a human or you xD . If you’re not using the from_messages function, the ChatPromptTemplate will ensure your prompt works seamlessly with the language model by reserving some additional system messages. While there’s always room for improvement with more generic prompts to achieve better results, this setup should work for now!&lt;/p&gt;

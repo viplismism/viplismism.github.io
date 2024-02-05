@@ -48,6 +48,8 @@ pre {
 
 code,pre {
 	background: #f5f5f5;  // Change the background color
+	max-width: 98%;
+	overflow-x: auto;
 }
 
 code {
@@ -64,9 +66,12 @@ pre {
 	overflow-x: auto;
 }
 
+
 img {
 	max-width:100%;
 	background: none;
+	display: block;
+	margin: auto;
 }
 
 hr {

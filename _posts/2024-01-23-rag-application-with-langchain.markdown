@@ -7,6 +7,7 @@ tags: [LLM,  Deep Learning]
 ---
 
 
+![cat]()
 
 *If you've ever thought about creating a custom bot for your documents or website that interacts based on specific data, you're in the right place. I'm here to assist you in developing a bot that leverages Langchain and RAG strategies for this purpose.*
 
@@ -173,7 +174,6 @@ Note that <s> and </s> are special tokens for beginning of string (BOS) and end 
 Now for our case we are going to use "huggingfaceh4/zephyr-7b-alpha" which is a text generation model. Just to make it clear, Zephyr-7B-α has not been aligned or formated to human preferences with techniques like RLHF (Reinforcement Learning with Human Feedback) or deployed with in-the-loop filtering of responses like ChatGPT, so the model can produce problematic outputs (especially when prompted to do so). Instead of writing a Prompt on our own, I will use ChatPromptTemplate class which creates a prompt template for the chat models. Basically, instead of writing a specified prompt I am letting ChatPromptTemplate to do it for me. Here is an example prompt template that is being generated from the manual messsages.
 
 ```python
-
 from langchain_core.prompts import ChatPromptTemplate
 
 template = ChatPromptTemplate.from_messages([
@@ -199,7 +199,6 @@ template = """
 """
 
 prompt = ChatPromptTemplate.from_template(template)
-
 ```
 
 Our prompt is set! We've crafted a single message, assuming it's from a human or you xD . If you're not using the from_messages function, the ChatPromptTemplate will ensure your prompt works seamlessly with the language model by reserving some additional system messages. While there's always room for improvement with more generic prompts to achieve better results, this setup should work for now!
