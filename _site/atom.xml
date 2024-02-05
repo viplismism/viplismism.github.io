@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-02-05T22:42:06+05:30</updated>
+ <updated>2024-02-05T22:47:39+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -17,7 +17,7 @@
    <link href="http://localhost:4000/2024/01/23/rag-application-with-langchain"/>
    <updated>2024-01-23T00:00:00+05:30</updated>
    <id>http://localhost:4000/2024/01/23/rag-application-with-langchain</id>
-   <content type="html">&lt;p&gt;&lt;img src=&quot;&quot; alt=&quot;cat&quot; /&gt;&lt;/p&gt;
+   <content type="html">&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/cat.png?raw=true&quot; alt=&quot;cat&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;If you’ve ever thought about creating a custom bot for your documents or website that interacts based on specific data, you’re in the right place. I’m here to assist you in developing a bot that leverages Langchain and RAG strategies for this purpose.&lt;/em&gt;&lt;/p&gt;
 
@@ -395,6 +395,8 @@ fellow Night&apos;s Watch members in season 5, episode 9,
 in season 6, episode 3, &quot;Oathbreaker.&quot; So, technically, 
 no one killed Jon Snow in the show.
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;&quot; alt=&quot;cat2&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Have fun experimenting with various data sources! You can try changing the website addresses, adding new PDF files or maybe change the template a bit. LLMs are fun, you never know what you get!&lt;/p&gt;
 

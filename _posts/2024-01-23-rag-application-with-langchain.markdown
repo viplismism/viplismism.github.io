@@ -7,7 +7,7 @@ tags: [LLM,  Deep Learning]
 ---
 
 
-![cat]()
+![cat](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/cat.png?raw=true)
 
 *If you've ever thought about creating a custom bot for your documents or website that interacts based on specific data, you're in the right place. I'm here to assist you in developing a bot that leverages Langchain and RAG strategies for this purpose.*
 
@@ -387,6 +387,8 @@ fellow Night's Watch members in season 5, episode 9,
 in season 6, episode 3, "Oathbreaker." So, technically, 
 no one killed Jon Snow in the show.
 ```
+
+![cat2]()
 
 Have fun experimenting with various data sources! You can try changing the website addresses, adding new PDF files or maybe change the template a bit. LLMs are fun, you never know what you get! 
 
