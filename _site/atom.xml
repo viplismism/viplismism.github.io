@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-02-04T13:44:18+05:30</updated>
+ <updated>2024-02-05T21:33:12+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -281,6 +281,8 @@ model =  HuggingFaceHub(
 &lt;p&gt;Secondally, &lt;code&gt;StrOutputParser&lt;/code&gt; is typically employed in RAG chains to parse the output of the model into a human-readable string. In the layman terms, It is responsible for transforming the model’s output into a more coherent and grammatically correct sentence, which is generally better readable by Humans! That’s it!&lt;/p&gt;
 
 &lt;h3 id=&quot;d-day&quot;&gt;D-Day&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/LLM_with_RAG.png?raw=true&quot; alt=&quot;With_RAG&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;To make sure we get the entire idea even if the response gets cut off, I’ve implemented a function called &lt;code&gt;get_complete_sentence()&lt;/code&gt;. Basically this function helps extract the last complete sentence from the text. So, even if the response hits the maximum token limit that we set upon and it gets truncated midway, we will still get a coherent understanding of the message.&lt;/p&gt;
 

@@ -7,7 +7,6 @@ tags: [LLM,  Deep Learning]
 ---
 
 
-![With_RAG]()
 
 *If you've ever thought about creating a custom bot for your documents or website that interacts based on specific data, you're in the right place. I'm here to assist you in developing a bot that leverages Langchain and RAG strategies for this purpose.*
 
@@ -17,7 +16,7 @@ ChatGPTs and other Large Language Models (LLMs) are extensively trained on text 
 
 Imagine requesting the model to enhance your company policies; in such scenarios, ChatGPTs and other Large Language Models might struggle to provide factual responses because they lack training on your company's specific policies. Instead, they may generate nonsensical or irrelevant responses, which can be unhelpful. So, how can we ensure that an LLM comprehends our specific data and generates responses accordingly? This is where techniques like Retrieval Augmentation Generation (RAG) come to the rescue.
 
-![RAG]()
+![RAG](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/LLM_without_RAG.png?raw=true)
 
 ### What is RAG?
 RAG or Retrieval Augmented Generation uses three main workflows to generate and give the better response
@@ -272,6 +271,7 @@ Secondally, `StrOutputParser` is typically employed in RAG chains to parse the o
 
 ### D-Day
 
+![With_RAG](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/LLM_with_RAG.png?raw=true)
 
 To make sure we get the entire idea even if the response gets cut off, I've implemented a function called `get_complete_sentence()`. Basically this function helps extract the last complete sentence from the text. So, even if the response hits the maximum token limit that we set upon and it gets truncated midway, we will still get a coherent understanding of the message.
 

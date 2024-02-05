@@ -2,16 +2,21 @@
 layout: compress
 ---
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
   {% include head.html %}  
   <body>
     <main>
-	    
-	    {% include navigation.html %}
-	    
-        {{ content }}
-        	    
+      {% include navigation.html %}
+      {{ content }}
     </main>
-            
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JBZRCCYMBP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-JBZRCCYMBP');
+    </script>
   </body>
 </html>
