@@ -388,7 +388,7 @@ in season 6, episode 3, "Oathbreaker." So, technically,
 no one killed Jon Snow in the show.
 ```
 
-![cat2]()
+![cat2](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/cat2.png?raw=true)
 
 Have fun experimenting with various data sources! You can try changing the website addresses, adding new PDF files or maybe change the template a bit. LLMs are fun, you never know what you get! 
 
