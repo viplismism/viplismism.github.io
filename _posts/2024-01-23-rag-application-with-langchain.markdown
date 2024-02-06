@@ -9,13 +9,13 @@ tags: [LLM,  Deep Learning]
 
 ![cat](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/cat.png?raw=true)
 
-*If you've ever thought about creating a custom bot for your documents or website that interacts based on specific data, you're in the right place. I'm here to assist you in developing a bot that leverages Langchain and RAG strategies for this purpose.*
+*If you're considering making a personalized bot for your documents or your website that responds to you, you're in the right spot. I'm here to help you create a bot using Langchain and RAG strategies for this purpose.*
 
 ### Understanding the Limitations of ChatGPT and LLMs
 
 ChatGPTs and other Large Language Models (LLMs) are extensively trained on text corpora to comprehend language semantics and coherence. Despite their impressive capabilities, these models have limitations that require careful consideration for particular use cases. One significant challenge is the potential for hallucinations, where the model might generate inaccurate or contextually irrelevant information.
 
-Imagine requesting the model to enhance your company policies; in such scenarios, ChatGPTs and other Large Language Models might struggle to provide factual responses because they lack training on your company's specific policies. Instead, they may generate nonsensical or irrelevant responses, which can be unhelpful. So, how can we ensure that an LLM comprehends our specific data and generates responses accordingly? This is where techniques like Retrieval Augmentation Generation (RAG) come to the rescue.
+Imagine requesting the model to enhance your company policies; in such scenarios, ChatGPTs and other Large Language Models might struggle to provide factual responses because they lack training on your company's data. Instead, they may generate nonsensical or irrelevant responses, which can be unhelpful. So, how can we ensure that an LLM comprehends our specific data and generates responses accordingly? This is where techniques like Retrieval Augmentation Generation (RAG) come to the rescue.
 
 ![RAG](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/LLM_without_RAG.png?raw=true)
 
@@ -28,7 +28,7 @@ RAG or Retrieval Augmented Generation uses three main workflows to generate and 
 
 - Response: Finally, the LLM generates a response that is more accurate and relevant since it has been augmented with the retrieved information. I mean we gave LLM some additional information from our Knowledge library which allows LLMs to provide more contextually relevant and factual responses, solving the problem of models when they are just hallucinating or providing irrelevant answer.
 
-Let's take an example of company policies again. Suppose you have an HR bot that handles queries related to your Company policies. Now if someones asks anything specific to the policies, The bot can pull the most recent policy documents from the knowledge libray, pass the relevant context to a well crafted prompt which is then passed further to the LLM for generating the response. 
+Let's take the example of company policies again. Suppose you have an HR bot that handles queries related to your Company policies. Now if someones asks anything specific to the policies, The bot can pull the most recent policy documents from the knowledge libray, pass the relevant context to a well crafted prompt which is then passed further to the LLM for generating the response. 
 
 To make it more easy, Imagine a LLM as your knowledgeable friend who seems to know everything, from Geography to Computer Science from Politics to Philosophy. Now, picture yourself asking this friend a few questions:
 
@@ -36,10 +36,9 @@ To make it more easy, Imagine a LLM as your knowledgeable friend who seems to kn
 - "Who lives next door to me?"
 - "What brand of peanut butter do I prefer?"
 
-Chances are, your friend wouldn't be able to answer these questions, right? Most of the time, no.
-But let's say this distant friend becomes closer to you over time, he comes at your place regularly, know your parents very well, you both hangout pretty often, you go on outings, blah blah blah.. You got the point right? I mean he is gaining access to personal and insider information about you.  Now, when you pose the same questions, they can somehow answer those question with more relevance now because because he is better suited with your personal insights.
+Chances are, your friend wouldn't be able to answer these questions, right? Most of the time, no. But let's say this distant friend becomes closer to you over time, he comes at your place regularly, know your parents very well, you both hangout pretty often, you go on outings, blah blah blah.. You got the point.  I mean he is gaining access to personal and insider information about you.  Now, when you pose the same questions, he can somehow answer those question with more relevance now because because he is better suited with your personal insights.
 
-Similarly, an LLM, when provided with additional information or access to your use case data, won't guess or hallucinate. Instead, it will leverage that data to provide relevant and accurate answers. 
+Similarly, a LLM, when provided with additional information or access to your use case data, won't guess or hallucinate. Instead, it will leverage that data to provide relevant and accurate answers. 
 
 
 ### To break it down, here are the exact steps to create any RAG application...
@@ -61,7 +60,7 @@ Similarly, an LLM, when provided with additional information or access to your u
 
 4. To keep things simple, our data ingestion process will involve using a URL and some PDFs. While you can incorporate additional data sources if needed, we'll concentrate solely on these two for now.
 
-With Langchain for the interface, Hugging Face for fetching the models, along with open-source components, we're all set to go! This way, we save some bucks while still having everything we need. Let's move to the next steps
+With Langchain for the interface, Hugging Face for fetching the models, along with open-source components, we're all set to go! This way, we will save some bucks while still having everything we need. Let's move to the next steps
 
 ### Environment Setup
 
