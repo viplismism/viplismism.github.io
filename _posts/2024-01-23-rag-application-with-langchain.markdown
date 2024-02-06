@@ -36,9 +36,11 @@ To make it more easy, Imagine a LLM as your knowledgeable friend who seems to kn
 - "Who lives next door to me?"
 - "What brand of peanut butter do I prefer?"
 
-Chances are, your friend wouldn't be able to answer these questions, right? Most of the time, no. But let's say this distant friend becomes closer to you over time, he comes at your place regularly, know your parents very well, you both hangout pretty often, you go on outings, blah blah blah.. You got the point.  I mean he is gaining access to personal and insider information about you.  Now, when you pose the same questions, he can somehow answer those question with more relevance now because because he is better suited with your personal insights.
+Chances are, your friend wouldn't be able to answer these questions. Most of the time, no. But let's say this distant friend becomes closer to you over time, he comes at your place regularly, know your parents very well, you both hangout pretty often, you go on outings, blah blah blah.. You got the point.  
 
-Similarly, a LLM, when provided with additional information or access to your use case data, won't guess or hallucinate. Instead, it will leverage that data to provide relevant and accurate answers. 
+I mean he is gaining access to personal and insider information about you.  Now, when you pose the same questions, he can somehow answer those question with more relevance now because because he is better suited with your personal insights.
+
+Similarly, a LLM, when provided with additional information or access to your data, it won't guess or hallucinate. Instead, it can leverage that data to provide more relevant and accurate answers. 
 
 
 ### To break it down, here are the exact steps to create any RAG application...
@@ -54,7 +56,7 @@ Similarly, a LLM, when provided with additional information or access to your us
 
 1. We will be using [Langchain](https://python.langchain.com/docs/get_started/introduction) for this task, Basically it's like a wrapper which lets you talk and manage to your LLM operations better. 
 
-2. Along with it we will be using [Hugging Face](https://huggingface.co/),  it is like an open-source library for building, training, and deploying state-of-the-art machine learning models, especially about NLP. To use the HuggingFace we need the access token, Get your access token [here](https://huggingface.co/docs/hub/security-tokens)
+2. Along with it we will be using [Hugging Face](https://huggingface.co/),  it  an open-source library for building, training, and deploying state-of-the-art machine learning models, especially about NLP. To use the HuggingFace we need the access token, Get your access token [here](https://huggingface.co/docs/hub/security-tokens)
 
 3. For our models, we'll need two key components: a LLM (Large Language Model) and an embedding model. While paid sources like OpenAI offer these, we'll be utilizing open-source models to ensure accessibility for everyone.
 
@@ -72,7 +74,7 @@ source env/bin/activate
 pip3 install dotenv langchain langchain_community 
 ```
 
-Now create a .env file in the same directory to place your Hugging face api credentials like this
+Now create a .env file in the same directory to place your Hugging Face api credentials like this
 
 ```python
 HUGGINGFACEHUB_API_TOKEN = hf_KKNWfBqgwCUOHdHFrBwQ.....
@@ -114,7 +116,7 @@ This will ingest all the data from the URL link and the PDFs.
 
 We've all the necessary data for developing our RAG application. Now, it's time to break down this information into smaller chunks. Later, we'll utilize an embedding model to convert these chunks into their respective embeddings. But why it's important?
 
-Think of it like this: If you're tasked with digesting a 100-page book all at once and then asked a specific question about it, it would be challenging to retrieve the necessary information from the entire book to provide an answer. However, if you're permitted to break the book into smaller, manageable chunks—let's say 10 pages each—and each chunk is labeled with an index or numbering from 0 to 9, the process becomes much simpler. When the same question is posed after this breakdown, you can easily locate the relevant chunk based on its index and then extract the information needed to answer the question accurately.
+Think of it like this: If you're tasked with digesting a 100-page book all at once and then asked a specific question about it, it would be challenging to retrieve the necessary information from the entire book to provide an answer. However, if you're permitted to break the book into smaller, manageable chunks—let's say 10 pages each—and each chunk is labeled with an index from 0 to 9, the process becomes much simpler. When the same question is posed after this breakdown, you can easily locate the relevant chunk based on its index and then extract the information needed to answer the question accurately.
 
 Picture the book as your extracted information, with each 10-page segment representing a small chunk of data, and the index as the embedding. Essentially, we'll apply an embedding model to these chunks to transform the information into their respective embeddings. While as humans, we may not directly comprehend or relate to these embeddings, they serve as numeric representations of the chunks to our application.  This is how you can do this in Python
 
@@ -125,13 +127,17 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size = 1000, chunk_overlap 
 documents = text_splitter.split_documents(docs)
 ```
 
-Now the chunk_size parameter specifies the maximum number of characters that a chunk can contain, while the chunk_overlap parameter specifies the number of characters that should overlap between two adjacent chunks. With the chunk_overlap set to 50, the last 50 characters of the adjacent chunks will be shared between each other. This approach helps to prevent important information from being split across two chunks, ensuring that each chunk contains sufficient contextual information for the subsequent processing or analysis. As the shared information at the boundary of neighboring chunks enables a more seamless transition and understanding of the text's content. The best strategy for choosing the chunk_size and chunk_overlap parameters largely depends on the nature of the documents and the purpose of the application.
+Now the chunk_size parameter specifies the maximum number of characters that a chunk can contain, while the chunk_overlap parameter specifies the number of characters that should overlap between two adjacent chunks. With the chunk_overlap set to 50, the last 50 characters of the adjacent chunks will be shared between each other. 
+
+This approach helps to prevent important information from being split across two chunks, ensuring that each chunk contains sufficient contextual information for the subsequent processing or analysis. As the shared information at the boundary of neighboring chunks enables a more seamless transition and understanding of the text's content. The best strategy for choosing the chunk_size and chunk_overlap parameters largely depends on the nature of the documents and the purpose of the application. 
 
 ### Step 3 : Creating the embeddings and store them into a vectordatabase
 
-We have two ways to get embeddings from these chunks. First, we can download a model, handle preprocessing, and do computations on our own. Or, we can use Hugging Face's model hub. They've got lots of pre-trained models for different NLP tasks, including embeddings. With this approach, we'll use one of their embedding models. We'll just give our chunks to this model, and Hugging Face's servers will do the hard work like preprocessing and computing. This saves us from doing it all on our own machines.
+We have two ways to generate the embeddings for these chunks. First, we can download a model, handle preprocessing and do computations on our own. Or, we can use Hugging Face's model hub. They've got lots of pre-trained models for different NLP tasks, including embedding generation. 
 
-We have a bunch of options for embedding models, and you can check out the leaderboard [here](https://huggingface.co/spaces/mteb/leaderboard). But for now, we'll go with "bge-base-en-v1.5". It's great for making embeddings for English text, plus it's smaller, so it loads quickly and gets the job done fast.
+With this approach, we'll use one of their embedding models where we'll just give our chunks to this model, and Hugging Face's servers will do the hard work like preprocessing and computing. This saves us from burning our own machines for those heavy computations. 💀
+
+We have a bunch of options for embedding models, and you can check out the leaderboard [here](https://huggingface.co/spaces/mteb/leaderboard) and choose best one for your compatibility. But for now, we'll go with "bge-base-en-v1.5". It's great for generating embeddings for English text, plus it's smaller, so it loads quickly and gets the job done fast.
 
 ```python
 from langchain.embeddings import HuggingFaceInferenceAPIEmbeddings
@@ -151,7 +157,9 @@ embeddings.embed_documents([query])[0]
 # 768
 ```
 
-When it comes to vector databases, there are plenty of options out there. Some, like Pinecone, are paid but offer fast performance and extra features compared to open-source alternatives like FAISS or Chroma. However, if you don't need to scale your database to handle hundreds of users fetching and storing data every minute, open-source options are more than sufficient. They work really well. So, what we'll do is create an instance of FAISS vector database and store our embeddings in it. It's straightforward and doesn't require any rocket science.
+We have the embeddings for our chunks, now we need a vector database to store them. When it comes to vector databases, there are plenty of options out there. 
+
+DB like Pinecone are paid but offer fast performance and extra features compared to open-source alternatives like FAISS or Chroma. However, if you don't need to scale your database to handle hundreds of users fetching and storing data every minute, open-source options are more than enough. Instead, they work really well. So, what we'll do we'll create  an instance of FAISS vector database and store our embeddings in it. It's straightforward and doesn't require any rocket science.
 
 ```python
 from langchain_community.vectorstores import FAISS
@@ -162,30 +170,31 @@ vectorstore = FAISS.from_documents(documents, embeddings)
 
 ### Step 4 : Create a prompt template which will be fed to the LLM
 
-Ok now comes the prompt template. So when you write a question to the ChatGPT and it answers that question, you are basically providing a prompt to the model so that it can understand what's the question is. When companies train the models, they decide what kind of prompt they are going to use for invoking the model and ask the question. So for example,if you are working with "Mistral 7B instruct" and you want the optimal results it's recommended to use the following chat template:
+Ok now comes the prompt template. So when you write a question to the ChatGPT and it answers that question, you are basically providing a prompt to the model so that it can understand what's the question is. When companies train the models, they decide what kind of prompt they are going to use for invoking the model and ask the question. For example, if you are working with "Mistral 7B instruct" and you want the optimal results it's recommended to use the following chat template:
 
 ```python
 <s>[INST] Instruction [/INST] Model answer</s>[INST] Follow-up instruction [/INST]
 ```
 
-Note that <s> and </s> are special tokens for beginning of string (BOS) and end of string (EOS) while [INST] and [/INST] are regular strings. It's just that the Mistral 7B instruct is made in such a way that the model look for those special tokens to understand the question better. Different types of LLMs have different kinds of instructed prompts. 
+Note that \<s> and \</s> are special tokens to represent beginning of string (BOS) and end of string (EOS) while [INST] and [/INST] are regular strings. It's just that the Mistral 7B instruct is made in such a way that the model look for those special tokens to understand the question better. Different types of LLMs have different kinds of instructed prompts. 
 
-Now for our case we are going to use "huggingfaceh4/zephyr-7b-alpha" which is a text generation model. Just to make it clear, Zephyr-7B-α has not been aligned or formated to human preferences with techniques like RLHF (Reinforcement Learning with Human Feedback) or deployed with in-the-loop filtering of responses like ChatGPT, so the model can produce problematic outputs (especially when prompted to do so). Instead of writing a Prompt on our own, I will use ChatPromptTemplate class which creates a prompt template for the chat models. Basically, instead of writing a specified prompt I am letting ChatPromptTemplate to do it for me. Here is an example prompt template that is being generated from the manual messsages.
+Now for our case we are going to use [huggingfaceh4/zephyr-7b-alpha](https://huggingface.co/HuggingFaceH4/zephyr-7b-alpha) which is a text generation model. Just to make it clear, Zephyr-7B-α has not been aligned or formated to human preferences with techniques like RLHF (Reinforcement Learning with Human Feedback) or deployed with in-the-loop filtering of responses like ChatGPT, so the model can produce problematic outputs (especially when prompted to do so). 
+
+Instead of writing a Prompt of our own, I will use ChatPromptTemplate class which creates a prompt template for the chat models. In layman terms, instead of writing a specified prompt I am letting ChatPromptTemplate to do it for me. Here is an example prompt template that is being generated from the manual messsages.
 
 ```python
 from langchain_core.prompts import ChatPromptTemplate
 
-template = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful AI bot. Your name is {name}."),
-    ("human", "Hello, how are you doing?"),
-    ("ai", "I'm doing well, thanks!"),
-    ("human", "{user_input}"),
-])
-
-messages = template.format_messages(
-    name="Bob",
-    user_input="What is your name?"
+chat_template = ChatPromptTemplate.from_messages(
+    [
+        ("system", "You are a helpful AI bot. Your name is {name}."),
+        ("human", "Hello, how are you doing?"),
+        ("ai", "I'm doing well, thanks!"),
+        ("human", "{user_input}"),
+    ]
 )
+
+messages = chat_template.format_messages(name="Bob", user_input="What is your name?")
 ```
 
 If you don't want to write the manual instructions, you can just use the *from_template* function to generate a more generic prompt template which I used for this project. Here it is..
@@ -200,15 +209,16 @@ template = """
 prompt = ChatPromptTemplate.from_template(template)
 ```
 
-Our prompt is set! We've crafted a single message, assuming it's from a human or you xD . If you're not using the from_messages function, the ChatPromptTemplate will ensure your prompt works seamlessly with the language model by reserving some additional system messages. While there's always room for improvement with more generic prompts to achieve better results, this setup should work for now!
+Our prompt is set! We've crafted a single message, assuming it's from a human xD . If you're not using the from_messages function, the ChatPromptTemplate will ensure your prompt works seamlessly with the language model by reserving some additional system messages. While there's always room for improvement with more generic prompts to achieve better results, this setup should work for now!
 
 ### Step 5 : Convert the query to it's relevant embedding using same embedding model.
 
-Now, let's talk about the query or question we want to ask our RAG application. We can't just pass the query to our model and expect information in return. Instead, we need to pass the query through the same embedding model used for the chunks earlier. Why is this important? Well, by embedding queries, we allow models to compare them efficiently with previously processed chunks of text. This enables tasks like finding similar documents or generating relevant responses. It's like translating language into a language computers understand.
+Now, let's talk about the query or question we want to ask our RAG application. We can't just pass the query to our model and expect information in return. Instead, we need to pass the query through the same embedding model used for the chunks earlier. Why is this important? Well, by embedding queries, we allow models to compare them efficiently with previously processed chunks of text. This enables tasks like finding similar documents or generating relevant responses.
 
-It's like translating language into a language computers understand. Imagine you're an English speaker and your friend speaks Hindi. Neither of you understands each other's language. You hand your English-speaking friend a one-page document written in Hindi. Your friend has to translate that document into English before they can understand its content. Now, if you ask a question in Hindi related to that document, your friend has to translate the question into English first to understand it and find a relevant response from the information you shared earlier. In this scenario, your friend acts like an embedding model. They converted your previous texts into embeddings. Now, when you ask a query or question, it will be translated into the relevant embeddings using the same embedding model used for the chunks. Then, a search operation will be performed to find the relevant response to your query. I hope this clarifies why we converted our query into embeddings first.
+It's like translating language into a language computers understand. Imagine you're an English speaker and your friend speaks Hindi. Neither of you understands each other's language. You hand your English-speaking friend a one-page document written in Hindi. Your friend has to translate that document into English before they can understand it's content. Now, if you ask a question in Hindi related to that document, your friend has to translate the question into English first to understand it, and then find a relevant response from the information you shared earlier. In this scenario, your friend acts like an embedding model. He converted your previous texts into the relevant language or embeddings if I say. 
 
-That being said, any query or a question that you want to ask will first be collectilevy used for creating a generic prompt then the whole piece of text will be embedded using the same embedding model that you used earlier for the chunks. As the embedding is done, we can process further 
+Now, when you ask a query or question, it will be translated into the relevant embeddings using the same embedding model used for the chunks. Then, a search operation will be performed to find the relevant response to your query. I hope this clarifies why we converted our query into embeddings first.
+
 
 ### Step 6 : Fetch K number of documents.
 
@@ -229,7 +239,7 @@ When you run this code, the retriever will fetch 3 most most relevant documents 
 
 So far, we've asked our retriever to fetch a set number of relevant documents from the database. Now, we need a language model (LLM) to generate a relevant response based on that context. To ensure robustness, let's remember that at the beginning of this blog, I mentioned that LLMs like ChatGPT can sometimes generate irrelevant responses, especially when asked about specific use cases or contexts. However, this time, we're providing the context from our own data to the LLM as a reference. So, it will consider this reference along with its general capabilities to answer the question. That's the whole idea behind using RAG!
 
-Now, let's dive into implementing the language model (LLM) aspect of our RAG setup. We'll be using a powerful model architecture from the Hugging Face Hub. Here's how we do it in Python:
+Now, let's dive into implementing the language model (LLM) aspect of our RAG setup. We'll be using zephyr model architecture from the Hugging Face Hub. Here's how we do it in Python:
 
 ```python
 from langchain.llms import HuggingFaceHub
@@ -241,9 +251,11 @@ model =  HuggingFaceHub(
 )
 ```
 
-In this code snippet, we're instantiating our language model using the Hugging Face Hub. Specifically, we're selecting the Zephyr 7 billion model which is placed in this repository ID "huggingfaceh4/zephyr-7b-alpha". Choice of choosing this model isn't arbitrary; it's based on the model's suitability for our specific task and requirements. As we are already implementing only Open Source components, Zephyr 7 billion works good enough to generate the useful response with minimal overhead and low latency.
+In this code snippet, we're instantiating our language model using the Hugging Face Hub. Specifically, we're selecting the zephyr 7 billion model which is placed in this repository ID ["huggingfaceh4/zephyr-7b-alpha"](https://huggingface.co/HuggingFaceH4/zephyr-7b-alpha). Choice of choosing this model isn't arbitrary; as I said before, it's based on the model's suitability for our specific task and requirements. As we are already implementing only Open Source components, Zephyr 7 billion works good enough to generate the useful response with minimal overhead and low latency.
 
-This model comes with some additional parameters to fine-tune its behavior. We've set the temperature to 0.5, which controls the randomness of the generated text. As a lower temperature tends to result in more conservative and predictable outputs and    when the temperature is set to max which is 1, the model tries to be as much creative as it could, so based on what type of output you want for your use case, you can tweak this parameter. For the sake of the simplicity and demonstration purposes, I set it to 0.5 to make sure we get decent results. Next is max_length parameter, it defines the maximum length of the generated text which includes the size of your prompt as well as the response, and max_new_tokens which sets the maximum number of new tokens that can be generated. As a general rule of thumb, the max_new_tokens should always be less than or equal to the max_length parameter. Why? Think about it..
+This model comes with some additional parameters to fine-tune its behavior. We've set the temperature to 0.5, which controls the randomness of the generated text. As a lower temperature tends to result in more conservative and predictable outputs and    when the temperature is set to max which is 1, the model tries to be as much creative as it could, so based on what type of output you want for your use case, you can tweak this parameter. For the sake of the simplicity and demonstration purposes, I set it to 0.5 to make sure we get decent results. Next is max_length parameter which defines the maximum length of the generated text and it includes the size of your prompt as well as the response. 
+
+max_new_tokens sets the threshold on maximum number of new tokens that can be generated. As a general rule of thumb, the max_new_tokens should always be less than or equal to the max_length parameter. Why? Think about it..
 
 ### Step 8 : Create a chain for invoking the LLM.
 
