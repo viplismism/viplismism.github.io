@@ -215,3 +215,17 @@ figcaption {
         display: none !important;
     }
 }
+
+
+.back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ffffff;
+    color: #000;
+    padding: 10px;
+    text-decoration: none;
+    border-radius: 5px;
+    display: block; /* Initially hidden */
+    margin-right: 20%; /* Adjust the margin to move the icon closer to the post content */
+}
