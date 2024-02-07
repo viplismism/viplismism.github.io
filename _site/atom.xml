@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-02-07T11:25:16+05:30</updated>
+ <updated>2024-02-07T19:07:11+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -14,9 +14,9 @@
  
  <entry>
    <title>Create LLM apps using RAG</title>
-   <link href="http://localhost:4000/2024/01/23/rag-application-with-langchain"/>
-   <updated>2024-01-23T00:00:00+05:30</updated>
-   <id>http://localhost:4000/2024/01/23/rag-application-with-langchain</id>
+   <link href="http://localhost:4000/2024/02/07/rag-application-with-langchain"/>
+   <updated>2024-02-07T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2024/02/07/rag-application-with-langchain</id>
    <content type="html">&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/cat.png?raw=true&quot; alt=&quot;cat&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;If you’re considering making a personalized bot for your documents or your website that responds to you, you’re in the right spot. I’m here to help you create a bot using Langchain and RAG strategies for this purpose.&lt;/em&gt;&lt;/p&gt;
