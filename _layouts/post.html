@@ -4,9 +4,17 @@ layout: default
 
 <section class="post">
   <h2>{{ page.title }}</h2>
-  {{ content }}
-  <span class="meta"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time>
+
+  {% if page.version == "Draft" %}
+    <p>Version: {{ page.version }}</p>
+    <p>Release Date: {{ page.release | date: "%d-%m-%Y" }}</p>
+  {% else %}
+    {{ content }}
+    <span class="meta"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time></span>
+  {% endif %}
 </section>
+
+
 
 <!--
 ---
