@@ -65,7 +65,7 @@ python3 -m venv env
 source env/bin/activate
 pip install --upgrade pip
 pip3 install dotenv 
-pip3 install langchain langchain-community bs4 pypdf chromadb
+pip3 install langchain langchain-community bs4 pypdf lancedb
 pip3 uninstall urllib3
 pip3 install 'urllib3<2.0'
 ```
@@ -78,12 +78,10 @@ HUGGINGFACEHUB_API_TOKEN = hf_KKNWfBqgwCUOHdHFrBwQ.....
 
 Ensure the name "HUGGINGFACEHUB_API_TOKEN" remains unchanged, as it is crucial for authentication purposes.
 
-If you prefer a straightforward approach without relying on external packages or file loading, you can directly configure the environment variable within your code. You can utilize `getpass` which allows you to prompt for user input, presenting a convenient fill-in bar for entering your Hugging Face token.
+If you prefer a straightforward approach without relying on external packages or file loading, you can directly configure the environment variable within your code like this..
 
 ```python
-from getpass import getpass
-# Put the token values inside the double quotes
-HF_TOKEN = getpass("HF Token:")
+HF_TOKEN = "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"
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = HF_TOKEN
 ```
 
@@ -96,13 +94,10 @@ It seems like everything is in order, and we're all set!
 To get your RAG application running, the first thing we need to do is to extract the relevant information from the various data sources. It can be a website page, a PDF file, a notion link, a google doc whatever it is, it needs to be extracted from it's original source first. 
 
 ```python
-import os
-from getpass import getpass
-
 from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader, DirectoryLoader
 
 # Put the token values inside the double quotes
-HF_TOKEN = getpass("HF Token:")
+HF_TOKEN = "hf_*******"
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = HF_TOKEN
 
 # Loading the web url and data 
