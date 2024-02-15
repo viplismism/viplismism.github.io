@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-02-14T22:58:52+05:30</updated>
+ <updated>2024-02-15T15:55:28+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -14,9 +14,9 @@
  
  <entry>
    <title>Create LLM apps using RAG</title>
-   <link href="http://localhost:4000/2024/02/07/rag-application-with-langchain"/>
-   <updated>2024-02-07T00:00:00+05:30</updated>
-   <id>http://localhost:4000/2024/02/07/rag-application-with-langchain</id>
+   <link href="http://localhost:4000/2024/02/14/rag-application-with-langchain"/>
+   <updated>2024-02-14T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2024/02/14/rag-application-with-langchain</id>
    <content type="html">&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/cat.png?raw=true&quot; alt=&quot;cat&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;If you’re considering making a personalized bot for your documents or your website that responds to you, you’re in the right spot. I’m here to help you create a bot using Langchain and RAG strategies for this purpose.&lt;/em&gt;&lt;/p&gt;
@@ -104,7 +104,7 @@ source env/bin/activate
 pip install --upgrade pip
 
 # Install required dependencies
-pip3 install lancedb langchain_community prettytable sentence-transformers huggingface-hub bs4 pypdf pandas
+pip3 install lancedb langchain langchain_community prettytable sentence-transformers huggingface-hub bs4 pypdf pandas
 
 # This is optional, I did it for removing a warning
 pip3 uninstall urllib3
@@ -140,7 +140,7 @@ HF_TOKEN = &quot;hf_*******&quot;
 os.environ[&quot;HUGGINGFACEHUB_API_TOKEN&quot;] = HF_TOKEN
 
 # Loading the web url and data 
-url_loader = WebBaseLoader(&quot;https://docs.smith.langchain.com/overview&quot;)
+url_loader = WebBaseLoader(&quot;https://gameofthrones.fandom.com/wiki/Jon_Snow&quot;)
 documents_loader = DirectoryLoader(&apos;data&apos;, glob=&quot;./*.pdf&quot;, loader_cls=PyPDFLoader)
 
 # Creating the instances
@@ -454,7 +454,6 @@ table.add_row([&quot;Complete Sentence Extraction&quot;, round(complete_sentence
 table.add_row([&quot;Embedding Model&quot;, embedding_model_name])
 table.add_row([&quot;LLM (Language Model) Repo ID&quot;, llm_repo_id])
 table.add_row([&quot;Vector Database&quot;, database_name])
-table.add_row([&quot;Search Type&quot;, search_type])
 table.add_row([&quot;Temperature&quot;, model_kwargs[&quot;temperature&quot;]])
 table.add_row([&quot;Max Length Tokens&quot;, model_kwargs[&quot;max_length&quot;]])
 table.add_row([&quot;Max New Tokens&quot;, model_kwargs[&quot;max_new_tokens&quot;]])
@@ -514,6 +513,8 @@ Execution Timings:
 
 &lt;h3 id=&quot;whats-next&quot;&gt;What’s next?&lt;/h3&gt;
 &lt;p&gt;There are plenty of things we can adjust here. We could switch to a more effective embedding model for better indexing, try different searching techniques for the retriever, add a reranker to improve the ranking of documents, or use a more advanced LLM with a larger context window and faster response times. Essentially, every RAG application is just an enhanced version based on these factors. However, the fundamental concept of how RAG applications function always stays the same.&lt;/p&gt;
+
+&lt;p&gt;Here is the &lt;a href=&quot;https://colab.research.google.com/drive/1YsOfovVdNPBwCDMWHvLfOaNtqXn4qXTs?usp=sharing&quot;&gt;collab&lt;/a&gt; link for the reference..&lt;/p&gt;
 </content>
  </entry>
  

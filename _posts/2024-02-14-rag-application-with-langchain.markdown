@@ -80,7 +80,7 @@ source env/bin/activate
 pip install --upgrade pip
 
 # Install required dependencies
-pip3 install lancedb langchain_community prettytable sentence-transformers huggingface-hub bs4 pypdf pandas
+pip3 install lancedb langchain langchain_community prettytable sentence-transformers huggingface-hub bs4 pypdf pandas
 
 # This is optional, I did it for removing a warning
 pip3 uninstall urllib3
@@ -119,7 +119,7 @@ HF_TOKEN = "hf_*******"
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = HF_TOKEN
 
 # Loading the web url and data 
-url_loader = WebBaseLoader("https://docs.smith.langchain.com/overview")
+url_loader = WebBaseLoader("https://gameofthrones.fandom.com/wiki/Jon_Snow")
 documents_loader = DirectoryLoader('data', glob="./*.pdf", loader_cls=PyPDFLoader)
 
 # Creating the instances
@@ -446,7 +446,6 @@ table.add_row(["Complete Sentence Extraction", round(complete_sentence_end_time 
 table.add_row(["Embedding Model", embedding_model_name])
 table.add_row(["LLM (Language Model) Repo ID", llm_repo_id])
 table.add_row(["Vector Database", database_name])
-table.add_row(["Search Type", search_type])
 table.add_row(["Temperature", model_kwargs["temperature"]])
 table.add_row(["Max Length Tokens", model_kwargs["max_length"]])
 table.add_row(["Max New Tokens", model_kwargs["max_new_tokens"]])
@@ -506,4 +505,6 @@ Execution Timings:
 Have fun experimenting with various data sources! You can try changing the website addresses, adding new PDF files or maybe change the template a bit. LLMs are fun, you never know what you get! 
 
 ### What's next?
-There are plenty of things we can adjust here. We could switch to a more effective embedding model for better indexing, try different searching techniques for the retriever, add a reranker to improve the ranking of documents, or use a more advanced LLM with a larger context window and faster response times. Essentially, every RAG application is just an enhanced version based on these factors. However, the fundamental concept of how RAG applications function always stays the same.
+There are plenty of things we can adjust here. We could switch to a more effective embedding model for better indexing, try different searching techniques for the retriever, add a reranker to improve the ranking of documents, or use a more advanced LLM with a larger context window and faster response times. Essentially, every RAG application is just an enhanced version based on these factors. However, the fundamental concept of how RAG applications function always stays the same. 
+
+Here is the [collab](https://colab.research.google.com/drive/1YsOfovVdNPBwCDMWHvLfOaNtqXn4qXTs?usp=sharing) link for the reference..
