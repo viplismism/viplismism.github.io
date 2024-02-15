@@ -61,6 +61,8 @@ Similarly, a LLM, when provided with additional information or access to your da
 
 3. For our models, we'll need two key components: a LLM (Large Language Model) and an embedding model. While paid sources like OpenAI offer these, we'll be utilizing open-source models to ensure accessibility for everyone.
 
+4. Now we need a Vector Database to store our embeddings, For that task, we've got [LanceDB](https://lancedb.com/)– it's like a super-smart data lake for handling lots of information. It's a top-notch vector database, making it the go-to choice for dealing with complex data like vector embeddings.. And the best part? It won't burn a dent in your pocket because it's open source and free to use!!
+
 4. To keep things simple, our data ingestion process will involve using a URL and some PDFs. While you can incorporate additional data sources if needed, we'll concentrate solely on these two for now.
 
 With Langchain for the interface, Hugging Face for fetching the models, along with open-source components, we're all set to go! This way, we will save some bucks while still having everything we need. Let's move to the next steps
