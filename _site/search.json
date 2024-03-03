@@ -2,6 +2,17 @@
   
     {
 
+      "title"    : "Multimodal RAG applications",
+      "description" : "Multimodal RAG applications using lanceDB",
+      "url"      : "/2024/03/01/multimodal-rag-application",
+      "category" : "",
+      "tags"     : "LLM, Deep Learning",
+      "date"     : "2024-03-01 00:00:00 +0530"
+
+    } ,
+  
+    {
+
       "title"    : "Create LLM apps using RAG",
       "description" : "RAG and Langcahin for creating the personalized bots",
       "url"      : "/2024/02/14/rag-application-with-langchain",

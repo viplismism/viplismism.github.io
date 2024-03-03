@@ -4,13 +4,257 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-02-15T15:55:28+05:30</updated>
+ <updated>2024-03-03T18:32:10+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>Multimodal RAG applications</title>
+   <link href="http://localhost:4000/2024/03/01/multimodal-rag-application"/>
+   <updated>2024-03-01T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2024/03/01/multimodal-rag-application</id>
+   <content type="html">&lt;p&gt;&lt;em&gt;Artificial Intelligence (AI) has been actively working with text for quite some time, but the world isn’t solely centered around words. If you take a moment to look around, you’ll find a mix of text, images, videos, audios, and their combinations.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;-&amp;gt; sketch&lt;/p&gt;
+
+&lt;p&gt;Today we are going to work on Multimodality which is basically a concept that essentially empowers AI models with the capacity to perceive, listen, and comprehend data in diverse formats together with the text. Pretty much like how we do!&lt;/p&gt;
+
+&lt;p&gt;In an ideal situation, we should be able to mix different types of data together and show them to a generative AI model at the same time and iterate on it. It could be as simple as telling the AI model, “Hey, a few days ago, I sent you a picture of a brown, short dog. Can you find that picture for me?” and the model should then give us the details of that picture. Basically, we want the AI to understand the things more like how we humans do,  becoming really good at handling and responding to all kinds of information.&lt;/p&gt;
+
+&lt;p&gt;But the challenge here is to make a computer understands one data format with it’s related reference, and that could be a mix of text, audio, thermal imagery, and videos. Now to make this happen, we use something called Embeddings. It’s really a numeric vector which contains a bunch of numbers written together that might not mean much to us but understood by machines very well.&lt;/p&gt;
+
+&lt;h3 id=&quot;cat-is-equal-to-cat&quot;&gt;Cat is equal to Cat&lt;/h3&gt;
+
+&lt;p&gt;Let’s think of the text components for now, so we are currently aiming that our model should learn that words like “Dog” and “Cat” are closely linked to the word “Pet.” Now this understanding is easily achievable by using an embedding model which will convert these text words into their respective embeddings first and then the model is trained to follow a straightforward logic: if words are related, they are close together in the vector space, if not, they would be separated by the adequate distance.&lt;/p&gt;
+
+&lt;p&gt;But to help a model recognize that an image of a “Cat” and the word “Cat” are similar, we rely on Multimodal Embeddings. To simplify things a bit, imagine there is a magic box which is capable of handling various inputs – images, audios, text, and more.&lt;/p&gt;
+
+&lt;p&gt;Now, when we feed the box with an image of a “Cat” with the text “Cat,” it performs its magic and produces two numeric vectors. When these two vectors were given to a machines, it made machines to think, “Hmm, based on these numeric values, it seems like both are connected to “Cat”. So that’s exactly what we were aiming for! Our goal was to help machines to recognize the close connection between an image of a “Cat” and the text “Cat”. However, to validate this concept, when we plot those two numeric vectors in a vector space, it turns out they are very close to each other. This outcome exactly mirrors what we observed earlier with the proximity of the two text words “Cat” and “Dog” in the vector space.&lt;/p&gt;
+
+&lt;h2 id=&quot;ladies-and-gentlemen-thats-the-essence-of-multimodality-&quot;&gt;Ladies and gentlemen, that’s the essence of Multimodality. 👏&lt;/h2&gt;
+
+&lt;p&gt;So we made our model to comprehend the association between “Cat” images and the word “Cat.” Well this is it, I mean if you are able to do this, you would have ingested the audio, images, videos as well as the word “Cat” and the model will understand how the cat is being portrayed across all kinds of file format..&lt;/p&gt;
+
+&lt;h3 id=&quot;rag-is-here&quot;&gt;RAG is here..&lt;/h3&gt;
+
+&lt;p&gt;Well if you don’t know what RAG means, I would highly advise to read this article &lt;a href=&quot;https://vipul-maheshwari.github.io/2024/02/14/rag-application-with-langchain&quot;&gt;here&lt;/a&gt; which I wrote some days back and loved by ton of people, not exageerating it but yeah, it’s good to get the balls rolling..&lt;/p&gt;
+
+&lt;p&gt;So there are impressive models like DALLE-2 that provide text-to-image functionality. Essentially, you input text, and the model generates relevant images for you. But can we create a system similar to Multimodal RAG, where the model produces output images based on our own data? Alright, so the goal for today is to create an AI model that when asked something like, “How many girls were there in my party?” 💀 not only provides textual information but also includes a relevant image related to it. Think of it as an extension of simple RAG system, but now incorporating images.&lt;/p&gt;
+
+&lt;p&gt;Before we dive in, remember that Multimodality isn’t limited to just text-to-image or image-to-text as it encompasses the freedom to input and output any type of data. However, for now, let’s concentrate on the interaction from image to text exclusively.&lt;/p&gt;
+
+&lt;h3 id=&quot;contrasive-learning&quot;&gt;Contrasive learning&lt;/h3&gt;
+
+&lt;p&gt;Now the question is, What exactly was that box doing? The magic it performs is known as Contrastive Learning. While the term might sound complex, it’s not that tricky. To simplify, consider a dataset with images, along with a caption describing what the image represents.&lt;/p&gt;
+
+&lt;p&gt;-&amp;gt; some images of the dogs, cats, pets with their names in the captions&lt;/p&gt;
+
+&lt;p&gt;Alright, now what happens is: we give our text-image model with these Positive and Negative samples, where each sample consists of an image and a descriptive text. Positive samples are those where the image and text are correctly align – for instance, a picture of a cat matched with the text “this is an image of a cat.” Conversely, negative samples involve a mismatch, like presenting an image of a dog alongside the text “this is an image of a cat.”&lt;/p&gt;
+
+&lt;p&gt;Now we train our text-image model to recognize that positive samples offer accurate interpretations, while negative samples are misleading and should be disregarded during training. In formal terms this technique is called “CLIP” (Contrastive Language-Image Pre-training) introduced by OpenAI where authors trained an image-text model on something around 400 million image caption pairs taken from the interent and everytime model makes a mistake, the contrasive loss function increases and penalize it to make sure the model trains well. The same kind of principles are applied to the other modality combinations as well, so voice of cat with the word cat is positive sample for speech-text model, a video of cat with the descriptive text “this is a cat” is a positive sample for video-text model.&lt;/p&gt;
+
+&lt;p&gt;See, it’s easy.&lt;/p&gt;
+
+&lt;p&gt;-&amp;gt; a meme here showing tantanta&lt;/p&gt;
+
+&lt;h3 id=&quot;show-time&quot;&gt;Show time&lt;/h3&gt;
+
+&lt;p&gt;Well you don’t have to build that box from scratch because folks have already done it for us. There’s a Multimodal embedding model, like the “clip-ViT-L-14” from Sentence Transformers, available on Hugging Face. This model can handle various data types, including text, images, videos, audios, and even thermal and gyroscope data. Now, onto the next question: how do we store those embeddings?&lt;/p&gt;
+
+&lt;p&gt;For that we’ll need a vector database that can efficiently fetch, query, and retrieve relevant embeddings for us,  ideally one that supports multimodal data and doesn’t burn a hole in our wallets. That’s where LanceDB comes into play.&lt;/p&gt;
+
+&lt;h3 id=&quot;vector-database&quot;&gt;Vector database&lt;/h3&gt;
+
+&lt;p&gt;When we talk about the vector database, there are ton of options available in the current market, but there is something about the LanceDB which makes it stands out as an optimal choice for a vector database, As far as I have used it, it address the limitations of traditional embedded databases in handling AI/ML workloads. When I say traditional, it typically means those databases management tools which are not aligned with the usage of heavy compuatation that comes with the ML infra.&lt;/p&gt;
+
+&lt;p&gt;TLDR; LanceDB operates on a serverless architecture, meaning storage and compute are separated into two distinct units. This design makes it exceptionally fast for RAG use cases, ensuring fast fetching and retrieval. Additionally, it has some notable advantages – being open source, utilizing its Lance columnar data format built on top of Apache Arrow for high efficiency, persistent storage capabilities, and incorporating its own Disk Approximate Nearest Neighbor search. All these factors collectively make LanceDB an ideal solution for accessing and working with multimodal data. I love you LanceDB ❤️.&lt;/p&gt;
+
+&lt;h3 id=&quot;data-time&quot;&gt;Data time&lt;/h3&gt;
+
+&lt;p&gt;To add some excitement, I’ve crafted a GTA-V Image Captioning dataset, featuring thousands of images, each paired with a descriptive text illustrating the image’s content. Now, when we train our magic box, the expectation is clear – if I ask that box to provide me an image of “road with a stop sign,” it should deliver a GTA-V image of a road with a stop sign on it. Otherwise, what’s the point, right?&lt;/p&gt;
+
+&lt;h3 id=&quot;faq&quot;&gt;FAQ&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;We will be using “sentence-transformers/clip-ViT-L-14” to convert our multimodal data into it’s respective embeddings.&lt;/li&gt;
+  &lt;li&gt;LanceDB as our vector database to store the relevant embeddings.&lt;/li&gt;
+  &lt;li&gt;GTA-V Image Captioning dataset for our magic box.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;environment-setup&quot;&gt;Environment Setup&lt;/h3&gt;
+
+&lt;p&gt;I am using a MacBook Air M1, and it’s important to note that some kind of dependencies and configurations may vary depending on the type of system that you are running, so it’s important to take that into account.&lt;/p&gt;
+
+&lt;p&gt;Here are the steps to install the relevant dependencies&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;# Create a virtual environment
+python3 -m venv env
+
+# Activate the virtual environment
+source env/bin/activate
+
+# Upgrade pip in the virtual environment
+pip install --upgrade pip
+
+# Install required dependencies
+pip3 install lancedb clip torch datasets
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;downloading-the-data&quot;&gt;Downloading the Data&lt;/h3&gt;
+&lt;p&gt;Dataset can easily be fetched using the datasets library.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import clip
+import torch
+import os
+from datasets import load_dataset
+
+ds = load_dataset(&quot;vipulmaheshwari/GTA-Image-Captioning-Dataset&quot;)
+device = torch.device(&quot;mps&quot;)
+model, preprocess = clip.load(&quot;ViT-L-14&quot;, device=device)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Downloading the dataset may require some time, so please take a moment to relax while this process completes. Once the download is finished, you can visualize some sample points like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from textwrap import wrap
+import matplotlib.pyplot as plt
+import numpy as np
+
+def plot_images(images, captions):
+    plt.figure(figsize=(15, 7))
+    for i in range(len(images)):
+        ax = plt.subplot(1, len(images), i + 1)
+        caption = captions[i]
+        caption = &quot;\n&quot;.join(wrap(caption, 12))
+        plt.title(caption)
+        plt.imshow(images[i])
+        plt.axis(&quot;off&quot;)
+
+# Assuming ds is a dictionary with &quot;train&quot; key containing a list of samples
+sample_dataset = ds[&quot;train&quot;]
+random_indices = np.random.choice(len(sample_dataset), size=2, replace=False)
+random_indices = [index.item() for index in random_indices]
+
+# Get the random images and their captions
+random_images = [np.array(sample_dataset[index][&quot;image&quot;]) for index in random_indices]
+random_captions = [sample_dataset[index][&quot;text&quot;] for index in random_indices]
+
+# Plot the random images with their captions
+plot_images(random_images, random_captions)
+
+# Show the plot
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;-&amp;gt; images with the captions&lt;/p&gt;
+
+&lt;h3 id=&quot;storing-the-embeddings&quot;&gt;Storing the Embeddings&lt;/h3&gt;
+
+&lt;p&gt;The dataset consists of two key features: the image and its corresponding descriptive text. Initially, our task is to create a LanceDB table to store the embeddings. This process is straightforward – all you need to do is define the relevant schema. In our case, the columns include “vector” for storing the multimodal embeddings, a “text” column for the descriptive text, and a “label” column for the corresponding IDs.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import pyarrow as pa
+import lancedb
+import tqdm
+
+db = lancedb.connect(&apos;./data/tables&apos;)
+schema = pa.schema(
+  [
+      pa.field(&quot;vector&quot;, pa.list_(pa.float32(), 512)),
+      pa.field(&quot;text&quot;, pa.string()),
+      pa.field(&quot;id&quot;, pa.int32())
+  ])
+tbl = db.create_table(&quot;gta_data&quot;, schema=schema, mode=&quot;overwrite&quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Executing this will generate a table with the specified schema, and it’s ready to store the embeddings along with the relevant columns. It’s as straightforward as that – almost too easy!&lt;/p&gt;
+
+&lt;h3 id=&quot;encode-the-images&quot;&gt;Encode the Images&lt;/h3&gt;
+
+&lt;p&gt;Now, we’ll simply take the images from the dataset, feed them into an encoding function that leverages our Multimodal Embedding model, and generate the corresponding embeddings. These embeddings will then be stored in the database.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;def embed_image(img):
+    processed_image = preprocess(img)
+    unsqueezed_image = processed_image.unsqueeze(0).to(device)
+    embeddings = model.encode_image(unsqueezed_image)
+    
+    # Detach, move to CPU, convert to numpy array, and extract the first element as a list
+    result = embeddings.detach().cpu().numpy()[0].tolist()
+    return result
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So our &lt;code&gt;embed_image&lt;/code&gt; function takes an input image, prepocesses it through our CLIP model preprocessor, encode the preprocessed image and returns a list representing the embeddings of that image. This returned embedding serves as a concise numerical representation, capturing all the key features and patterns within the image for downstream tasks or analysis. The next thing is to call this function for all the images and store the relevant embeddings in the database.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;data = []
+for i in range(len(ds[&quot;train&quot;])):
+    img = ds[&quot;train&quot;][i][&apos;image&apos;]
+    text = ds[&quot;train&quot;][i][&apos;text&apos;]
+    
+    # Encode the image
+    encoded_img = embed_image(img)
+    data.append({&quot;vector&quot;: encoded_img, &quot;text&quot;: text, &quot;id&quot; : i})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here, we’re just taking a list, adding the numeric embeddings, reference text and the current index id to it. All that’s left is to include this list in our LanceDB table. And voila, our datalake for the embeddings is set up and good to go!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;tbl.add(data)
+tbl.to_pandas()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Up until now, we’ve efficiently converted the images into their respective multimodal embeddings and stored them in the LanceDB table. Now the LanceDB tables offer a convenient feature: if there’s a need to add or remove images, it’s remarkably straightforward. Just encode the new image and add it, following to the same steps we followed for the previous images.&lt;/p&gt;
+
+&lt;h3 id=&quot;query-search&quot;&gt;Query search&lt;/h3&gt;
+
+&lt;p&gt;Our next move is to embed our text query using the same multimodal embedding model we used for our images. Remember that “box” I mentioned earlier? Essentially, we want this box to create embeddings for both our images and our texts which ensures that the representation of different types of data happens in the same way. Following this, we just need to initiate a search to find the nearest image embeddings that matches our text query.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;
+def embed_txt(txt):
+    tokenized_text = clip.tokenize([txt]).to(device)
+    embeddings = model.encode_text(tokenized_text)
+    
+    # Detach, move to CPU, convert to numpy array, and extract the first element as a list
+    result = embeddings.detach().cpu().numpy()[0].tolist()
+    return result
+
+res = tbl.search(embed_txt(&quot;a road with a stop&quot;)).limit(3).to_pandas()
+res
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-txt&quot;&gt;0 | [0.064575195, .. ] | there is a stop sign...| 569 |	131.995728
+1 | [-0.07989502, .. ] | there is a bus that... | 423 | 135.047852
+2 | [0.06756592, .. ]  | amazing view of a ...	| 30  | 135.309937
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let’s slow down a bit and understand what just happened. Putting simply, the code snippet executes a search algorithm in it’s core to pinpoint the most relevant image embedding that align with our text query. The resulting output, as showcased above, give us the embeddings which closely resembles to our text query.  In the result, the second column presents the embedding vector, while the third column contains the description of the image that closely matches our text query. Essentially, we’ve determined which image is closely corresponds to our text query by examining the embeddings of both our text query and the image.&lt;/p&gt;
+
+&lt;h3 id=&quot;its-as-much-as-similiar-to-saying-if-these-numbers-represents-the-word-cat-i-spot-an-image-with-a-similar-set-of-numbers-so-most-likely-its-a-match-for-an-image-of-a-cat-&quot;&gt;It’s as much as similiar to saying, If these numbers represents the word “Cat”, I spot an image with a similar set of numbers, so most likely it’s a match for an image of a “Cat”. 😺&lt;/h3&gt;
+
+&lt;p&gt;If you are looking for the explanation of how the search happens, I will write a detailed explanation in the coming write ups because it’s so exciting to look under the hood and see how the searching happens. Essentially there is something called Approximate Nearest Neighbors (ANN) which is a technique used to efficiently find the closest points in high-dimensional spaces. ANN is extensively used in data mining, machine learning, computer vision and NLP use cases. So when we passed our embedded text query to the searching algorithm and asked it to give us the closest sample point in the vector space, it used a type of ANN algorithm to get it for us. Specifically LanceDB utilizes DANN (Deep Approximate Nearest Neighbor) for searching the relevant embeddings within its ecosystem..&lt;/p&gt;
+
+&lt;p&gt;So we have 5 columns for our result, first is just an index number, second is the embedding vector, third is the description of the image that matches our text query, fourth is the label of the image but I would like to have your attention on the last column. It’s called Distance. So when I talked about the ANN algorithm, it essentially draws a line between the current data point which is in our case the embedding of our text query and find out which image data point is closest to ours. So when you notice the other data points from the results have more distance as compared to the top one, that means they are a little bit further away than the top one. How the distance is calculated is the part of the algorithm itself.&lt;/p&gt;
+
+&lt;p&gt;In our results, we have five columns. The first is the index number, the second is the embedding vector, the third is the description of the image matching our text query, and the fourth is the label of the image. However, let’s focus on the last column – Distance. When I mentioned the ANN algorithm, it simply draws a line between the current data point (in our case, the embedding of our text query) and identifies which data point (image) is closest to it. If you observe that the other data points in the results have a greater distance compared to the top one, it indicates they are a bit further away or more unrelated to our query. Just to make it clear, the calculation of distance is a part of the algorithm itself.&lt;/p&gt;
+
+&lt;h2 id=&quot;d-day&quot;&gt;D-DAY&lt;/h2&gt;
+
+&lt;p&gt;Now that we have all the necessary information, displaying the most relevant image for our query is straightforward. Simply take the relevant label of the top-matched embedding vector and showcase the corresponding image.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;data_id = int(res[&apos;id&apos;][0])
+display(ds[&quot;train&quot;][data_id][&apos;image&apos;])
+print(ds[&quot;train&quot;][data_id][&apos;text&apos;])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;-&amp;gt; image&lt;/p&gt;
+
+&lt;p&gt;oh boy!!&lt;/p&gt;
+
+&lt;h3 id=&quot;whats-next&quot;&gt;What’s next?&lt;/h3&gt;
+
+&lt;p&gt;To make things more interesting, I’m currently working on creating an extensive GTA-V captioning dataset. This dataset will include a larger number of images paired with their respective reference text, providing us with a richer set of queries to explore and experiment with.. Nevertheless, there’s always room for refining the model. We can explore creating a customized CLIP model, adjusting various parameters. Increasing the number of training epochs may afford the model more time to grasp the relevance between embeddings. Additionally, there’s an impressive multimodal embedding model developed by the Meta known as &lt;a href=&quot;https://imagebind.metademolab.com/&quot;&gt;ImageBind&lt;/a&gt;. We can consider trying ImageBind as an alternative to our current multimodal embedding model and compare the outcomes. With numerous options available, the fundamental concept behind the Multimodal RAG workflow remains largely consistent.&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>Create LLM apps using RAG</title>
@@ -82,6 +326,9 @@
   &lt;/li&gt;
   &lt;li&gt;
     &lt;p&gt;For our models, we’ll need two key components: a LLM (Large Language Model) and an embedding model. While paid sources like OpenAI offer these, we’ll be utilizing open-source models to ensure accessibility for everyone.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Now we need a Vector Database to store our embeddings, For that task, we’ve got &lt;a href=&quot;https://lancedb.com/&quot;&gt;LanceDB&lt;/a&gt;– it’s like a super-smart data lake for handling lots of information. It’s a top-notch vector database, making it the go-to choice for dealing with complex data like vector embeddings.. And the best part? It won’t burn a dent in your pocket because it’s open source and free to use!!&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
     &lt;p&gt;To keep things simple, our data ingestion process will involve using a URL and some PDFs. While you can incorporate additional data sources if needed, we’ll concentrate solely on these two for now.&lt;/p&gt;
@@ -197,9 +444,13 @@ len(embeddings.embed_documents([query])[0])
 
 &lt;p&gt;We have the embeddings for our chunks, now we need a vector database to store them.&lt;/p&gt;
 
-&lt;p&gt;When it comes to vector databases, there are plenty of options out there. Databases like Pinecone are paid but offer fast performance and extra features compared to open-source alternatives like FAISS or Chroma. However, if you don’t need to scale your database to handle hundreds of users fetching and storing data every minute, open-source options are more than enough. Instead, they work really well. But for making things spiced up, I have used LanceDB vector database, it’s Open sourced like FAISS and Chroma and works for almost all the multi-modal use cases..&lt;/p&gt;
+&lt;p&gt;When it comes to vector databases, there are plenty of options out there suiting various needs. Databases like Pinecone offer adequate performance and advanced features but come with a hefty price tag. On the other hand, open-source alternatives like FAISS or Chroma may lack some extras but are more than sufficient for those not who don’t requires extensive scalability.&lt;/p&gt;
 
-&lt;p&gt;We’ll create an instance of LanceDB vector database by calling &lt;code&gt;lancedb.connect(&quot;lance_database&quot;)&lt;/code&gt;. This line essentially sets up a connection to the LanceDB database named “lance_database.” Next, we create a table within the database named “rag_sample” using the create_table function. Now we initialzed this table with a single data entry which includes a numeric vector generated by the embed_query function. So text “Hello World” is first converted to it’s numeric representation (fancy name of embeddings) and then it’s mapped to &lt;code&gt;id&lt;/code&gt; number 1. Like a key-value pair. Lastly, the mode=”overwrite” parameter ensures that if the table “rag_sample” already exists, it will be overwritten with the new data.&lt;/p&gt;
+&lt;p&gt;But wait, I am dropping a bomb here, I’ve recently come across LanceDB, So it’s an open-source vector database similar to FAISS and Chroma. What makes LanceDB stand out is not just it’s open-source nature but its unparalleled scalability. In fact, after a closer look, I realized that I haven’t done justice in highlighting the true value propositions of LanceDB earlier!!&lt;/p&gt;
+
+&lt;p&gt;Surprisingly, LanceDB is the most scalable vector database available, outperforming even the likes of Pinecone, Chroma, Qdrant, and others. Scaling up to a billion vectors locally on your laptop is a feat only achievable with LanceDB. I mean this capability is a game-changer, especially when you compare it to other vector databases struggling even with a hundred million vectors. What’s more mind blowing is that LanceDB manages to offer this unprecedented scalability at a fraction of cost, I mean they are offering the utilities and database tools at much cheaper rates than its closest counterparts.&lt;/p&gt;
+
+&lt;p&gt;So now, We’ll create an instance of LanceDB vector database by calling &lt;code&gt;lancedb.connect(&quot;lance_database&quot;)&lt;/code&gt;. This line essentially sets up a connection to the LanceDB database named “lance_database.” Next, we create a table within the database named “rag_sample” using the create_table function. Now we initialzed this table with a single data entry which includes a numeric vector generated by the embed_query function. So text “Hello World” is first converted to it’s numeric representation (fancy name of embeddings) and then it’s mapped to &lt;code&gt;id&lt;/code&gt; number 1. Like a key-value pair. Lastly, the mode=”overwrite” parameter ensures that if the table “rag_sample” already exists, it will be overwritten with the new data.&lt;/p&gt;
 
 &lt;p&gt;This happens with all the text chunks and it’s quite straightforward. This is how it looks in Python..&lt;/p&gt;
 
@@ -512,7 +763,7 @@ Execution Timings:
 &lt;p&gt;Have fun experimenting with various data sources! You can try changing the website addresses, adding new PDF files or maybe change the template a bit. LLMs are fun, you never know what you get!&lt;/p&gt;
 
 &lt;h3 id=&quot;whats-next&quot;&gt;What’s next?&lt;/h3&gt;
-&lt;p&gt;There are plenty of things we can adjust here. We could switch to a more effective embedding model for better indexing, try different searching techniques for the retriever, add a reranker to improve the ranking of documents, or use a more advanced LLM with a larger context window and faster response times. Essentially, every RAG application is just an enhanced version based on these factors. However, the fundamental concept of how RAG applications function always stays the same.&lt;/p&gt;
+&lt;p&gt;There are plenty of things we can adjust here. We could switch to a more effective embedding model for better indexing, try different searching techniques for the retriever, add a reranker to improve the ranking of documents, or use a more advanced LLM with a larger context window and faster response times. Essentially, every RAG application is just an enhanced version based on these factors. However, the fundamental concept of how a RAG application works always remains the same.&lt;/p&gt;
 
 &lt;p&gt;Here is the &lt;a href=&quot;https://colab.research.google.com/drive/1YsOfovVdNPBwCDMWHvLfOaNtqXn4qXTs?usp=sharing&quot;&gt;collab&lt;/a&gt; link for the reference..&lt;/p&gt;
 </content>
