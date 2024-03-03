@@ -4,7 +4,7 @@ title: Multimodal RAG applications
 description: Multimodal RAG applications using lanceDB
 summary: This blog post shows how you can create RAG applications on the multimodal scale
 tags: [LLM,  Deep Learning]
-version: draft
+version: Draft
 release: 03-03-2024
 ---
 
