@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-03-03T19:51:24+05:30</updated>
+ <updated>2024-03-03T20:01:10+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -31,7 +31,7 @@
 
 &lt;p&gt;Let’s think of the text components for now, so we are currently aiming that our model should learn that words like “Dog” and “Cat” are closely linked to the word “Pet.” Now this understanding is easily achievable by using an embedding model which will convert these text words into their respective embeddings first and then the model is trained to follow a straightforward logic: if words are related, they are close together in the vector space, if not, they would be separated by the adequate distance.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;&quot; alt=&quot;embeddings&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/embeddings.png?raw=true&quot; alt=&quot;embeddings&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;But to help a model recognize that an image of a “Cat” and the word “Cat” are similar, we rely on Multimodal Embeddings. To simplify things a bit, imagine there is a magic box which is capable of handling various inputs – images, audios, text, and more.&lt;/p&gt;
 
@@ -53,7 +53,7 @@
 
 &lt;p&gt;Now the question is, What exactly was that box doing? The magic it performs is known as Contrastive Learning. While the term might sound complex, it’s not that tricky. To simplify, consider a dataset with images, along with a caption describing what the image represents.&lt;/p&gt;
 
-&lt;p&gt;-&amp;gt; some images of the dogs, cats, pets with their names in the captions&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/clipmodel.png?raw=true&quot; alt=&quot;clipmodel&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Alright, now what happens is: we give our text-image model with these Positive and Negative samples, where each sample consists of an image and a descriptive text. Positive samples are those where the image and text are correctly align – for instance, a picture of a cat matched with the text “this is an image of a cat.” Conversely, negative samples involve a mismatch, like presenting an image of a dog alongside the text “this is an image of a cat.”&lt;/p&gt;
 
@@ -61,7 +61,7 @@
 
 &lt;p&gt;See, it’s easy.&lt;/p&gt;
 
-&lt;p&gt;-&amp;gt; a meme here showing tantanta&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/easy.png?raw=true&quot; alt=&quot;easy&quot; /&gt;)&lt;/p&gt;
 
 &lt;h3 id=&quot;show-time&quot;&gt;Show time&lt;/h3&gt;
 
@@ -150,6 +150,8 @@ plot_images(random_images, random_captions)
 # Show the plot
 plt.show()
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/output3.png?raw=true&quot; alt=&quot;output3&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;storing-the-embeddings&quot;&gt;Storing the Embeddings&lt;/h3&gt;
 
@@ -246,13 +248,15 @@ display(ds[&quot;train&quot;][data_id][&apos;image&apos;])
 print(ds[&quot;train&quot;][data_id][&apos;text&apos;])
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;-&amp;gt;image&lt;/p&gt;
-
-&lt;p&gt;oh boy!!&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/output_final.png?raw=true&quot; alt=&quot;output_final&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;whats-next&quot;&gt;What’s next?&lt;/h3&gt;
 
 &lt;p&gt;To make things more interesting, I’m currently working on creating an extensive GTA-V captioning dataset. This dataset will include a larger number of images paired with their respective reference text, providing us with a richer set of queries to explore and experiment with.. Nevertheless, there’s always room for refining the model. We can explore creating a customized CLIP model, adjusting various parameters. Increasing the number of training epochs may afford the model more time to grasp the relevance between embeddings. Additionally, there’s an impressive multimodal embedding model developed by the Meta known as &lt;a href=&quot;https://imagebind.metademolab.com/&quot;&gt;ImageBind&lt;/a&gt;. We can consider trying ImageBind as an alternative to our current multimodal embedding model and compare the outcomes. With numerous options available, the fundamental concept behind the Multimodal RAG workflow remains largely consistent.&lt;/p&gt;
+
+&lt;p&gt;This is how it all looks in one frame..&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/multimodalrag.png?raw=true&quot; alt=&quot;multimodal_rag&quot; /&gt;&lt;/p&gt;
 </content>
  </entry>
  
