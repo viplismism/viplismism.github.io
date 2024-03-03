@@ -4,13 +4,13 @@ title: Multimodal RAG applications
 description: Multimodal RAG applications using lanceDB
 summary: This blog post shows how you can create RAG applications on the multimodal scale
 tags: [LLM,  Deep Learning]
-version: Released
+version: draft
 release: 03-03-2024
 ---
 
 *Artificial Intelligence (AI) has been actively working with text for quite some time, but the world isn't solely centered around words. If you take a moment to look around, you'll find a mix of text, images, videos, audios, and their combinations.*
 
--> sketch
+![boomer_ai](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/Renevant%20Cheetah-66.jpg?raw=true)
 
 Today we are going to work on Multimodality which is basically a concept that essentially empowers AI models with the capacity to perceive, listen, and comprehend data in diverse formats together with the text. Pretty much like how we do!
 
@@ -21,6 +21,8 @@ But the challenge here is to make a computer understands one data format with it
 ### Cat is equal to Cat
 
 Let's think of the text components for now, so we are currently aiming that our model should learn that words like "Dog" and "Cat" are closely linked to the word "Pet." Now this understanding is easily achievable by using an embedding model which will convert these text words into their respective embeddings first and then the model is trained to follow a straightforward logic: if words are related, they are close together in the vector space, if not, they would be separated by the adequate distance.
+
+![embeddings]()
 
 But to help a model recognize that an image of a "Cat" and the word "Cat" are similar, we rely on Multimodal Embeddings. To simplify things a bit, imagine there is a magic box which is capable of handling various inputs – images, audios, text, and more.
 
