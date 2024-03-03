@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-03-03T20:01:10+05:30</updated>
+ <updated>2024-03-03T20:05:15+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -59,9 +59,7 @@
 
 &lt;p&gt;Now we train our text-image model to recognize that positive samples offer accurate interpretations, while negative samples are misleading and should be disregarded during training. In formal terms this technique is called “CLIP” (Contrastive Language-Image Pre-training) introduced by OpenAI where authors trained an image-text model on something around 400 million image caption pairs taken from the interent and everytime model makes a mistake, the contrasive loss function increases and penalize it to make sure the model trains well. The same kind of principles are applied to the other modality combinations as well, so voice of cat with the word cat is positive sample for speech-text model, a video of cat with the descriptive text “this is a cat” is a positive sample for video-text model.&lt;/p&gt;
 
-&lt;p&gt;See, it’s easy.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/easy.png?raw=true&quot; alt=&quot;easy&quot; /&gt;)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/easy.png?raw=true&quot; alt=&quot;easy&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;show-time&quot;&gt;Show time&lt;/h3&gt;
 

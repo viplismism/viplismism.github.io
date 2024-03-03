@@ -50,9 +50,7 @@ Alright, now what happens is: we give our text-image model with these Positive a
 
 Now we train our text-image model to recognize that positive samples offer accurate interpretations, while negative samples are misleading and should be disregarded during training. In formal terms this technique is called "CLIP" (Contrastive Language-Image Pre-training) introduced by OpenAI where authors trained an image-text model on something around 400 million image caption pairs taken from the interent and everytime model makes a mistake, the contrasive loss function increases and penalize it to make sure the model trains well. The same kind of principles are applied to the other modality combinations as well, so voice of cat with the word cat is positive sample for speech-text model, a video of cat with the descriptive text "this is a cat" is a positive sample for video-text model. 
 
-See, it's easy.
-
-![easy](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/easy.png?raw=true))
+![easy](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/easy.png?raw=true)
 
 ### Show time
 
