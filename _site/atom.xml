@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-03-03T20:05:15+05:30</updated>
+ <updated>2024-03-03T20:40:59+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -80,7 +80,7 @@
 &lt;h3 id=&quot;faq&quot;&gt;FAQ&lt;/h3&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;We will be using “sentence-transformers/clip-ViT-L-14” to convert our multimodal data into it’s respective embeddings.&lt;/li&gt;
+  &lt;li&gt;We will be using “ViT-L/14” to convert our multimodal data into it’s respective embeddings.&lt;/li&gt;
   &lt;li&gt;LanceDB as our vector database to store the relevant embeddings.&lt;/li&gt;
   &lt;li&gt;GTA-V Image Captioning dataset for our magic box.&lt;/li&gt;
 &lt;/ol&gt;
@@ -101,8 +101,11 @@ source env/bin/activate
 pip install --upgrade pip
 
 # Install required dependencies
-pip3 install lancedb clip torch datasets
+pip3 install lancedb clip torch datasets pillow 
+pip3 install git+https://github.com/openai/CLIP.git
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And don’t forget to get your access token from the hugging face to download the data.&lt;/p&gt;
 
 &lt;h3 id=&quot;downloading-the-data&quot;&gt;Downloading the Data&lt;/h3&gt;
 &lt;p&gt;Dataset can easily be fetched using the datasets library.&lt;/p&gt;
@@ -252,7 +255,7 @@ print(ds[&quot;train&quot;][data_id][&apos;text&apos;])
 
 &lt;p&gt;To make things more interesting, I’m currently working on creating an extensive GTA-V captioning dataset. This dataset will include a larger number of images paired with their respective reference text, providing us with a richer set of queries to explore and experiment with.. Nevertheless, there’s always room for refining the model. We can explore creating a customized CLIP model, adjusting various parameters. Increasing the number of training epochs may afford the model more time to grasp the relevance between embeddings. Additionally, there’s an impressive multimodal embedding model developed by the Meta known as &lt;a href=&quot;https://imagebind.metademolab.com/&quot;&gt;ImageBind&lt;/a&gt;. We can consider trying ImageBind as an alternative to our current multimodal embedding model and compare the outcomes. With numerous options available, the fundamental concept behind the Multimodal RAG workflow remains largely consistent.&lt;/p&gt;
 
-&lt;p&gt;This is how it all looks in one frame..&lt;/p&gt;
+&lt;p&gt;Here’s how everything comes together in one frame and this is the &lt;a href=&quot;https://colab.research.google.com/drive/1LM-WrDSBXpiMZ94CtaMCaGHlkxqGR6WK?usp=sharing&quot;&gt;Collab&lt;/a&gt; for your reference&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/multimodalrag.png?raw=true&quot; alt=&quot;multimodal_rag&quot; /&gt;&lt;/p&gt;
 </content>

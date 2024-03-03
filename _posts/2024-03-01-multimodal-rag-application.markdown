@@ -70,7 +70,7 @@ To add some excitement, I've crafted a GTA-V Image Captioning dataset, featuring
 
 ### FAQ
 
-1. We will be using "sentence-transformers/clip-ViT-L-14" to convert our multimodal data into it's respective embeddings.
+1. We will be using "ViT-L/14" to convert our multimodal data into it's respective embeddings.
 2. LanceDB as our vector database to store the relevant embeddings.
 3. GTA-V Image Captioning dataset for our magic box.
 
@@ -91,8 +91,11 @@ source env/bin/activate
 pip install --upgrade pip
 
 # Install required dependencies
-pip3 install lancedb clip torch datasets
+pip3 install lancedb clip torch datasets pillow 
+pip3 install git+https://github.com/openai/CLIP.git
 ```
+
+And don't forget to get your access token from the hugging face to download the data.
 
 ### Downloading the Data
 Dataset can easily be fetched using the datasets library.
@@ -251,6 +254,6 @@ print(ds["train"][data_id]['text'])
 
 To make things more interesting, I'm currently working on creating an extensive GTA-V captioning dataset. This dataset will include a larger number of images paired with their respective reference text, providing us with a richer set of queries to explore and experiment with.. Nevertheless, there's always room for refining the model. We can explore creating a customized CLIP model, adjusting various parameters. Increasing the number of training epochs may afford the model more time to grasp the relevance between embeddings. Additionally, there's an impressive multimodal embedding model developed by the Meta known as [ImageBind](https://imagebind.metademolab.com/). We can consider trying ImageBind as an alternative to our current multimodal embedding model and compare the outcomes. With numerous options available, the fundamental concept behind the Multimodal RAG workflow remains largely consistent.
 
-This is how it all looks in one frame..
+Here's how everything comes together in one frame and this is the [Collab](https://colab.research.google.com/drive/1LM-WrDSBXpiMZ94CtaMCaGHlkxqGR6WK?usp=sharing) for your reference
 
 ![multimodal_rag](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/multimodalrag.png?raw=true)
