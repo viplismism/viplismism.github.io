@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-03-03T20:43:00+05:30</updated>
+ <updated>2024-03-03T21:07:44+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -63,7 +63,7 @@
 
 &lt;h3 id=&quot;show-time&quot;&gt;Show time&lt;/h3&gt;
 
-&lt;p&gt;Well you don’t have to build that box from scratch because folks have already done it for us. There’s a Multimodal embedding model, like the “clip-ViT-L-14” from Sentence Transformers, available on Hugging Face. This model can handle various data types, including text, images, videos, audios, and even thermal and gyroscope data. Now, onto the next question: how do we store those embeddings?&lt;/p&gt;
+&lt;p&gt;Well you don’t have to build that box from scratch because folks have already done it for us. There’s a Multimodal embedding model, like the “ViT-L/14” from OpenAI. This model can handle various data types, including text, images, videos, audios, and even thermal and gyroscope data. Now, onto the next question: how do we store those embeddings?&lt;/p&gt;
 
 &lt;p&gt;For that we’ll need a vector database that can efficiently fetch, query, and retrieve relevant embeddings for us,  ideally one that supports multimodal data and doesn’t burn a hole in our wallets. That’s where LanceDB comes into play.&lt;/p&gt;
 

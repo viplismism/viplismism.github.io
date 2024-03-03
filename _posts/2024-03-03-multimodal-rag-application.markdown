@@ -54,7 +54,7 @@ Now we train our text-image model to recognize that positive samples offer accur
 
 ### Show time
 
-Well you don't have to build that box from scratch because folks have already done it for us. There's a Multimodal embedding model, like the "clip-ViT-L-14" from Sentence Transformers, available on Hugging Face. This model can handle various data types, including text, images, videos, audios, and even thermal and gyroscope data. Now, onto the next question: how do we store those embeddings? 
+Well you don't have to build that box from scratch because folks have already done it for us. There's a Multimodal embedding model, like the "ViT-L/14" from OpenAI. This model can handle various data types, including text, images, videos, audios, and even thermal and gyroscope data. Now, onto the next question: how do we store those embeddings? 
 
 For that we'll need a vector database that can efficiently fetch, query, and retrieve relevant embeddings for us,  ideally one that supports multimodal data and doesn't burn a hole in our wallets. That's where LanceDB comes into play.
 
