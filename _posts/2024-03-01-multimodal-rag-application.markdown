@@ -143,8 +143,6 @@ plot_images(random_images, random_captions)
 plt.show()
 ```
 
--> images with the captions
-
 ### Storing the Embeddings
 
 The dataset consists of two key features: the image and its corresponding descriptive text. Initially, our task is to create a LanceDB table to store the embeddings. This process is straightforward – all you need to do is define the relevant schema. In our case, the columns include "vector" for storing the multimodal embeddings, a "text" column for the descriptive text, and a "label" column for the corresponding IDs.
@@ -247,7 +245,7 @@ display(ds["train"][data_id]['image'])
 print(ds["train"][data_id]['text'])
 ```
 
--> image
+->image
 
 oh boy!!
 
