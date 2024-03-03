@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-03-03T20:40:59+05:30</updated>
+ <updated>2024-03-03T20:43:00+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -14,9 +14,9 @@
  
  <entry>
    <title>Multimodal RAG applications</title>
-   <link href="http://localhost:4000/2024/03/01/multimodal-rag-application"/>
-   <updated>2024-03-01T00:00:00+05:30</updated>
-   <id>http://localhost:4000/2024/03/01/multimodal-rag-application</id>
+   <link href="http://localhost:4000/2024/03/03/multimodal-rag-application"/>
+   <updated>2024-03-03T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2024/03/03/multimodal-rag-application</id>
    <content type="html">&lt;p&gt;&lt;em&gt;Artificial Intelligence (AI) has been actively working with text for quite some time, but the world isn’t solely centered around words. If you take a moment to look around, you’ll find a mix of text, images, videos, audios, and their combinations.&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/Renevant%20Cheetah-66.jpg?raw=true&quot; alt=&quot;boomer_ai&quot; /&gt;&lt;/p&gt;
@@ -250,6 +250,8 @@ print(ds[&quot;train&quot;][data_id][&apos;text&apos;])
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/output_final.png?raw=true&quot; alt=&quot;output_final&quot; /&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;there is a truck driving down a street with a stop sign
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&quot;whats-next&quot;&gt;What’s next?&lt;/h3&gt;
 

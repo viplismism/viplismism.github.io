@@ -249,6 +249,9 @@ print(ds["train"][data_id]['text'])
 ```
 
 ![output_final](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/output_final.png?raw=true)
+```python
+there is a truck driving down a street with a stop sign
+```
 
 ### What’s next?
 
