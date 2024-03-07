@@ -3,7 +3,7 @@ layout: page
 title: Contact
 ---
 
-Cuss words, feedback, collaborations—anything, just shoot! I am all ears!
+Cuss words, feedback, collaborations, freelancing, gigs—anything, just shoot! I am all ears!
 
 - [Email](mailto:vipulmaheshwari.deogarh@gmail.com)
   
