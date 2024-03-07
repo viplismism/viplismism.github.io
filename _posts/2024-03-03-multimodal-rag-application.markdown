@@ -14,9 +14,9 @@ release: 03-03-2024
 
 Today we are going to work on Multimodality which is basically a concept that essentially empowers AI models with the capacity to perceive, listen, and comprehend data in diverse formats together with the text. Pretty much like how we do!
 
-In an ideal situation, we should be able to mix different types of data together and show them to a generative AI model at the same time and iterate on it. It could be as simple as telling the AI model, "Hey, a few days ago, I sent you a picture of a brown, short dog. Can you find that picture for me?" and the model should then give us the details of that picture. Basically, we want the AI to understand the things more like how we humans do,  becoming really good at handling and responding to all kinds of information.
+In an ideal situation, we should be able to mix different types of data together and show them to a generative AI model at the same time and iterate on it. It could be as simple as telling the AI model, "Hey, a few days ago, I sent you a picture of a brown, short dog. Can you find that picture for me?" and the model should then give us the details of that picture. Basically, we want the AI to understand things more like how we humans do,  becoming really good at handling and responding to all kinds of information.
 
-But the challenge here is to make a computer understands one data format with it's related reference, and that could be a mix of text, audio, thermal imagery, and videos. Now to make this happen, we use something called Embeddings. It's really a numeric vector which contains a bunch of numbers written together that might not mean much to us but understood by machines very well. 
+But the challenge here is to make a computer understand one data format with its related reference, and that could be a mix of text, audio, thermal imagery, and videos. Now to make this happen, we use something called Embeddings. It's really a numeric vector which contains a bunch of numbers written together that might not mean much to us but are understood by machines very well.
 
 ### Cat is equal to Cat
 
@@ -26,29 +26,29 @@ Let's think of the text components for now, so we are currently aiming that our 
 
 But to help a model recognize that an image of a "Cat" and the word "Cat" are similar, we rely on Multimodal Embeddings. To simplify things a bit, imagine there is a magic box which is capable of handling various inputs – images, audios, text, and more.
 
-Now, when we feed the box with an image of a "Cat" with the text "Cat," it performs its magic and produces two numeric vectors. When these two vectors were given to a machines, it made machines to think, "Hmm, based on these numeric values, it seems like both are connected to "Cat". So that's exactly what we were aiming for! Our goal was to help machines to recognize the close connection between an image of a "Cat" and the text "Cat". However, to validate this concept, when we plot those two numeric vectors in a vector space, it turns out they are very close to each other. This outcome exactly mirrors what we observed earlier with the proximity of the two text words "Cat" and "Dog" in the vector space. 
-
+Now, when we feed the box with an image of a "Cat" with the text "Cat," it performs its magic and produces two numeric vectors. When these two vectors were given to a machine, it made machines think, "Hmm, based on these numeric values, it seems like both are connected to "Cat". So that's exactly what we were aiming for! Our goal was to help machines to recognize the close connection between an image of a "Cat" and the text "Cat". However, to validate this concept, when we plot those two numeric vectors in a vector space, it turns out they are very close to each other. This outcome exactly mirrors what we observed earlier with the proximity of the two text words "Cat" and "Dog" in the vector space.
+ 
 ## Ladies and gentlemen, that's the essence of Multimodality. 👏
 
 So we made our model to comprehend the association between "Cat" images and the word "Cat." Well this is it, I mean if you are able to do this, you would have ingested the audio, images, videos as well as the word "Cat" and the model will understand how the cat is being portrayed across all kinds of file format..
 
 ### RAG is here..
 
-Well if you don't know what RAG means, I would highly advise to read this article [here](https://vipul-maheshwari.github.io/2024/02/14/rag-application-with-langchain) which I wrote some days back and loved by ton of people, not exageerating it but yeah, it's good to get the balls rolling..
+Well if you don't know what RAG means, I would highly advise you to read this article [here](https://vipul-maheshwari.github.io/2024/02/14/rag-application-with-langchain) which I wrote some days back and loved by tons of people, not exaggerating it but yeah, it's good to get the balls rolling..
 
-So there are impressive models like DALLE-2 that provide text-to-image functionality. Essentially, you input text, and the model generates relevant images for you. But can we create a system similar to Multimodal RAG, where the model produces output images based on our own data? Alright, so the goal for today is to create an AI model that when asked something like, "How many girls were there in my party?" 💀 not only provides textual information but also includes a relevant image related to it. Think of it as an extension of simple RAG system, but now incorporating images. 
+So there are impressive models like DALLE-2 that provide text-to-image functionality. Essentially, you input text, and the model generates relevant images for you. But can we create a system similar to Multimodal RAG, where the model produces output images based on our own data? Alright, so the goal for today is to create an AI model that when asked something like, "How many girls were there in my party?" 💀 not only provides textual information but also includes a relevant image related to it. Think of it as an extension of a simple RAG system, but now incorporating images.
 
 Before we dive in, remember that Multimodality isn't limited to just text-to-image or image-to-text as it encompasses the freedom to input and output any type of data. However, for now, let's concentrate on the interaction from image to text exclusively.
 
-### Contrasive learning
+### Contrastive learning
 
-Now the question is, What exactly was that box doing? The magic it performs is known as Contrastive Learning. While the term might sound complex, it's not that tricky. To simplify, consider a dataset with images, along with a caption describing what the image represents. 
+Now the question is, What exactly was that box doing? The magic it performs is known as Contrastive Learning. While the term might sound complex, it's not that tricky. To simplify, consider a dataset with images, along with a caption describing what the image represents.
 
 ![clipmodel](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/clipmodel.png?raw=true)
 
-Alright, now what happens is: we give our text-image model with these Positive and Negative samples, where each sample consists of an image and a descriptive text. Positive samples are those where the image and text are correctly align – for instance, a picture of a cat matched with the text "this is an image of a cat." Conversely, negative samples involve a mismatch, like presenting an image of a dog alongside the text "this is an image of a cat."  
+Alright, now what happens is: we give our text-image model with these Positive and Negative samples, where each sample consists of an image and a descriptive text. Positive samples are those where the image and text are correctly aligned – for instance, a picture of a cat matched with the text "this is an image of a cat." Conversely, negative samples involve a mismatch, like presenting an image of a dog alongside the text "this is an image of a cat."  
 
-Now we train our text-image model to recognize that positive samples offer accurate interpretations, while negative samples are misleading and should be disregarded during training. In formal terms this technique is called "CLIP" (Contrastive Language-Image Pre-training) introduced by OpenAI where authors trained an image-text model on something around 400 million image caption pairs taken from the interent and everytime model makes a mistake, the contrasive loss function increases and penalize it to make sure the model trains well. The same kind of principles are applied to the other modality combinations as well, so voice of cat with the word cat is positive sample for speech-text model, a video of cat with the descriptive text "this is a cat" is a positive sample for video-text model. 
+Now we train our text-image model to recognize that positive samples offer accurate interpretations, while negative samples are misleading and should be disregarded during training. In formal terms this technique is called [CLIP](https://openai.com/research/clip) (Contrastive Language-Image Pre-training) introduced by OpenAI where authors trained an image-text model on something around 400 million image caption pairs taken from the internet and everytime model makes a mistake, the contrastive loss function increases and penalize it to make sure the model trains well. The same kind of principles are applied to the other modality combinations as well, so the voice of cat with the word cat is a positive sample for speech-text model, a video of cat with the descriptive text "this is a cat" is a positive sample for video-text model. 
 
 ![easy](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/easy.png?raw=true)
 
@@ -60,7 +60,7 @@ For that we'll need a vector database that can efficiently fetch, query, and ret
 
 ### Vector database
 
-When we talk about the vector database, there are ton of options available in the current market, but there is something about the LanceDB which makes it stands out as an optimal choice for a vector database, As far as I have used it, it address the limitations of traditional embedded databases in handling AI/ML workloads. When I say traditional, it typically means those databases management tools which are not aligned with the usage of heavy compuatation that comes with the ML infra. 
+When we talk about the vector database, there are ton of options available in the current market, but there is something about the LanceDB which makes it stands out as an optimal choice for a vector database, As far as I have used it, it address the limitations of traditional embedded databases in handling AI/ML workloads. When I say traditional, it typically means those database management tools which are not aligned with the usage of heavy computation that comes with the ML infra.
 
 TLDR; LanceDB operates on a serverless architecture, meaning storage and compute are separated into two distinct units. This design makes it exceptionally fast for RAG use cases, ensuring fast fetching and retrieval. Additionally, it has some notable advantages – being open source, utilizing its Lance columnar data format built on top of Apache Arrow for high efficiency, persistent storage capabilities, and incorporating its own Disk Approximate Nearest Neighbor search. All these factors collectively make LanceDB an ideal solution for accessing and working with multimodal data. I love you LanceDB ❤️.
 
@@ -70,13 +70,13 @@ To add some excitement, I've crafted a GTA-V Image Captioning dataset, featuring
 
 ### FAQ
 
-1. We will be using "ViT-L/14" to convert our multimodal data into it's respective embeddings.
+1. We will be using "ViT-L/14" to convert our multimodal data into its respective embeddings.
 2. LanceDB as our vector database to store the relevant embeddings.
 3. GTA-V Image Captioning dataset for our magic box.
 
 ### Environment Setup
 
-I am using a MacBook Air M1, and it's important to note that some kind of dependencies and configurations may vary depending on the type of system that you are running, so it's important to take that into account.
+I am using a MacBook Air M1, and it's important to note that some kinds of dependencies and configurations may vary depending on the type of system that you are running, so it's important to take that into account.
 
 Here are the steps to install the relevant dependencies
 
@@ -228,15 +228,13 @@ res
 2 | [0.06756592, .. ]  | amazing view of a ...	| 30  | 135.309937
 ```
 
-Let's slow down a bit and understand what just happened. Putting simply, the code snippet executes a search algorithm in it's core to pinpoint the most relevant image embedding that align with our text query. The resulting output, as showcased above, give us the embeddings which closely resembles to our text query.  In the result, the second column presents the embedding vector, while the third column contains the description of the image that closely matches our text query. Essentially, we've determined which image is closely corresponds to our text query by examining the embeddings of both our text query and the image. 
+Let's slow down a bit and understand what just happened. Putting simply, the code snippet executes a search algorithm in its core to pinpoint the most relevant image embedding that aligns with our text query. The resulting output, as showcased above, gives us the embeddings which closely resembles our text query.  In the result, the second column presents the embedding vector, while the third column contains the description of the image that closely matches our text query. Essentially, we've determined which image closely corresponds to our text query by examining the embeddings of both our text query and the image. 
 
-### It's as much as similiar to saying, If these numbers represents the word "Cat", I spot an image with a similar set of numbers, so most likely it's a match for an image of a "Cat". 😺
+### It's similar to saying, If these numbers represent the word "Cat", I spot an image with a similar set of numbers, so most likely it's a match for an image of a "Cat". 😺
 
 If you are looking for the explanation of how the search happens, I will write a detailed explanation in the coming write ups because it's so exciting to look under the hood and see how the searching happens. Essentially there is something called Approximate Nearest Neighbors (ANN) which is a technique used to efficiently find the closest points in high-dimensional spaces. ANN is extensively used in data mining, machine learning, computer vision and NLP use cases. So when we passed our embedded text query to the searching algorithm and asked it to give us the closest sample point in the vector space, it used a type of ANN algorithm to get it for us. Specifically LanceDB utilizes DANN (Deep Approximate Nearest Neighbor) for searching the relevant embeddings within its ecosystem..
 
-So we have 5 columns for our result, first is just an index number, second is the embedding vector, third is the description of the image that matches our text query, fourth is the label of the image but I would like to have your attention on the last column. It's called Distance. So when I talked about the ANN algorithm, it essentially draws a line between the current data point which is in our case the embedding of our text query and find out which image data point is closest to ours. So when you notice the other data points from the results have more distance as compared to the top one, that means they are a little bit further away than the top one. How the distance is calculated is the part of the algorithm itself.
-
-In our results, we have five columns. The first is the index number, the second is the embedding vector, the third is the description of the image matching our text query, and the fourth is the label of the image. However, let's focus on the last column – Distance. When I mentioned the ANN algorithm, it simply draws a line between the current data point (in our case, the embedding of our text query) and identifies which data point (image) is closest to it. If you observe that the other data points in the results have a greater distance compared to the top one, it indicates they are a bit further away or more unrelated to our query. Just to make it clear, the calculation of distance is a part of the algorithm itself.
+In our results, we have five columns. The first is the index number, the second is the embedding vector, the third is the description of the image matching our text query, and the fourth is the label of the image. However, let's focus on the last column – Distance. When I mentioned the ANN algorithm, it simply draws a line between the current data point (in our case, the embedding of our text query) and identifies which data point (image embedding) is closest to it. If you observe that the other data points in the results have a greater distance compared to the top one, it indicates they are a bit further away or more unrelated to our query. Just to make it clear, the calculation of distance is a part of the algorithm itself.
 
 ## D-DAY
 
