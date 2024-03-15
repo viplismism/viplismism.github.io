@@ -1,10 +1,10 @@
 ---
 layout: post
-title: Why LanceDB is shitty
+title: Embedded Databases
 description: How LanceDB is beating ass of every other Embedded Database
 summary: Everything related to the Embedded database
 tags: [LLM, Embedded Databases, LanceDB]
-version: Released
+version: Draft
 release: 15-03-2024
 ---
 
@@ -12,9 +12,7 @@ release: 15-03-2024
 
 In today's world, when everyone's curious about trying out generative AI tools and how they work, you've probably heard about embedded databases. Most of us tend to think about client-server based setups when databases come to mind. And honestly, that's somewhat accurate.
 
-However, client-server architectures aren't really built to handle heavy analytical and ML workloads. Essentially, the processing tasks fall into two main categories: OLTP (online transactional processing) and OLAP (online analytical processing). So, when you're changing your Instagram profile picture or uploading a photo on Facebook, you're essentially involved in OLTP tasks, which focus on quick and easy processing. On the flip side, when we deal with OLAP, it's all about handling complex computations such as retrieving queries from extensive datasets, combining tables, and aggregating data for big data purposes.
-
-Now, we need something that can handle our large ML workloads effectively and perform optimally across datasets ranging from small to large scales.
+However, client-server architectures aren't really built to handle heavy analytical and ML workloads. Essentially, the processing tasks fall into two main categories: OLTP (online transactional processing) and OLAP (online analytical processing). So, when you're changing your Instagram profile picture or uploading a photo on Facebook, you're essentially involved in OLTP tasks, which focus on quick and easy processing. On the flip side, when we deal with OLAP, it's all about handling complex computations such as retrieving queries from extensive datasets, combining tables, and aggregating data for big data purposes. Now, we need something that can handle our large ML workloads effectively and perform optimally across datasets ranging from small to large scales.
 
 ### Columnar Oriented Datastores
 
@@ -42,9 +40,9 @@ This blistering speed comes from clever tricks like zero-copy versioning and opt
 
 ### In-process
 
-Before understanding what Embedded Systems really do, First, we need to understand what a database management system (DBMS) is in Layman. Now in simple terms a DBMS is a software system that allows you to create, manage, and interact with databases (obviously duhh).  
+Before understanding what Embedded Systems really do, First, we need to understand what a database management system (DBMS) is in Layman. Now in simple terms a DBMS is a software system that allows you to create, manage, and interact with databases (obviously duhh). I mean It provides a way to store, retrieve, and manipulate data in an organized and more efficient manner.
 
-I mean It provides a way to store, retrieve, and manipulate data in an organized and more efficient manner.
+![inprocess_setting](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/in_process_setting.png?raw=true)
 
 Now, an embedded database is a type of DBMS that is tightly integrated with the application layer. This means that the database that you are working with is not a separate process or service running on its own; instead, it runs within the same process as the application itself.
 
@@ -68,11 +66,15 @@ And btw, when we are talking about the Serverless model, it is often associated 
 
 ### Scalability
 
+![lancedb_scaled](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/lancedb_scaled.png?raw=true)
+
 Ok so you decided to work on the simple RAG system and wanted to test it out or just maybe play with it and came up with the various vector databases, you did your experiment,  you are happy and done. Now when you got serious and came up with something and wanted to scale your RAG system for let’s say 1 billion embeddings, you open up your earlier setup, ingested more data, created more embeddings and when the time came, your traditional embedding database gave you nightmare in terms of the latency as well as storage capabilities.
 
 Now think of an embedding database which is open source, works for all kinds of setups, scales up to billions of embeddings, fetch the relevant embeddings with amazing searching capabilities and data never leaves your local machine, feels too good to be true right?! Well there is LanceDB again. I mean from the moment you dirty your hands for your next RAG system all upto the time you put something as big as production, LanceDB scales amazingly well… 
 
 ### Multimodality
+
+![multimodality](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/multimodality_in_lancedb.png?raw=true)
 
 The current embedded databases should not only support textual data but also be compatible with various file formats. It's no longer just about text ingestion. Some time ago, I developed a GTA-5 multimodal RAG application that displays the GTA5 landscape upon entering a query. I highly recommend giving it a [read](https://vipul-maheshwari.github.io/2024/03/03/multimodal-rag-application) to understand why the Multimodal RAG system is the new hotshot and why companies are eager to integrate it into their core. Honestly, I haven't come across any embedded vector database other than LanceDB that can effortlessly ingest any kind of file format.
 
@@ -84,8 +86,9 @@ Ok, so we stored the Embeddings, we scaled our RAG too, now for a given query, w
 
 But it's not just about searching guys, it integrates well enough with native Python, JavaScript/TypeScript, Pandas, Pydantic, that means you can easily integrate it with your favorite programming languages, in addition to that, it has direct integrations with cloud storage providers like AWS S3 and Azure Blob Storage. This means that we can directly query data stored on the cloud, without any added ETL steps. 
 
-Woah, I do love LanceDB 
+![grandma_knows](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/grandma_knows.png?raw=true)
 
+Woah, I do love LanceDB 
 ### More or less, we looked at these things right :
 
 1. Columnar Oriented Databases
@@ -97,5 +100,7 @@ Woah, I do love LanceDB
 7. Scalability
 8. Multimodality
 9. Searching and Integrations
+
+![gen_ai_application](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/gen_ai_applications.png?raw=true)
 
 Well all of them are bundled together with no cost upfront, ready to serve in one installation click and voila baby, you have your new best friend, maybe more than that, who knows? So what are you waiting for? Here is the reference, see you soon.
