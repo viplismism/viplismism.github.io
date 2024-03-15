@@ -25,24 +25,23 @@ RAG or Retrieval Augmented Generation uses three main workflows to generate and 
 
 - Information Retrieval: When a user asks a question, the AI system retrieves the relevant data from a well-maintained knowledge library or external sources like databases, articles, APIs, or document repositories. This is achieved by converting the query into a numerical format or vector that can be understood by machines.
 
-- LLM: The retrieved data is then presented to the LLM or Large Language Model, along with the user's query. The LLM uses this new knowledge and its training data to generate the response.
+- LLM:The retrieved data is then presented to the LLM or Large Language Model, along with the user's query. The LLM uses this new knowledge and its training data to generate the response.
 
-- Response: Finally, the LLM generates a response that is more accurate and relevant since it has been augmented with the retrieved information. I mean we gave LLM some additional information from our Knowledge library which allows LLMs to provide more contextually relevant and factual responses, solving the problem of models when they are just hallucinating or providing irrelevant answer.
+- Response: Finally, the LLM generates a response that is more accurate and relevant since it has been augmented with the retrieved information. I mean we gave LLM some additional information from our Knowledge library which allows LLMs to provide more contextually relevant and factual responses, solving the problem of models when they are just hallucinating or providing irrelevant answers.
 
-Let's take the example of company policies again. Suppose you have an HR bot that handles queries related to your Company policies. Now if someones asks anything specific to the policies, The bot can pull the most recent policy documents from the knowledge libray, pass the relevant context to a well crafted prompt which is then passed further to the LLM for generating the response. 
-
-To make it more easy, Imagine a LLM as your knowledgeable friend who seems to know everything, from Geography to Computer Science from Politics to Philosophy. Now, picture yourself asking this friend a few questions:
+Let's take the example of company policies again. Suppose you have an HR bot that handles queries related to your Company policies. Now if someone asks anything specific to the policies, The bot can pull the most recent policy documents from the knowledge library, pass the relevant context to a well crafted prompt which is then passed further to the LLM for generating the response.
+ 
+To make it easier, Imagine a LLM as your knowledgeable friend who seems to know everything, from Geography to Computer Science, from Politics to Philosophy. Now, picture yourself asking this friend a few questions:
 
 - "Who handles my laundry on weekends?"
 - "Who lives next door to me?"
 - "What brand of peanut butter do I prefer?"
 
-Chances are, your friend wouldn't be able to answer these questions. Most of the time, no. But let's say this distant friend becomes closer to you over time, he comes at your place regularly, know your parents very well, you both hangout pretty often, you go on outings, blah blah blah.. You got the point.  
+Chances are, your friend wouldn't be able to answer these questions. Most of the time, no. But let's say this distant friend becomes closer to you over time, he comes to your place regularly, knows your parents very well, you both hangout pretty often, you go on outings, blah blah blah.. You got the point.  
 
-I mean he is gaining access to personal and insider information about you.  Now, when you pose the same questions, he can somehow answer those question with more relevance now because because he is better suited with your personal insights.
+I mean he is gaining access to personal and insider information about you.  Now, when you pose the same questions, he can somehow answer those questions with more relevance now because he is better suited with your personal insights.
 
-Similarly, a LLM, when provided with additional information or access to your data, it won't guess or hallucinate. Instead, it can leverage that access data to provide more relevant and accurate answers. 
-
+Similarly, a LLM, when provided with additional information or access to your data, won't guess or hallucinate. Instead, it can leverage that access data to provide more relevant and accurate answers.
 
 ### To break it down, here are the exact steps to create any RAG application...
 1. Extract the relevant information from your data sources. 
@@ -57,11 +56,11 @@ Similarly, a LLM, when provided with additional information or access to your da
 
 1. We will be using [Langchain](https://python.langchain.com/docs/get_started/introduction) for this task, Basically it's like a wrapper which lets you talk and manage your LLM operations better. Note that the Langchain is updating very fast and some functions and other classes might moved to the different modules. So if something doesn't work, just check if you are importing the libraries from the right sources!
 
-2. Along with it we will be using [Hugging Face](https://huggingface.co/),  it  an open-source library for building, training, and deploying state-of-the-art machine learning models, especially about NLP. To use the HuggingFace we need the access token, Get your access token [here](https://huggingface.co/docs/hub/security-tokens)
+2. Along with it we will be using [Hugging Face](https://huggingface.co/), an open-source library for building, training, and deploying state-of-the-art machine learning models, especially about NLP. To use the HuggingFace we need the access token, Get your access token [here](https://huggingface.co/docs/hub/security-tokens)
 
 3. For our models, we'll need two key components: a LLM (Large Language Model) and an embedding model. While paid sources like OpenAI offer these, we'll be utilizing open-source models to ensure accessibility for everyone.
 
-4. Now we need a Vector Database to store our embeddings, For that task, we've got [LanceDB](https://lancedb.com/)– it's like a super-smart data lake for handling lots of information. It's a top-notch vector database, making it the go-to choice for dealing with complex data like vector embeddings.. And the best part? It won't burn a dent in your pocket because it's open source and free to use!!
+4. Now we need a Vector Database to store our embeddings, For that task, we've got [LanceDB](https://lancedb.com/) – it's like a super-smart data lake for handling lots of information. It's a top-notch vector database, making it the go-to choice for dealing with complex data like vector embeddings.. And the best part? It won't burn a dent in your pocket because it's open source and free to use!!
 
 4. To keep things simple, our data ingestion process will involve using a URL and some PDFs. While you can incorporate additional data sources if needed, we'll concentrate solely on these two for now.
 
@@ -136,7 +135,7 @@ This will ingest all the data from the URL link and the PDFs.
 
 ### Step 2 : Breaking the information into smaller chunks
 
-We've all the necessary data for developing our RAG application. Now, it's time to break down this information into smaller chunks. Later, we'll utilize an embedding model to convert these chunks into their respective embeddings. But why it's important?
+We've all the necessary data for developing our RAG application. Now, it's time to break down this information into smaller chunks. Later, we'll utilize an embedding model to convert these chunks into their respective embeddings. But why is it important?
 
 Think of it like this: If you're tasked with digesting a 100-page book all at once and then asked a specific question about it, it would be challenging to retrieve the necessary information from the entire book to provide an answer. However, if you're permitted to break the book into smaller, manageable chunks—let's say 10 pages each—and each chunk is labeled with an index from 0 to 9, the process becomes much simpler. When the same question is posed after this breakdown, you can easily locate the relevant chunk based on its index and then extract the information needed to answer the question accurately.
 
@@ -149,11 +148,11 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size = 1000, chunk_overlap 
 chunks = text_splitter.split_documents(docs)
 ```
 
-Now the chunk_size parameter specifies the maximum number of characters that a chunk can contain, while the chunk_overlap parameter specifies the number of characters that should overlap between two adjacent chunks. With the chunk_overlap set to 50, the last 50 characters of the adjacent chunks will be shared between each other. 
+Now the chunk_size parameter specifies the maximum number of characters that a chunk can contain, while the chunk_overlap parameter specifies the number of characters that should overlap between two adjacent chunks. With the chunk_overlap set to 50, the last 50 characters of the adjacent chunks will be shared between each other.
 
-This approach helps to prevent important information from being split across two chunks, ensuring that each chunk contains sufficient contextual information of their neighbour chunks for the subsequent processing or analysis. 
+This approach helps to prevent important information from being split across two chunks, ensuring that each chunk contains sufficient contextual information of their neighbor chunks for the subsequent processing or analysis.
 
-Shared information at the boundary of neighboring chunks enables a more seamless transition and understanding of the text's content. The best strategy for choosing the chunk_size and chunk_overlap parameters largely depends on the nature of the documents and the purpose of the application. 
+Shared information at the boundary of neighboring chunks enables a more seamless transition and understanding of the text's content. The best strategy for choosing the chunk_size and chunk_overlap parameters largely depends on the nature of the documents and the purpose of the application.
 
 ### Step 3 : Creating the embeddings and store them into a vectordatabase
 
@@ -180,11 +179,11 @@ len(embeddings.embed_documents([query])[0])
 # 384
 ```
 
-We have the embeddings for our chunks, now we need a vector database to store them. 
+We have the embeddings for our chunks, now we need a vector database to store them.
 
-When it comes to vector databases, there are plenty of options out there suiting various needs. Databases like Pinecone offer adequate performance and advanced features but come with a hefty price tag. On the other hand, open-source alternatives like FAISS or Chroma may lack some extras but are more than sufficient for those not who don't requires extensive scalability.
+When it comes to vector databases, there are plenty of options out there suiting various needs. Databases like Pinecone offer adequate performance and advanced features but come with a hefty price tag. On the other hand, open-source alternatives like FAISS or Chroma may lack some extras but are more than sufficient for those not who don't require extensive scalability.
 
-But wait, I am dropping a bomb here, I've recently come across LanceDB, So it's an open-source vector database similar to FAISS and Chroma. What makes LanceDB stand out is not just it's open-source nature but its unparalleled scalability. In fact, after a closer look, I realized that I haven't done justice in highlighting the true value propositions of LanceDB earlier!!
+But wait, I am dropping a bomb here, I've recently come across LanceDB, So it's an open-source vector database similar to FAISS and Chroma. What makes LanceDB stand out is not just its open-source nature but its unparalleled scalability. In fact, after a closer look, I realized that I haven't done justice in highlighting the true value propositions of LanceDB earlier!!
 
 Surprisingly, LanceDB is the most scalable vector database available, outperforming even the likes of Pinecone, Chroma, Qdrant, and others. Scaling up to a billion vectors locally on your laptop is a feat only achievable with LanceDB. I mean this capability is a game-changer, especially when you compare it to other vector databases struggling even with a hundred million vectors. What's more mind blowing is that LanceDB manages to offer this unprecedented scalability at a fraction of cost, I mean they are offering the utilities and database tools at much cheaper rates than its closest counterparts.
 
@@ -215,13 +214,13 @@ NO ROCKET SCIENCE HA!
 
 ### Step 4 : Create a prompt template which will be fed to the LLM
 
-Ok now comes the prompt template. So when you write a question to the ChatGPT and it answers that question, you are basically providing a prompt to the model so that it can understand what's the question is. When companies train the models, they decide what kind of prompt they are going to use for invoking the model and ask the question. For example, if you are working with "Mistral 7B instruct" and you want the optimal results it's recommended to use the following chat template:
+Ok now comes the prompt template. So when you write a question to the ChatGPT and it answers that question, you are basically providing a prompt to the model so that it can understand what the question is. When companies train the models, they decide what kind of prompt they are going to use for invoking the model and ask the question. For example, if you are working with "Mistral 7B instruct" and you want the optimal results it's recommended to use the following chat template:
 
 ```python
 <s>[INST] Instruction [/INST] Model answer</s>[INST] Follow-up instruction [/INST]
 ```
 
-Note that \<s> and \</s> are special tokens to represent beginning of string (BOS) and end of string (EOS) while [INST] and [/INST] are regular strings. It's just that the Mistral 7B instruct is made in such a way that the model look for those special tokens to understand the question better. Different types of LLMs have different kinds of instructed prompts. 
+Note that \<s> and \</s> are special tokens to represent beginning of string (BOS) and end of string (EOS) while [INST] and [/INST] are regular strings. It's just that the Mistral 7B instruct is made in such a way that the model looks for those special tokens to understand the question better. Different types of LLMs have different kinds of instructed prompts.
 
 Now for our case we are going to use [huggingfaceh4/zephyr-7b-alpha](https://huggingface.co/HuggingFaceH4/zephyr-7b-alpha) which is a text generation model. Just to make it clear, Zephyr-7B-α has not been aligned or formated to human preferences with techniques like RLHF (Reinforcement Learning with Human Feedback) or deployed with in-the-loop filtering of responses like ChatGPT, so the model can produce problematic outputs (especially when prompted to do so). 
 
@@ -260,9 +259,9 @@ Our prompt is set! We've crafted a single message, assuming it's from a human xD
 
 Now, let's talk about the query or question we want to ask our RAG application. We can't just pass the query to our model and expect information in return. Instead, we need to pass the query through the same embedding model used for the chunks earlier. Why is this important? Well, by embedding queries, we allow models to compare them efficiently with previously processed chunks of text. This enables tasks like finding similar documents or generating relevant responses.
 
-To understand it better, Imagine you and your friend speak different languages, like English and Hindi, and you need to understand each other's writings. If your friend hands you a page in Hindi, you won't understand it directly. So, your friend translate it first, turning the Hindi into English for you. So now if your friend asks you a question in Hindi, you can easily translate that question into English first and look up for the relevant answers in that translated English Text.. 
+To understand it better, Imagine you and your friend speak different languages, like English and Hindi, and you need to understand each other's writings. If your friend hands you a page in Hindi, you won't understand it directly. So, your friend translates it first, turning the Hindi into English for you. So now if your friend asks you a question in Hindi, you can easily translate that question into English first and look up for the relevant answers in that translated English Text..
 
-Similarly, we initially transformed textual information into their corresponding embeddings. Now,  when you pose a query, it undergoes a similiar kind of conversion into the numeric form using the same embedding model applied previously to process our textual chunks. This consistent approach allows for efficient retrieval of relevant responses.
+Similarly, we initially transformed textual information into their corresponding embeddings. Now,  when you pose a query, it undergoes a similar kind of conversion into the numeric form using the same embedding model applied previously to process our textual chunks. This consistent approach allows for efficient retrieval of relevant responses.
 
 ### Step 6 : Fetch K number of documents.
 
@@ -294,17 +293,17 @@ model_kwargs = {"temperature": 0.5, "max_length": 4096, "max_new_tokens": 2048}
 model = HuggingFaceHub(repo_id=llm_repo_id, model_kwargs=model_kwargs)
 ```
 
-In this code snippet, we're instantiating our language model using the Hugging Face Hub. Specifically, we're selecting the zephyr 7 billion model which is placed in this repository ID ["huggingfaceh4/zephyr-7b-alpha"](https://huggingface.co/HuggingFaceH4/zephyr-7b-alpha). Choice of choosing this model isn't arbitrary; as I said before, it's based on the model's suitability for our specific task and requirements. As we are already implementing only Open Source components, Zephyr 7 billion works good enough to generate the useful response with minimal overhead and low latency.
+In this code snippet, we're instantiating our language model using the Hugging Face Hub. Specifically, we're selecting the zephyr 7 billion model which is placed in this repository ID ["huggingfaceh4/zephyr-7b-alpha"](https://huggingface.co/HuggingFaceH4/zephyr-7b-alpha). Choosing this model isn't arbitrary; as I said before, it's based on the model's suitability for our specific task and requirements. As we are already implementing only Open Source components, Zephyr 7 billion works good enough to generate a useful response with minimal overhead and low latency.
 
-This model comes with some additional parameters to fine-tune its behavior. We've set the temperature to 0.5, which controls the randomness of the generated text. As a lower temperature tends to result in more conservative and predictable outputs and    when the temperature is set to max which is 1, the model tries to be as much creative as it could, so based on what type of output you want for your use case, you can tweak this parameter. For the sake of the simplicity and demonstration purposes, I set it to 0.5 to make sure we get decent results. Next is max_length parameter which defines the maximum length of the generated text and it includes the size of your prompt as well as the response. 
+This model comes with some additional parameters to fine-tune its behavior. We've set the temperature to 0.5, which controls the randomness of the generated text. As a lower temperature tends to result in more conservative and predictable outputs and when the temperature is set to max which is 1, the model tries to be as creative as it could, so based on what type of output you want for your use case, you can tweak this parameter. For the sake of the simplicity and demonstration purposes, I set it to 0.5 to make sure we get decent results. Next is max_length parameter which defines the maximum length of the generated text and it includes the size of your prompt as well as the response.
 
-max_new_tokens sets the threshold on maximum number of new tokens that can be generated. As a general rule of thumb, the max_new_tokens should always be less than or equal to the max_length parameter. Why? Think about it..
+max_new_tokens sets the threshold on the maximum number of new tokens that can be generated. As a general rule of thumb, the max_new_tokens should always be less than or equal to the max_length parameter. Why? Think about it..
 
 ### Step 8 : Create a chain for invoking the LLM.
 
-We have everything we want for our RAG application, last thing we need to do is to create a chain for invoking the LLM on our query to generate the response. There are different types of chains for the different types of use cases, if you like your LLM to remember the context of the chat over the time like the ChatGPT , you would need a memory instance which can be shared among multiple conversation pieces, for such cases, there are conversational chains available. 
+We have everything we want for our RAG application. The last thing we need to do is to create a chain for invoking the LLM on our query to generate the response. There are different types of chains for the different types of use cases, if you like your LLM to remember the context of the chat over the time like the ChatGPT , you would need a memory instance which can be shared among multiple conversation pieces, for such cases, there are conversational chains available.
 
-For now we just need a chain which can combine our retrieved contexts and pass it with the query to the LLM to generate the response. 
+For now we just need a chain which can combine our retrieved contexts and pass it with the query to the LLM to generate the response.
 
 ```python
 from langchain_core.output_parsers import StrOutputParser

@@ -4,13 +4,114 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-03-03T21:07:44+05:30</updated>
+ <updated>2024-03-15T13:05:14+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>Why LanceDB is shitty</title>
+   <link href="http://localhost:4000/2024/03/15/embedded-databases"/>
+   <updated>2024-03-15T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2024/03/15/embedded-databases</id>
+   <content type="html">&lt;p&gt;&lt;img src=&quot;&quot; alt=&quot;production_fucked&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In today’s world, when everyone’s curious about trying out generative AI tools and how they work, you’ve probably heard about embedded databases. Most of us tend to think about client-server based setups when databases come to mind. And honestly, that’s somewhat accurate.&lt;/p&gt;
+
+&lt;p&gt;However, client-server architectures aren’t really built to handle heavy analytical and ML workloads. Essentially, the processing tasks fall into two main categories: OLTP (online transactional processing) and OLAP (online analytical processing). So, when you’re changing your Instagram profile picture or uploading a photo on Facebook, you’re essentially involved in OLTP tasks, which focus on quick and easy processing. On the flip side, when we deal with OLAP, it’s all about handling complex computations such as retrieving queries from extensive datasets, combining tables, and aggregating data for big data purposes.&lt;/p&gt;
+
+&lt;p&gt;Now, we need something that can handle our large ML workloads effectively and perform optimally across datasets ranging from small to large scales.&lt;/p&gt;
+
+&lt;h3 id=&quot;columnar-oriented-datastores&quot;&gt;Columnar Oriented Datastores&lt;/h3&gt;
+
+&lt;p&gt;Hard drives store data in terms of blocks, so whenever an operation is performed, the entire block containing the data is loaded into memory for reading by the OS. Now, Row-oriented databases aim to store whole rows of the database in the same block, whereas columnar databases store column entries in the same block.&lt;/p&gt;
+
+&lt;p&gt;This implies that when you need to perform column-oriented operations like updating columns, aggregations, or selecting a column entry, column-oriented databases outperform row-oriented ones in terms of speed. However, if you need to add a new data point entry with multiple columns, then row-oriented databases perform better.&lt;/p&gt;
+
+&lt;p&gt;Now, the point is, there’s something called Apache Arrow, which is a language-independent columnar memory format for flat and hierarchical data, organized for efficient analytic operations on modern hardware like CPUs and GPUs.&lt;/p&gt;
+
+&lt;p&gt;This is too technical. Let me break it down for you. Machine learning is all about feeding huge amounts of data into complex mathematical models to find patterns and make predictions, right? Now, Apache Arrow turbocharges this process by providing a standardized way to store and work with data that’s &lt;a href=&quot;https://developer.nvidia.com/blog/accelerating-apache-spark-3-0-with-gpus-and-rapids/&quot;&gt;optimized&lt;/a&gt; for modern hardware like powerful GPUs. So Instead of dealing with clunky row-based formats, Arrow’s columnar layout lets you focus on the specific data features you need, drastically cutting down processing time. And since Arrow keeps data in memory, AKA RAM, rather than on sluggish disk storage like hard drives or SSDs, your models can crunch through datasets at blistering speeds. The end result? You can iterate faster, train better models, and stay ahead of the competition.&lt;/p&gt;
+
+&lt;p&gt;Still confused, right? I was too. Well, let’s take an example. If you’re building a model to predict housing prices based on factors like square footage, number of bedrooms, location, etc., Arrow’s columnar format would allow you to easily isolate and work with just the columns containing those specific features, ignoring any other irrelevant data columns. This focused, selective data access is more efficient than dealing with row-based formats where you’d have to sort through all the data indiscriminately.&lt;/p&gt;
+
+&lt;p&gt;Now that’s where the power of Arrow based columnar databases comes into play.&lt;/p&gt;
+
+&lt;h3 id=&quot;lance-data-format&quot;&gt;Lance Data Format&lt;/h3&gt;
+
+&lt;p&gt;Building on the advantages of Apache Arrow’s columnar, in-memory approach for machine learning, there’s another game-changing data format that takes things to a whole new level – the Lance Data Format.&lt;/p&gt;
+
+&lt;p&gt;Designed from the ground up with modern ML workflows in mind, Lance is an absolute speed demon when it comes to querying and prepping data for training models. But it’s not just about raw speed – Lance has some seriously impressive versatility under the hood.&lt;/p&gt;
+
+&lt;p&gt;Unlike formats limited to tabular data, Lance can handle all kinds of data types like images, videos, 3D point clouds, audio, and more. It’s like a Swiss Army knife of data formats for ML. And btw, Don’t just take my word for it because I love LanceDB, instead – &lt;a href=&quot;https://blog.lancedb.com/announcing-lancedb-5cb0deaa46ee-2/&quot;&gt;benchmarks&lt;/a&gt; have shown that Lance can provide random data access a mind-boggling 100 times faster than Parquet, another popular columnar format.&lt;/p&gt;
+
+&lt;p&gt;This blistering speed comes from clever tricks like zero-copy versioning and optimized vector operations. So basically, zero-copy versioning means that when you create a new version of your data, Lance doesn’t have to make an entire copy – it just stores the changes efficiently. This saves a ton of time and storage space compared to traditional versioning methods. And optimized vector operations allow Lance to process data in bulk, taking full advantage of modern hardware like GPUs and vectorized CPUs. It’s all part of Lance’s cloud-native design.&lt;/p&gt;
+
+&lt;h3 id=&quot;in-process&quot;&gt;In-process&lt;/h3&gt;
+
+&lt;p&gt;Before understanding what Embedded Systems really do, First, we need to understand what a database management system (DBMS) is in Layman. Now in simple terms a DBMS is a software system that allows you to create, manage, and interact with databases (obviously duhh).&lt;/p&gt;
+
+&lt;p&gt;I mean It provides a way to store, retrieve, and manipulate data in an organized and more efficient manner.&lt;/p&gt;
+
+&lt;p&gt;Now, an embedded database is a type of DBMS that is tightly integrated with the application layer. This means that the database that you are working with is not a separate process or service running on its own; instead, it runs within the same process as the application itself.&lt;/p&gt;
+
+&lt;p&gt;This tight integration makes it easier for the application to interact with the database, as there’s no need for inter-process communication or network communication unlike traditional client-server database systems where the database is a  separate process or a service&lt;/p&gt;
+
+&lt;p&gt;This type of thing is called “in-process”. Remember this for the rest of your life. It might be the most important thing to remember when judging the other embedded databases out there.&lt;/p&gt;
+
+&lt;p&gt;In simple terms, the application can directly access and manipulate the database without going through additional layers or protocols. CUTTING THE BS.&lt;/p&gt;
+
+&lt;h3 id=&quot;on-disk-storage&quot;&gt;&lt;strong&gt;On-disk storage&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;p&gt;Remember I said earlier that Embedded systems have this ability to store the data in-memory and work at blistering speeds. While embedded databases can store data in memory, they also have this capability to store larger datasets on disk. This allows them to scale to large amounts of data (terabytes or billion dataset points, think of embeddings of billion tokens) while still providing relatively low query latencies and response times. So it’s like the best of the both worlds.&lt;/p&gt;
+
+&lt;h3 id=&quot;serverless&quot;&gt;Serverless&lt;/h3&gt;
+
+&lt;p&gt;Ok new term! Sometimes the terms “Embedded” and “Serverless” are sometimes used interchangeably in the database community, but they actually refer to different concepts. “Embedded” refers to the database being tightly integrated with the application as we seen earlier in case of Embedded databases while Serverless refers to the separation of storage and compute resources, and it’s often used in the context of microservices architectures.&lt;/p&gt;
+
+&lt;p&gt;To make it more concise, think of the serverless database as it’s composed of two different containers, the storage layer (where the data is stored) and the compute layer (where the data is processed). Now this separation allows the compute resources to be dynamically allocated and scaled up or down based on the workload.&lt;/p&gt;
+
+&lt;p&gt;And btw, when we are talking about the Serverless model, it is often associated with the cloud based services, where you don’t have to manage the underlying infra..&lt;/p&gt;
+
+&lt;h3 id=&quot;scalability&quot;&gt;Scalability&lt;/h3&gt;
+
+&lt;p&gt;Ok so you decided to work on the simple RAG system and wanted to test it out or just maybe play with it and came up with the various vector databases, you did your experiment,  you are happy and done. Now when you got serious and came up with something and wanted to scale your RAG system for let’s say 1 billion embeddings, you open up your earlier setup, ingested more data, created more embeddings and when the time came, your traditional embedding database gave you nightmare in terms of the latency as well as storage capabilities.&lt;/p&gt;
+
+&lt;p&gt;Now think of an embedding database which is open source, works for all kinds of setups, scales up to billions of embeddings, fetch the relevant embeddings with amazing searching capabilities and data never leaves your local machine, feels too good to be true right?! Well there is LanceDB again. I mean from the moment you dirty your hands for your next RAG system all upto the time you put something as big as production, LanceDB scales amazingly well…&lt;/p&gt;
+
+&lt;h3 id=&quot;multimodality&quot;&gt;Multimodality&lt;/h3&gt;
+
+&lt;p&gt;The current embedded databases should not only support textual data but also be compatible with various file formats. It’s no longer just about text ingestion. Some time ago, I developed a GTA-5 multimodal RAG application that displays the GTA5 landscape upon entering a query. I highly recommend giving it a &lt;a href=&quot;https://vipul-maheshwari.github.io/2024/03/03/multimodal-rag-application&quot;&gt;read&lt;/a&gt; to understand why the Multimodal RAG system is the new hotshot and why companies are eager to integrate it into their core. Honestly, I haven’t come across any embedded vector database other than LanceDB that can effortlessly ingest any kind of file format.&lt;/p&gt;
+
+&lt;p&gt;By the way, multimodality does make sense because LanceDB is built on top of the Lance format. As mentioned earlier, it supports diverse data types, including images, audio, and text, making it incredibly flexible for applications with various data formats.&lt;/p&gt;
+
+&lt;h3 id=&quot;searching-and-integrations&quot;&gt;Searching and Integrations&lt;/h3&gt;
+
+&lt;p&gt;Ok, so we stored the Embeddings, we scaled our RAG too, now for a given query, we want to find the relevant embeddings, and that’s where LanceDB shines. Now Searching in LanceDB is as easy as it could be, you can just query your data in a number of ways - via SQL, full-text search , and vector search. As it supports the Hybrid search too which is one of the biggest favorable for the amazing search capabilities in LanceDB.&lt;/p&gt;
+
+&lt;p&gt;But it’s not just about searching guys, it integrates well enough with native Python, JavaScript/TypeScript, Pandas, Pydantic, that means you can easily integrate it with your favorite programming languages, in addition to that, it has direct integrations with cloud storage providers like AWS S3 and Azure Blob Storage. This means that we can directly query data stored on the cloud, without any added ETL steps.&lt;/p&gt;
+
+&lt;p&gt;Woah, I do love LanceDB&lt;/p&gt;
+
+&lt;h3 id=&quot;more-or-less-we-looked-at-these-things-right-&quot;&gt;More or less, we looked at these things right :&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Columnar Oriented Databases&lt;/li&gt;
+  &lt;li&gt;Lance Format&lt;/li&gt;
+  &lt;li&gt;In-process&lt;/li&gt;
+  &lt;li&gt;On-disk storage&lt;/li&gt;
+  &lt;li&gt;Serverless&lt;/li&gt;
+  &lt;li&gt;Embedded systems.&lt;/li&gt;
+  &lt;li&gt;Scalability&lt;/li&gt;
+  &lt;li&gt;Multimodality&lt;/li&gt;
+  &lt;li&gt;Searching and Integrations&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Well all of them are bundled together with no cost upfront, ready to serve in one installation click and voila baby, you have your new best friend, maybe more than that, who knows? So what are you waiting for? Here is the reference, see you soon.&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>Multimodal RAG applications</title>
@@ -23,9 +124,9 @@
 
 &lt;p&gt;Today we are going to work on Multimodality which is basically a concept that essentially empowers AI models with the capacity to perceive, listen, and comprehend data in diverse formats together with the text. Pretty much like how we do!&lt;/p&gt;
 
-&lt;p&gt;In an ideal situation, we should be able to mix different types of data together and show them to a generative AI model at the same time and iterate on it. It could be as simple as telling the AI model, “Hey, a few days ago, I sent you a picture of a brown, short dog. Can you find that picture for me?” and the model should then give us the details of that picture. Basically, we want the AI to understand the things more like how we humans do,  becoming really good at handling and responding to all kinds of information.&lt;/p&gt;
+&lt;p&gt;In an ideal situation, we should be able to mix different types of data together and show them to a generative AI model at the same time and iterate on it. It could be as simple as telling the AI model, “Hey, a few days ago, I sent you a picture of a brown, short dog. Can you find that picture for me?” and the model should then give us the details of that picture. Basically, we want the AI to understand things more like how we humans do,  becoming really good at handling and responding to all kinds of information.&lt;/p&gt;
 
-&lt;p&gt;But the challenge here is to make a computer understands one data format with it’s related reference, and that could be a mix of text, audio, thermal imagery, and videos. Now to make this happen, we use something called Embeddings. It’s really a numeric vector which contains a bunch of numbers written together that might not mean much to us but understood by machines very well.&lt;/p&gt;
+&lt;p&gt;But the challenge here is to make a computer understand one data format with its related reference, and that could be a mix of text, audio, thermal imagery, and videos. Now to make this happen, we use something called Embeddings. It’s really a numeric vector which contains a bunch of numbers written together that might not mean much to us but are understood by machines very well.&lt;/p&gt;
 
 &lt;h3 id=&quot;cat-is-equal-to-cat&quot;&gt;Cat is equal to Cat&lt;/h3&gt;
 
@@ -35,7 +136,7 @@
 
 &lt;p&gt;But to help a model recognize that an image of a “Cat” and the word “Cat” are similar, we rely on Multimodal Embeddings. To simplify things a bit, imagine there is a magic box which is capable of handling various inputs – images, audios, text, and more.&lt;/p&gt;
 
-&lt;p&gt;Now, when we feed the box with an image of a “Cat” with the text “Cat,” it performs its magic and produces two numeric vectors. When these two vectors were given to a machines, it made machines to think, “Hmm, based on these numeric values, it seems like both are connected to “Cat”. So that’s exactly what we were aiming for! Our goal was to help machines to recognize the close connection between an image of a “Cat” and the text “Cat”. However, to validate this concept, when we plot those two numeric vectors in a vector space, it turns out they are very close to each other. This outcome exactly mirrors what we observed earlier with the proximity of the two text words “Cat” and “Dog” in the vector space.&lt;/p&gt;
+&lt;p&gt;Now, when we feed the box with an image of a “Cat” with the text “Cat,” it performs its magic and produces two numeric vectors. When these two vectors were given to a machine, it made machines think, “Hmm, based on these numeric values, it seems like both are connected to “Cat”. So that’s exactly what we were aiming for! Our goal was to help machines to recognize the close connection between an image of a “Cat” and the text “Cat”. However, to validate this concept, when we plot those two numeric vectors in a vector space, it turns out they are very close to each other. This outcome exactly mirrors what we observed earlier with the proximity of the two text words “Cat” and “Dog” in the vector space.&lt;/p&gt;
 
 &lt;h2 id=&quot;ladies-and-gentlemen-thats-the-essence-of-multimodality-&quot;&gt;Ladies and gentlemen, that’s the essence of Multimodality. 👏&lt;/h2&gt;
 
@@ -43,21 +144,21 @@
 
 &lt;h3 id=&quot;rag-is-here&quot;&gt;RAG is here..&lt;/h3&gt;
 
-&lt;p&gt;Well if you don’t know what RAG means, I would highly advise to read this article &lt;a href=&quot;https://vipul-maheshwari.github.io/2024/02/14/rag-application-with-langchain&quot;&gt;here&lt;/a&gt; which I wrote some days back and loved by ton of people, not exageerating it but yeah, it’s good to get the balls rolling..&lt;/p&gt;
+&lt;p&gt;Well if you don’t know what RAG means, I would highly advise you to read this article &lt;a href=&quot;https://vipul-maheshwari.github.io/2024/02/14/rag-application-with-langchain&quot;&gt;here&lt;/a&gt; which I wrote some days back and loved by tons of people, not exaggerating it but yeah, it’s good to get the balls rolling..&lt;/p&gt;
 
-&lt;p&gt;So there are impressive models like DALLE-2 that provide text-to-image functionality. Essentially, you input text, and the model generates relevant images for you. But can we create a system similar to Multimodal RAG, where the model produces output images based on our own data? Alright, so the goal for today is to create an AI model that when asked something like, “How many girls were there in my party?” 💀 not only provides textual information but also includes a relevant image related to it. Think of it as an extension of simple RAG system, but now incorporating images.&lt;/p&gt;
+&lt;p&gt;So there are impressive models like DALLE-2 that provide text-to-image functionality. Essentially, you input text, and the model generates relevant images for you. But can we create a system similar to Multimodal RAG, where the model produces output images based on our own data? Alright, so the goal for today is to create an AI model that when asked something like, “How many girls were there in my party?” 💀 not only provides textual information but also includes a relevant image related to it. Think of it as an extension of a simple RAG system, but now incorporating images.&lt;/p&gt;
 
 &lt;p&gt;Before we dive in, remember that Multimodality isn’t limited to just text-to-image or image-to-text as it encompasses the freedom to input and output any type of data. However, for now, let’s concentrate on the interaction from image to text exclusively.&lt;/p&gt;
 
-&lt;h3 id=&quot;contrasive-learning&quot;&gt;Contrasive learning&lt;/h3&gt;
+&lt;h3 id=&quot;contrastive-learning&quot;&gt;Contrastive learning&lt;/h3&gt;
 
 &lt;p&gt;Now the question is, What exactly was that box doing? The magic it performs is known as Contrastive Learning. While the term might sound complex, it’s not that tricky. To simplify, consider a dataset with images, along with a caption describing what the image represents.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/clipmodel.png?raw=true&quot; alt=&quot;clipmodel&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Alright, now what happens is: we give our text-image model with these Positive and Negative samples, where each sample consists of an image and a descriptive text. Positive samples are those where the image and text are correctly align – for instance, a picture of a cat matched with the text “this is an image of a cat.” Conversely, negative samples involve a mismatch, like presenting an image of a dog alongside the text “this is an image of a cat.”&lt;/p&gt;
+&lt;p&gt;Alright, now what happens is: we give our text-image model with these Positive and Negative samples, where each sample consists of an image and a descriptive text. Positive samples are those where the image and text are correctly aligned – for instance, a picture of a cat matched with the text “this is an image of a cat.” Conversely, negative samples involve a mismatch, like presenting an image of a dog alongside the text “this is an image of a cat.”&lt;/p&gt;
 
-&lt;p&gt;Now we train our text-image model to recognize that positive samples offer accurate interpretations, while negative samples are misleading and should be disregarded during training. In formal terms this technique is called “CLIP” (Contrastive Language-Image Pre-training) introduced by OpenAI where authors trained an image-text model on something around 400 million image caption pairs taken from the interent and everytime model makes a mistake, the contrasive loss function increases and penalize it to make sure the model trains well. The same kind of principles are applied to the other modality combinations as well, so voice of cat with the word cat is positive sample for speech-text model, a video of cat with the descriptive text “this is a cat” is a positive sample for video-text model.&lt;/p&gt;
+&lt;p&gt;Now we train our text-image model to recognize that positive samples offer accurate interpretations, while negative samples are misleading and should be disregarded during training. In formal terms this technique is called &lt;a href=&quot;https://openai.com/research/clip&quot;&gt;CLIP&lt;/a&gt; (Contrastive Language-Image Pre-training) introduced by OpenAI where authors trained an image-text model on something around 400 million image caption pairs taken from the internet and everytime model makes a mistake, the contrastive loss function increases and penalize it to make sure the model trains well. The same kind of principles are applied to the other modality combinations as well, so the voice of cat with the word cat is a positive sample for speech-text model, a video of cat with the descriptive text “this is a cat” is a positive sample for video-text model.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/easy.png?raw=true&quot; alt=&quot;easy&quot; /&gt;&lt;/p&gt;
 
@@ -69,7 +170,7 @@
 
 &lt;h3 id=&quot;vector-database&quot;&gt;Vector database&lt;/h3&gt;
 
-&lt;p&gt;When we talk about the vector database, there are ton of options available in the current market, but there is something about the LanceDB which makes it stands out as an optimal choice for a vector database, As far as I have used it, it address the limitations of traditional embedded databases in handling AI/ML workloads. When I say traditional, it typically means those databases management tools which are not aligned with the usage of heavy compuatation that comes with the ML infra.&lt;/p&gt;
+&lt;p&gt;When we talk about the vector database, there are ton of options available in the current market, but there is something about the LanceDB which makes it stands out as an optimal choice for a vector database, As far as I have used it, it address the limitations of traditional embedded databases in handling AI/ML workloads. When I say traditional, it typically means those database management tools which are not aligned with the usage of heavy computation that comes with the ML infra.&lt;/p&gt;
 
 &lt;p&gt;TLDR; LanceDB operates on a serverless architecture, meaning storage and compute are separated into two distinct units. This design makes it exceptionally fast for RAG use cases, ensuring fast fetching and retrieval. Additionally, it has some notable advantages – being open source, utilizing its Lance columnar data format built on top of Apache Arrow for high efficiency, persistent storage capabilities, and incorporating its own Disk Approximate Nearest Neighbor search. All these factors collectively make LanceDB an ideal solution for accessing and working with multimodal data. I love you LanceDB ❤️.&lt;/p&gt;
 
@@ -80,14 +181,14 @@
 &lt;h3 id=&quot;faq&quot;&gt;FAQ&lt;/h3&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;We will be using “ViT-L/14” to convert our multimodal data into it’s respective embeddings.&lt;/li&gt;
+  &lt;li&gt;We will be using “ViT-L/14” to convert our multimodal data into its respective embeddings.&lt;/li&gt;
   &lt;li&gt;LanceDB as our vector database to store the relevant embeddings.&lt;/li&gt;
   &lt;li&gt;GTA-V Image Captioning dataset for our magic box.&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;h3 id=&quot;environment-setup&quot;&gt;Environment Setup&lt;/h3&gt;
 
-&lt;p&gt;I am using a MacBook Air M1, and it’s important to note that some kind of dependencies and configurations may vary depending on the type of system that you are running, so it’s important to take that into account.&lt;/p&gt;
+&lt;p&gt;I am using a MacBook Air M1, and it’s important to note that some kinds of dependencies and configurations may vary depending on the type of system that you are running, so it’s important to take that into account.&lt;/p&gt;
 
 &lt;p&gt;Here are the steps to install the relevant dependencies&lt;/p&gt;
 
@@ -230,15 +331,13 @@ res
 2 | [0.06756592, .. ]  | amazing view of a ...	| 30  | 135.309937
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Let’s slow down a bit and understand what just happened. Putting simply, the code snippet executes a search algorithm in it’s core to pinpoint the most relevant image embedding that align with our text query. The resulting output, as showcased above, give us the embeddings which closely resembles to our text query.  In the result, the second column presents the embedding vector, while the third column contains the description of the image that closely matches our text query. Essentially, we’ve determined which image is closely corresponds to our text query by examining the embeddings of both our text query and the image.&lt;/p&gt;
+&lt;p&gt;Let’s slow down a bit and understand what just happened. Putting simply, the code snippet executes a search algorithm in its core to pinpoint the most relevant image embedding that aligns with our text query. The resulting output, as showcased above, gives us the embeddings which closely resembles our text query.  In the result, the second column presents the embedding vector, while the third column contains the description of the image that closely matches our text query. Essentially, we’ve determined which image closely corresponds to our text query by examining the embeddings of both our text query and the image.&lt;/p&gt;
 
-&lt;h3 id=&quot;its-as-much-as-similiar-to-saying-if-these-numbers-represents-the-word-cat-i-spot-an-image-with-a-similar-set-of-numbers-so-most-likely-its-a-match-for-an-image-of-a-cat-&quot;&gt;It’s as much as similiar to saying, If these numbers represents the word “Cat”, I spot an image with a similar set of numbers, so most likely it’s a match for an image of a “Cat”. 😺&lt;/h3&gt;
+&lt;h3 id=&quot;its-similar-to-saying-if-these-numbers-represent-the-word-cat-i-spot-an-image-with-a-similar-set-of-numbers-so-most-likely-its-a-match-for-an-image-of-a-cat-&quot;&gt;It’s similar to saying, If these numbers represent the word “Cat”, I spot an image with a similar set of numbers, so most likely it’s a match for an image of a “Cat”. 😺&lt;/h3&gt;
 
 &lt;p&gt;If you are looking for the explanation of how the search happens, I will write a detailed explanation in the coming write ups because it’s so exciting to look under the hood and see how the searching happens. Essentially there is something called Approximate Nearest Neighbors (ANN) which is a technique used to efficiently find the closest points in high-dimensional spaces. ANN is extensively used in data mining, machine learning, computer vision and NLP use cases. So when we passed our embedded text query to the searching algorithm and asked it to give us the closest sample point in the vector space, it used a type of ANN algorithm to get it for us. Specifically LanceDB utilizes DANN (Deep Approximate Nearest Neighbor) for searching the relevant embeddings within its ecosystem..&lt;/p&gt;
 
-&lt;p&gt;So we have 5 columns for our result, first is just an index number, second is the embedding vector, third is the description of the image that matches our text query, fourth is the label of the image but I would like to have your attention on the last column. It’s called Distance. So when I talked about the ANN algorithm, it essentially draws a line between the current data point which is in our case the embedding of our text query and find out which image data point is closest to ours. So when you notice the other data points from the results have more distance as compared to the top one, that means they are a little bit further away than the top one. How the distance is calculated is the part of the algorithm itself.&lt;/p&gt;
-
-&lt;p&gt;In our results, we have five columns. The first is the index number, the second is the embedding vector, the third is the description of the image matching our text query, and the fourth is the label of the image. However, let’s focus on the last column – Distance. When I mentioned the ANN algorithm, it simply draws a line between the current data point (in our case, the embedding of our text query) and identifies which data point (image) is closest to it. If you observe that the other data points in the results have a greater distance compared to the top one, it indicates they are a bit further away or more unrelated to our query. Just to make it clear, the calculation of distance is a part of the algorithm itself.&lt;/p&gt;
+&lt;p&gt;In our results, we have five columns. The first is the index number, the second is the embedding vector, the third is the description of the image matching our text query, and the fourth is the label of the image. However, let’s focus on the last column – Distance. When I mentioned the ANN algorithm, it simply draws a line between the current data point (in our case, the embedding of our text query) and identifies which data point (image embedding) is closest to it. If you observe that the other data points in the results have a greater distance compared to the top one, it indicates they are a bit further away or more unrelated to our query. Just to make it clear, the calculation of distance is a part of the algorithm itself.&lt;/p&gt;
 
 &lt;h2 id=&quot;d-day&quot;&gt;D-DAY&lt;/h2&gt;
 
@@ -288,16 +387,16 @@ print(ds[&quot;train&quot;][data_id][&apos;text&apos;])
     &lt;p&gt;Information Retrieval: When a user asks a question, the AI system retrieves the relevant data from a well-maintained knowledge library or external sources like databases, articles, APIs, or document repositories. This is achieved by converting the query into a numerical format or vector that can be understood by machines.&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;LLM: The retrieved data is then presented to the LLM or Large Language Model, along with the user’s query. The LLM uses this new knowledge and its training data to generate the response.&lt;/p&gt;
+    &lt;p&gt;LLM:The retrieved data is then presented to the LLM or Large Language Model, along with the user’s query. The LLM uses this new knowledge and its training data to generate the response.&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;Response: Finally, the LLM generates a response that is more accurate and relevant since it has been augmented with the retrieved information. I mean we gave LLM some additional information from our Knowledge library which allows LLMs to provide more contextually relevant and factual responses, solving the problem of models when they are just hallucinating or providing irrelevant answer.&lt;/p&gt;
+    &lt;p&gt;Response: Finally, the LLM generates a response that is more accurate and relevant since it has been augmented with the retrieved information. I mean we gave LLM some additional information from our Knowledge library which allows LLMs to provide more contextually relevant and factual responses, solving the problem of models when they are just hallucinating or providing irrelevant answers.&lt;/p&gt;
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Let’s take the example of company policies again. Suppose you have an HR bot that handles queries related to your Company policies. Now if someones asks anything specific to the policies, The bot can pull the most recent policy documents from the knowledge libray, pass the relevant context to a well crafted prompt which is then passed further to the LLM for generating the response.&lt;/p&gt;
+&lt;p&gt;Let’s take the example of company policies again. Suppose you have an HR bot that handles queries related to your Company policies. Now if someone asks anything specific to the policies, The bot can pull the most recent policy documents from the knowledge library, pass the relevant context to a well crafted prompt which is then passed further to the LLM for generating the response.&lt;/p&gt;
 
-&lt;p&gt;To make it more easy, Imagine a LLM as your knowledgeable friend who seems to know everything, from Geography to Computer Science from Politics to Philosophy. Now, picture yourself asking this friend a few questions:&lt;/p&gt;
+&lt;p&gt;To make it easier, Imagine a LLM as your knowledgeable friend who seems to know everything, from Geography to Computer Science, from Politics to Philosophy. Now, picture yourself asking this friend a few questions:&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;“Who handles my laundry on weekends?”&lt;/li&gt;
@@ -305,11 +404,11 @@ print(ds[&quot;train&quot;][data_id][&apos;text&apos;])
   &lt;li&gt;“What brand of peanut butter do I prefer?”&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Chances are, your friend wouldn’t be able to answer these questions. Most of the time, no. But let’s say this distant friend becomes closer to you over time, he comes at your place regularly, know your parents very well, you both hangout pretty often, you go on outings, blah blah blah.. You got the point.&lt;/p&gt;
+&lt;p&gt;Chances are, your friend wouldn’t be able to answer these questions. Most of the time, no. But let’s say this distant friend becomes closer to you over time, he comes to your place regularly, knows your parents very well, you both hangout pretty often, you go on outings, blah blah blah.. You got the point.&lt;/p&gt;
 
-&lt;p&gt;I mean he is gaining access to personal and insider information about you.  Now, when you pose the same questions, he can somehow answer those question with more relevance now because because he is better suited with your personal insights.&lt;/p&gt;
+&lt;p&gt;I mean he is gaining access to personal and insider information about you.  Now, when you pose the same questions, he can somehow answer those questions with more relevance now because he is better suited with your personal insights.&lt;/p&gt;
 
-&lt;p&gt;Similarly, a LLM, when provided with additional information or access to your data, it won’t guess or hallucinate. Instead, it can leverage that access data to provide more relevant and accurate answers.&lt;/p&gt;
+&lt;p&gt;Similarly, a LLM, when provided with additional information or access to your data, won’t guess or hallucinate. Instead, it can leverage that access data to provide more relevant and accurate answers.&lt;/p&gt;
 
 &lt;h3 id=&quot;to-break-it-down-here-are-the-exact-steps-to-create-any-rag-application&quot;&gt;To break it down, here are the exact steps to create any RAG application…&lt;/h3&gt;
 &lt;ol&gt;
@@ -329,13 +428,13 @@ print(ds[&quot;train&quot;][data_id][&apos;text&apos;])
     &lt;p&gt;We will be using &lt;a href=&quot;https://python.langchain.com/docs/get_started/introduction&quot;&gt;Langchain&lt;/a&gt; for this task, Basically it’s like a wrapper which lets you talk and manage your LLM operations better. Note that the Langchain is updating very fast and some functions and other classes might moved to the different modules. So if something doesn’t work, just check if you are importing the libraries from the right sources!&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;Along with it we will be using &lt;a href=&quot;https://huggingface.co/&quot;&gt;Hugging Face&lt;/a&gt;,  it  an open-source library for building, training, and deploying state-of-the-art machine learning models, especially about NLP. To use the HuggingFace we need the access token, Get your access token &lt;a href=&quot;https://huggingface.co/docs/hub/security-tokens&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+    &lt;p&gt;Along with it we will be using &lt;a href=&quot;https://huggingface.co/&quot;&gt;Hugging Face&lt;/a&gt;, an open-source library for building, training, and deploying state-of-the-art machine learning models, especially about NLP. To use the HuggingFace we need the access token, Get your access token &lt;a href=&quot;https://huggingface.co/docs/hub/security-tokens&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
     &lt;p&gt;For our models, we’ll need two key components: a LLM (Large Language Model) and an embedding model. While paid sources like OpenAI offer these, we’ll be utilizing open-source models to ensure accessibility for everyone.&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;Now we need a Vector Database to store our embeddings, For that task, we’ve got &lt;a href=&quot;https://lancedb.com/&quot;&gt;LanceDB&lt;/a&gt;– it’s like a super-smart data lake for handling lots of information. It’s a top-notch vector database, making it the go-to choice for dealing with complex data like vector embeddings.. And the best part? It won’t burn a dent in your pocket because it’s open source and free to use!!&lt;/p&gt;
+    &lt;p&gt;Now we need a Vector Database to store our embeddings, For that task, we’ve got &lt;a href=&quot;https://lancedb.com/&quot;&gt;LanceDB&lt;/a&gt; – it’s like a super-smart data lake for handling lots of information. It’s a top-notch vector database, making it the go-to choice for dealing with complex data like vector embeddings.. And the best part? It won’t burn a dent in your pocket because it’s open source and free to use!!&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
     &lt;p&gt;To keep things simple, our data ingestion process will involve using a URL and some PDFs. While you can incorporate additional data sources if needed, we’ll concentrate solely on these two for now.&lt;/p&gt;
@@ -409,7 +508,7 @@ docs = url_docs + data_docs
 
 &lt;h3 id=&quot;step-2--breaking-the-information-into-smaller-chunks&quot;&gt;Step 2 : Breaking the information into smaller chunks&lt;/h3&gt;
 
-&lt;p&gt;We’ve all the necessary data for developing our RAG application. Now, it’s time to break down this information into smaller chunks. Later, we’ll utilize an embedding model to convert these chunks into their respective embeddings. But why it’s important?&lt;/p&gt;
+&lt;p&gt;We’ve all the necessary data for developing our RAG application. Now, it’s time to break down this information into smaller chunks. Later, we’ll utilize an embedding model to convert these chunks into their respective embeddings. But why is it important?&lt;/p&gt;
 
 &lt;p&gt;Think of it like this: If you’re tasked with digesting a 100-page book all at once and then asked a specific question about it, it would be challenging to retrieve the necessary information from the entire book to provide an answer. However, if you’re permitted to break the book into smaller, manageable chunks—let’s say 10 pages each—and each chunk is labeled with an index from 0 to 9, the process becomes much simpler. When the same question is posed after this breakdown, you can easily locate the relevant chunk based on its index and then extract the information needed to answer the question accurately.&lt;/p&gt;
 
@@ -423,7 +522,7 @@ chunks = text_splitter.split_documents(docs)
 
 &lt;p&gt;Now the chunk_size parameter specifies the maximum number of characters that a chunk can contain, while the chunk_overlap parameter specifies the number of characters that should overlap between two adjacent chunks. With the chunk_overlap set to 50, the last 50 characters of the adjacent chunks will be shared between each other.&lt;/p&gt;
 
-&lt;p&gt;This approach helps to prevent important information from being split across two chunks, ensuring that each chunk contains sufficient contextual information of their neighbour chunks for the subsequent processing or analysis.&lt;/p&gt;
+&lt;p&gt;This approach helps to prevent important information from being split across two chunks, ensuring that each chunk contains sufficient contextual information of their neighbor chunks for the subsequent processing or analysis.&lt;/p&gt;
 
 &lt;p&gt;Shared information at the boundary of neighboring chunks enables a more seamless transition and understanding of the text’s content. The best strategy for choosing the chunk_size and chunk_overlap parameters largely depends on the nature of the documents and the purpose of the application.&lt;/p&gt;
 
@@ -451,9 +550,9 @@ len(embeddings.embed_documents([query])[0])
 
 &lt;p&gt;We have the embeddings for our chunks, now we need a vector database to store them.&lt;/p&gt;
 
-&lt;p&gt;When it comes to vector databases, there are plenty of options out there suiting various needs. Databases like Pinecone offer adequate performance and advanced features but come with a hefty price tag. On the other hand, open-source alternatives like FAISS or Chroma may lack some extras but are more than sufficient for those not who don’t requires extensive scalability.&lt;/p&gt;
+&lt;p&gt;When it comes to vector databases, there are plenty of options out there suiting various needs. Databases like Pinecone offer adequate performance and advanced features but come with a hefty price tag. On the other hand, open-source alternatives like FAISS or Chroma may lack some extras but are more than sufficient for those not who don’t require extensive scalability.&lt;/p&gt;
 
-&lt;p&gt;But wait, I am dropping a bomb here, I’ve recently come across LanceDB, So it’s an open-source vector database similar to FAISS and Chroma. What makes LanceDB stand out is not just it’s open-source nature but its unparalleled scalability. In fact, after a closer look, I realized that I haven’t done justice in highlighting the true value propositions of LanceDB earlier!!&lt;/p&gt;
+&lt;p&gt;But wait, I am dropping a bomb here, I’ve recently come across LanceDB, So it’s an open-source vector database similar to FAISS and Chroma. What makes LanceDB stand out is not just its open-source nature but its unparalleled scalability. In fact, after a closer look, I realized that I haven’t done justice in highlighting the true value propositions of LanceDB earlier!!&lt;/p&gt;
 
 &lt;p&gt;Surprisingly, LanceDB is the most scalable vector database available, outperforming even the likes of Pinecone, Chroma, Qdrant, and others. Scaling up to a billion vectors locally on your laptop is a feat only achievable with LanceDB. I mean this capability is a game-changer, especially when you compare it to other vector databases struggling even with a hundred million vectors. What’s more mind blowing is that LanceDB manages to offer this unprecedented scalability at a fraction of cost, I mean they are offering the utilities and database tools at much cheaper rates than its closest counterparts.&lt;/p&gt;
 
@@ -483,12 +582,12 @@ docsearch = LanceDB.from_documents(chunks, embeddings, connection=table)
 
 &lt;h3 id=&quot;step-4--create-a-prompt-template-which-will-be-fed-to-the-llm&quot;&gt;Step 4 : Create a prompt template which will be fed to the LLM&lt;/h3&gt;
 
-&lt;p&gt;Ok now comes the prompt template. So when you write a question to the ChatGPT and it answers that question, you are basically providing a prompt to the model so that it can understand what’s the question is. When companies train the models, they decide what kind of prompt they are going to use for invoking the model and ask the question. For example, if you are working with “Mistral 7B instruct” and you want the optimal results it’s recommended to use the following chat template:&lt;/p&gt;
+&lt;p&gt;Ok now comes the prompt template. So when you write a question to the ChatGPT and it answers that question, you are basically providing a prompt to the model so that it can understand what the question is. When companies train the models, they decide what kind of prompt they are going to use for invoking the model and ask the question. For example, if you are working with “Mistral 7B instruct” and you want the optimal results it’s recommended to use the following chat template:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;&amp;lt;s&amp;gt;[INST] Instruction [/INST] Model answer&amp;lt;/s&amp;gt;[INST] Follow-up instruction [/INST]
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Note that &amp;lt;s&amp;gt; and &amp;lt;/s&amp;gt; are special tokens to represent beginning of string (BOS) and end of string (EOS) while [INST] and [/INST] are regular strings. It’s just that the Mistral 7B instruct is made in such a way that the model look for those special tokens to understand the question better. Different types of LLMs have different kinds of instructed prompts.&lt;/p&gt;
+&lt;p&gt;Note that &amp;lt;s&amp;gt; and &amp;lt;/s&amp;gt; are special tokens to represent beginning of string (BOS) and end of string (EOS) while [INST] and [/INST] are regular strings. It’s just that the Mistral 7B instruct is made in such a way that the model looks for those special tokens to understand the question better. Different types of LLMs have different kinds of instructed prompts.&lt;/p&gt;
 
 &lt;p&gt;Now for our case we are going to use &lt;a href=&quot;https://huggingface.co/HuggingFaceH4/zephyr-7b-alpha&quot;&gt;huggingfaceh4/zephyr-7b-alpha&lt;/a&gt; which is a text generation model. Just to make it clear, Zephyr-7B-α has not been aligned or formated to human preferences with techniques like RLHF (Reinforcement Learning with Human Feedback) or deployed with in-the-loop filtering of responses like ChatGPT, so the model can produce problematic outputs (especially when prompted to do so).&lt;/p&gt;
 
@@ -525,9 +624,9 @@ prompt = ChatPromptTemplate.from_template(template)
 
 &lt;p&gt;Now, let’s talk about the query or question we want to ask our RAG application. We can’t just pass the query to our model and expect information in return. Instead, we need to pass the query through the same embedding model used for the chunks earlier. Why is this important? Well, by embedding queries, we allow models to compare them efficiently with previously processed chunks of text. This enables tasks like finding similar documents or generating relevant responses.&lt;/p&gt;
 
-&lt;p&gt;To understand it better, Imagine you and your friend speak different languages, like English and Hindi, and you need to understand each other’s writings. If your friend hands you a page in Hindi, you won’t understand it directly. So, your friend translate it first, turning the Hindi into English for you. So now if your friend asks you a question in Hindi, you can easily translate that question into English first and look up for the relevant answers in that translated English Text..&lt;/p&gt;
+&lt;p&gt;To understand it better, Imagine you and your friend speak different languages, like English and Hindi, and you need to understand each other’s writings. If your friend hands you a page in Hindi, you won’t understand it directly. So, your friend translates it first, turning the Hindi into English for you. So now if your friend asks you a question in Hindi, you can easily translate that question into English first and look up for the relevant answers in that translated English Text..&lt;/p&gt;
 
-&lt;p&gt;Similarly, we initially transformed textual information into their corresponding embeddings. Now,  when you pose a query, it undergoes a similiar kind of conversion into the numeric form using the same embedding model applied previously to process our textual chunks. This consistent approach allows for efficient retrieval of relevant responses.&lt;/p&gt;
+&lt;p&gt;Similarly, we initially transformed textual information into their corresponding embeddings. Now,  when you pose a query, it undergoes a similar kind of conversion into the numeric form using the same embedding model applied previously to process our textual chunks. This consistent approach allows for efficient retrieval of relevant responses.&lt;/p&gt;
 
 &lt;h3 id=&quot;step-6--fetch-k-number-of-documents&quot;&gt;Step 6 : Fetch K number of documents.&lt;/h3&gt;
 
@@ -556,15 +655,15 @@ model_kwargs = {&quot;temperature&quot;: 0.5, &quot;max_length&quot;: 4096, &quo
 model = HuggingFaceHub(repo_id=llm_repo_id, model_kwargs=model_kwargs)
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;In this code snippet, we’re instantiating our language model using the Hugging Face Hub. Specifically, we’re selecting the zephyr 7 billion model which is placed in this repository ID &lt;a href=&quot;https://huggingface.co/HuggingFaceH4/zephyr-7b-alpha&quot;&gt;“huggingfaceh4/zephyr-7b-alpha”&lt;/a&gt;. Choice of choosing this model isn’t arbitrary; as I said before, it’s based on the model’s suitability for our specific task and requirements. As we are already implementing only Open Source components, Zephyr 7 billion works good enough to generate the useful response with minimal overhead and low latency.&lt;/p&gt;
+&lt;p&gt;In this code snippet, we’re instantiating our language model using the Hugging Face Hub. Specifically, we’re selecting the zephyr 7 billion model which is placed in this repository ID &lt;a href=&quot;https://huggingface.co/HuggingFaceH4/zephyr-7b-alpha&quot;&gt;“huggingfaceh4/zephyr-7b-alpha”&lt;/a&gt;. Choosing this model isn’t arbitrary; as I said before, it’s based on the model’s suitability for our specific task and requirements. As we are already implementing only Open Source components, Zephyr 7 billion works good enough to generate a useful response with minimal overhead and low latency.&lt;/p&gt;
 
-&lt;p&gt;This model comes with some additional parameters to fine-tune its behavior. We’ve set the temperature to 0.5, which controls the randomness of the generated text. As a lower temperature tends to result in more conservative and predictable outputs and    when the temperature is set to max which is 1, the model tries to be as much creative as it could, so based on what type of output you want for your use case, you can tweak this parameter. For the sake of the simplicity and demonstration purposes, I set it to 0.5 to make sure we get decent results. Next is max_length parameter which defines the maximum length of the generated text and it includes the size of your prompt as well as the response.&lt;/p&gt;
+&lt;p&gt;This model comes with some additional parameters to fine-tune its behavior. We’ve set the temperature to 0.5, which controls the randomness of the generated text. As a lower temperature tends to result in more conservative and predictable outputs and when the temperature is set to max which is 1, the model tries to be as creative as it could, so based on what type of output you want for your use case, you can tweak this parameter. For the sake of the simplicity and demonstration purposes, I set it to 0.5 to make sure we get decent results. Next is max_length parameter which defines the maximum length of the generated text and it includes the size of your prompt as well as the response.&lt;/p&gt;
 
-&lt;p&gt;max_new_tokens sets the threshold on maximum number of new tokens that can be generated. As a general rule of thumb, the max_new_tokens should always be less than or equal to the max_length parameter. Why? Think about it..&lt;/p&gt;
+&lt;p&gt;max_new_tokens sets the threshold on the maximum number of new tokens that can be generated. As a general rule of thumb, the max_new_tokens should always be less than or equal to the max_length parameter. Why? Think about it..&lt;/p&gt;
 
 &lt;h3 id=&quot;step-8--create-a-chain-for-invoking-the-llm&quot;&gt;Step 8 : Create a chain for invoking the LLM.&lt;/h3&gt;
 
-&lt;p&gt;We have everything we want for our RAG application, last thing we need to do is to create a chain for invoking the LLM on our query to generate the response. There are different types of chains for the different types of use cases, if you like your LLM to remember the context of the chat over the time like the ChatGPT , you would need a memory instance which can be shared among multiple conversation pieces, for such cases, there are conversational chains available.&lt;/p&gt;
+&lt;p&gt;We have everything we want for our RAG application. The last thing we need to do is to create a chain for invoking the LLM on our query to generate the response. There are different types of chains for the different types of use cases, if you like your LLM to remember the context of the chat over the time like the ChatGPT , you would need a memory instance which can be shared among multiple conversation pieces, for such cases, there are conversational chains available.&lt;/p&gt;
 
 &lt;p&gt;For now we just need a chain which can combine our retrieved contexts and pass it with the query to the LLM to generate the response.&lt;/p&gt;
 
