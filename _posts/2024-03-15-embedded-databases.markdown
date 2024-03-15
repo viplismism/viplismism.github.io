@@ -4,11 +4,11 @@ title: Why LanceDB is shitty
 description: How LanceDB is beating ass of every other Embedded Database
 summary: Everything related to the Embedded database
 tags: [LLM, Embedded Databases, LanceDB]
-version: Draft
+version: Released
 release: 15-03-2024
 ---
 
-![production_fucked]()
+![production_fucked](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/production_fucked.png?raw=true)
 
 In today's world, when everyone's curious about trying out generative AI tools and how they work, you've probably heard about embedded databases. Most of us tend to think about client-server based setups when databases come to mind. And honestly, that's somewhat accurate.
 

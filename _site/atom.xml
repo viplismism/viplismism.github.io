@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-03-15T13:05:14+05:30</updated>
+ <updated>2024-03-15T13:14:01+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -17,7 +17,7 @@
    <link href="http://localhost:4000/2024/03/15/embedded-databases"/>
    <updated>2024-03-15T00:00:00+05:30</updated>
    <id>http://localhost:4000/2024/03/15/embedded-databases</id>
-   <content type="html">&lt;p&gt;&lt;img src=&quot;&quot; alt=&quot;production_fucked&quot; /&gt;&lt;/p&gt;
+   <content type="html">&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/production_fucked.png?raw=true&quot; alt=&quot;production_fucked&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;In today’s world, when everyone’s curious about trying out generative AI tools and how they work, you’ve probably heard about embedded databases. Most of us tend to think about client-server based setups when databases come to mind. And honestly, that’s somewhat accurate.&lt;/p&gt;
 
