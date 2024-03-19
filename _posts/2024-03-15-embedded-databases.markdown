@@ -4,7 +4,7 @@ title: Embedded Databases
 description: How LanceDB is beating ass of every other Embedded Database
 summary: Everything related to the Embedded database
 tags: [LLM, Embedded Databases, LanceDB]
-version: Draft
+version: Released
 release: 15-03-2024
 ---
 
@@ -34,7 +34,7 @@ Building on the advantages of Apache Arrow's columnar, in-memory approach for ma
 
 Designed from the ground up with modern ML workflows in mind, Lance is an absolute speed demon when it comes to querying and prepping data for training models. But it's not just about raw speed – Lance has some seriously impressive versatility under the hood.
 
-Unlike formats limited to tabular data, Lance can handle all kinds of data types like images, videos, 3D point clouds, audio, and more. It's like a Swiss Army knife of data formats for ML. Btw, Don't just take my word for it because I love LanceDB, instead – ![benchmarks](https://blog.lancedb.com/announcing-lancedb-5cb0deaa46ee-2/) have shown that Lance can provide random data access involving read and write operation a mind-boggling approximately 1000 times faster than Parquet, another popular columnar format. This blistering speed comes from unique storage memory layout used by Lance.
+Unlike formats limited to tabular data, Lance can handle all kinds of data types like images, videos, 3D point clouds, audio, and more. It's like a Swiss Army knife of data formats for ML. Btw, Don't just take my word for it because I love LanceDB, instead – [benchmarks](https://blog.lancedb.com/announcing-lancedb-5cb0deaa46ee-2/) have shown that Lance can provide random data access involving read and write operation a mind-boggling approximately 1000 times faster than Parquet, another popular columnar format. This blistering speed comes from unique storage memory layout used by Lance.
 
 The other important thing LanceDB provides is the usage of Zero-copy versioning, essentially it means that when you create a new version of your data, LanceDB doesn't have to make an entire copy – it just stores the changes efficiently. This saves a ton of time and storage space compared to traditional versioning methods. And optimized vector operations allow Lance to process data in bulk, taking full advantage of modern hardware like GPUs and vectorized CPUs. It’s all part of Lance's cloud-native design.
 
