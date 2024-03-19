@@ -20,7 +20,7 @@ Hard drives store data in terms of blocks, so whenever an operation is performed
 
 This implies that when you need to perform column-oriented operations like updating columns, aggregations, or selecting a column entry, column-oriented databases outperform row-oriented ones in terms of speed. However, if you need to add a new data point entry with multiple columns, then row-oriented databases perform better.
 
-Now, the point is, there's something called Apache Arrow, which is a language-independent columnar memory format for flat and hierarchical data, organized for efficient analytic operations on modern hardware like CPUs and GPUs. 
+Now, the point is, there's something called Apache Arrow, which is a language-agnostic columnar memory format for flat and hierarchical data, organized for efficient analytic operations on modern hardware like CPUs and GPUs. 
 
 This is too technical. Let me break it down for you. Machine learning is all about feeding huge amounts of data into complex mathematical models to find patterns and make predictions, right? Now, Apache Arrow turbocharges this process by providing a standardized way to store and work with data that's [optimized](https://developer.nvidia.com/blog/accelerating-apache-spark-3-0-with-gpus-and-rapids/) for modern hardware like powerful GPUs. So Instead of dealing with clunky row-based formats, Arrow's columnar layout lets you focus on the specific data features you need, drastically cutting down processing time. And since Arrow keeps data in memory, AKA RAM, rather than on sluggish disk storage like hard drives or SSDs, your models can crunch through datasets at blistering speeds. The end result? You can iterate faster, train better models, and stay ahead of the competition.
 
@@ -34,9 +34,9 @@ Building on the advantages of Apache Arrow's columnar, in-memory approach for ma
 
 Designed from the ground up with modern ML workflows in mind, Lance is an absolute speed demon when it comes to querying and prepping data for training models. But it's not just about raw speed – Lance has some seriously impressive versatility under the hood.
 
-Unlike formats limited to tabular data, Lance can handle all kinds of data types like images, videos, 3D point clouds, audio, and more. It's like a Swiss Army knife of data formats for ML. And btw, Don't just take my word for it because I love LanceDB, instead – [benchmarks](https://blog.lancedb.com/announcing-lancedb-5cb0deaa46ee-2/) have shown that Lance can provide random data access a mind-boggling 100 times faster than Parquet, another popular columnar format.
+Unlike formats limited to tabular data, Lance can handle all kinds of data types like images, videos, 3D point clouds, audio, and more. It's like a Swiss Army knife of data formats for ML. Btw, Don't just take my word for it because I love LanceDB, instead – ![benchmarks](https://blog.lancedb.com/announcing-lancedb-5cb0deaa46ee-2/) have shown that Lance can provide random data access involving read and write operation a mind-boggling approximately 1000 times faster than Parquet, another popular columnar format. This blistering speed comes from unique storage memory layout used by Lance.
 
-This blistering speed comes from clever tricks like zero-copy versioning and optimized vector operations. So basically, zero-copy versioning means that when you create a new version of your data, Lance doesn't have to make an entire copy – it just stores the changes efficiently. This saves a ton of time and storage space compared to traditional versioning methods. And optimized vector operations allow Lance to process data in bulk, taking full advantage of modern hardware like GPUs and vectorized CPUs. It’s all part of Lance's cloud-native design.
+The other important thing LanceDB provides is the usage of Zero-copy versioning, essentially it means that when you create a new version of your data, LanceDB doesn't have to make an entire copy – it just stores the changes efficiently. This saves a ton of time and storage space compared to traditional versioning methods. And optimized vector operations allow Lance to process data in bulk, taking full advantage of modern hardware like GPUs and vectorized CPUs. It’s all part of Lance's cloud-native design.
 
 ### In-process
 
@@ -68,9 +68,9 @@ And btw, when we are talking about the Serverless model, it is often associated 
 
 ![lancedb_scaled](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/lancedb_scaled.png?raw=true)
 
-Ok so you decided to work on the simple RAG system and wanted to test it out or just maybe play with it and came up with the various vector databases, you did your experiment,  you are happy and done. Now when you got serious and came up with something and wanted to scale your RAG system for let’s say 1 billion embeddings, you open up your earlier setup, ingested more data, created more embeddings and when the time came, your traditional embedding database gave you nightmare in terms of the latency as well as storage capabilities.
+Ok so you decided to work on the simple RAG system and wanted to test it out or just maybe play with it and came up with the various vector databases, you did your experiment,  you are happy and done. Now when you got serious and came up with something and wanted to scale your RAG system for let’s say 1 billion embeddings, you open up your earlier setup, ingested more data, created more embeddings and when the time came, your traditional embedding database gave you nightmares in terms of the latency as well as stability.
 
-Now think of an embedding database which is open source, works for all kinds of setups, scales up to billions of embeddings, fetch the relevant embeddings with amazing searching capabilities and data never leaves your local machine, feels too good to be true right?! Well there is LanceDB again. I mean from the moment you dirty your hands for your next RAG system all upto the time you put something as big as production, LanceDB scales amazingly well… 
+Now, Think of an open-source embedding database designed to seamlessly handle a variety of setups and effortlessly scales up to billions of vectors locally., scales up to billions of embeddings, fetch the relevant embeddings with amazing searching capabilities and data never leaves your local machine, feels too good to be true right?! Well there is LanceDB again. I mean from the moment you dirty your hands for your next RAG system all upto the time you put something as big as production, LanceDB scales amazingly well… 
 
 ### Multimodality
 
@@ -103,4 +103,4 @@ Woah, I do love LanceDB
 
 ![gen_ai_application](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/gen_ai_applications.png?raw=true)
 
-Well all of them are bundled together with no cost upfront, ready to serve in one installation click and voila baby, you have your new best friend, maybe more than that, who knows? So what are you waiting for? Here is the reference, see you soon.
+Well all of them are bundled together with no cost upfront, ready to serve in one installation click and voila baby, you have your new best friend, maybe more than that, who knows? So what are you waiting for? Here is the [reference](https://lancedb.com/), see you soon.
