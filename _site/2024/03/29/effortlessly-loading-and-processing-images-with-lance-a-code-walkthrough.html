@@ -1,66 +1,63 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Jekyll v4.3.3" /><meta property="og:title" content="Effortlessly Loading and Processing Images with Lance" /><meta property="og:locale" content="en_US" /><meta name="description" content="How you can use the lance format to work with big sized data" /><meta property="og:description" content="How you can use the lance format to work with big sized data" /><link rel="canonical" href="http://localhost:4000/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough" /><meta property="og:url" content="http://localhost:4000/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough" /><meta property="og:site_name" content="Blixxi Labs" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2024-03-29T00:00:00+05:30" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="Effortlessly Loading and Processing Images with Lance" /><meta name="twitter:site" content="@PinakaX" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-03-29T00:00:00+05:30","datePublished":"2024-03-29T00:00:00+05:30","description":"How you can use the lance format to work with big sized data","headline":"Effortlessly Loading and Processing Images with Lance","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough"},"url":"http://localhost:4000/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough"}</script><title> Effortlessly Loading and Processing Images with Lance - Blixxi Labs</title><link rel="shortcut icon" href="/favicon.png"><link rel="alternate" type="application/atom+xml" title="Blixxi Labs" href="/atom.xml"><link rel="alternate" type="application/json" title="Blixxi Labs" href="http://localhost:4000/feed.json" /><link rel="sitemap" type="application/xml" title="sitemap" href="/sitemap.xml" /><style> *,:after,:before{box-sizing:border-box;background-color:inherit;color:inherit;margin:0;padding:0}body{font-family:system-ui,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.5;font-size:1rem;color:#16171a}nav ul{border-right:1px solid #edf2f7}a{color:#000;text-decoration-skip-ink:auto;text-decoration:underline}pre{margin:.5rem 0;padding:.5rem}.post p{margin:.5rem 0}.post h1,.post h2,.post h3,.post h4{margin:1rem 0}.post h2:first-child,.project h2:first-child,.photo h2:first-child{margin-top:0}.meta{margin:2rem 0}code,pre{background:#f5f5f5;max-width:100%;overflow-x:auto}code{padding:.1rem;font-size:.85rem}pre code{border:none}pre{padding:1rem;overflow-x:auto}img{max-width:100%;background:none;display:block;margin:auto}hr{background:#000;height:1px;border:0}header{flex-basis:10rem;flex-grow:1;position:relative}header a{text-decoration:none}header li{margin-bottom:.2rem;text-align:right;margin-right:2rem}header a.active{font-weight:bold}header,section{padding:1rem}blockquote{font-style:italic;border-left:5px solid #ececec;padding-left:1rem}h1,h2,h3,h4,h5{line-height:1;margin:1rem 0;font-weight:600}section h1:first-child{margin-top:0}strong,b{font-weight:bold}.photos ul{list-style:none}.photos li{margin-bottom:1.5rem}.photo picture,.project picture{margin-bottom:.5rem}.posts ul,header ul{list-style:none}.posts li{align-items:center;display:flex;justify-content:space-between;margin-bottom:.5rem}.posts li a,.posts li div,.projects li a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none}.posts li time,.projects li time{padding-left:1rem;white-space:nowrap;font-variant-numeric:tabular-nums}.post ol,.project ul,.post ol,.post ul{padding-left:1rem}main{display:flex;flex-wrap:wrap;max-width:60rem;margin:2rem auto;padding:1rem}@media screen and (max-width: 45rem){header li{display:inline;margin-right:1rem}.logo{padding-bottom:1rem}header ul{border-bottom:1px solid #edf2f7;padding-bottom:2rem}nav ul{border-right:0px}.photos ul{margin-top:.5rem}}section{flex-basis:0;flex-grow:999;min-width:70%;display:flex;flex-direction:column}figcaption{font-size:smaller}@media print{.no-print,.no-print *{display:none !important}}.back-to-top{position:fixed;bottom:20px;right:20px;background-color:#fff;color:#000;padding:10px;text-decoration:none;border-radius:5px;display:block;margin-right:20%}</style></head><body><main><header aria-hidden="true" class="no-print"> <!--<h1 class="logo">Blixxi Labs</h1>--><nav role="navigation" aria-hidden="true"><ul><li><a href="/" >Home</a></li><li><a href="/about" >About</a></li><li><a href="/contact" >Contact</a></li></ul></nav></header><section class="post"><h1>Effortlessly Loading and Processing Images with Lance</h1><p>Working with large image datasets in machine learning can be challenging, often requiring significant computational resources and efficient data-handling techniques. While widely used for image storage, traditional file formats like JPEG or PNG are not optimized for efficient data loading and processing in Machine learning workflows. This is where the Lance format shines, offering a modern, columnar data storage solution designed specifically for machine learning applications.</p><p><img src="" alt="meme_for_ml_workloads" /></p><p>The Lance format stores data in a compressed columnar format, enabling efficient storage, fast data loading, and fast random access to data subsets. Additionally, the Lance format is maintained on disk, which provides a couple of advantages: It will persist through a system failure and doesn’t rely on keeping everything in memory, which can run out. This also lends itself to enhanced data privacy and security, as the data doesn’t need to be transferred over a network.</p><p>One of the other key advantages of the Lance format is its ability to store diverse data types, such as images, text, and numerical data, in a unified format. Imagine having a data lake where each kind of data can be stored seamlessly without separating underlying data types. This flexibility is particularly valuable in machine learning pipelines, where different data types often need to be processed together. This unparalleled flexibility is a game-changer in machine learning pipelines, where different modalities of data often need to be processed together for tasks like multimodal learning, audio-visual analysis, or natural language processing with visual inputs.</p><p>With Lance, you can effortlessly consider all kinds of data, from images to videos and audio files to text data and numerical values, all within the same columnar storage format. This means you can have a single, streamlined data pipeline that can handle any combination of data types without the need for complex data transformations or conversions. Lance easily handles it without worrying about compatibility issues or dealing with separate storage formats for different data types. And the best part? You can store and retrieve all these diverse data types within the same column.</p><p>In contrast, while efficient for tabular data, traditional formats like Parquet may need to handle diverse data types better. By converting all data into a single, unified format using Lance, you can retrieve and process any type of data without dealing with multiple formats or complex data structures. In this article, I’ll walk through a Python code example that demonstrates how to convert a dataset of GTA5 images into the Lance format and subsequently load them into a Pandas DataFrame for further processing.</p><pre><code class="language-python">import os
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Jekyll v4.3.3" /><meta property="og:title" content="Effortlessly Loading and Processing Images with Lance" /><meta property="og:locale" content="en_US" /><meta name="description" content="How you can use the lance format to work with big sized data" /><meta property="og:description" content="How you can use the lance format to work with big sized data" /><link rel="canonical" href="http://localhost:4000/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough" /><meta property="og:url" content="http://localhost:4000/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough" /><meta property="og:site_name" content="Blixxi Labs" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2024-03-29T00:00:00+05:30" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="Effortlessly Loading and Processing Images with Lance" /><meta name="twitter:site" content="@PinakaX" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-03-29T00:00:00+05:30","datePublished":"2024-03-29T00:00:00+05:30","description":"How you can use the lance format to work with big sized data","headline":"Effortlessly Loading and Processing Images with Lance","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough"},"url":"http://localhost:4000/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough"}</script><title> Effortlessly Loading and Processing Images with Lance - Blixxi Labs</title><link rel="shortcut icon" href="/favicon.png"><link rel="alternate" type="application/atom+xml" title="Blixxi Labs" href="/atom.xml"><link rel="alternate" type="application/json" title="Blixxi Labs" href="http://localhost:4000/feed.json" /><link rel="sitemap" type="application/xml" title="sitemap" href="/sitemap.xml" /><style> *,:after,:before{box-sizing:border-box;background-color:inherit;color:inherit;margin:0;padding:0}body{font-family:system-ui,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.5;font-size:1rem;color:#16171a}nav ul{border-right:1px solid #edf2f7}a{color:#000;text-decoration-skip-ink:auto;text-decoration:underline}pre{margin:.5rem 0;padding:.5rem}.post p{margin:.5rem 0}.post h1,.post h2,.post h3,.post h4{margin:1rem 0}.post h2:first-child,.project h2:first-child,.photo h2:first-child{margin-top:0}.meta{margin:2rem 0}code,pre{background:#f5f5f5;max-width:100%;overflow-x:auto}code{padding:.1rem;font-size:.85rem}pre code{border:none}pre{padding:1rem;overflow-x:auto}img{max-width:100%;background:none;display:block;margin:auto}hr{background:#000;height:1px;border:0}header{flex-basis:10rem;flex-grow:1;position:relative}header a{text-decoration:none}header li{margin-bottom:.2rem;text-align:right;margin-right:2rem}header a.active{font-weight:bold}header,section{padding:1rem}blockquote{font-style:italic;border-left:5px solid #ececec;padding-left:1rem}h1,h2,h3,h4,h5{line-height:1;margin:1rem 0;font-weight:600}section h1:first-child{margin-top:0}strong,b{font-weight:bold}.photos ul{list-style:none}.photos li{margin-bottom:1.5rem}.photo picture,.project picture{margin-bottom:.5rem}.posts ul,header ul{list-style:none}.posts li{align-items:center;display:flex;justify-content:space-between;margin-bottom:.5rem}.posts li a,.posts li div,.projects li a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none}.posts li time,.projects li time{padding-left:1rem;white-space:nowrap;font-variant-numeric:tabular-nums}.post ol,.project ul,.post ol,.post ul{padding-left:1rem}main{display:flex;flex-wrap:wrap;max-width:60rem;margin:2rem auto;padding:1rem}@media screen and (max-width: 45rem){header li{display:inline;margin-right:1rem}.logo{padding-bottom:1rem}header ul{border-bottom:1px solid #edf2f7;padding-bottom:2rem}nav ul{border-right:0px}.photos ul{margin-top:.5rem}}section{flex-basis:0;flex-grow:999;min-width:70%;display:flex;flex-direction:column}figcaption{font-size:smaller}@media print{.no-print,.no-print *{display:none !important}}.back-to-top{position:fixed;bottom:20px;right:20px;background-color:#fff;color:#000;padding:10px;text-decoration:none;border-radius:5px;display:block;margin-right:20%}</style></head><body><main><header aria-hidden="true" class="no-print"> <!--<h1 class="logo">Blixxi Labs</h1>--><nav role="navigation" aria-hidden="true"><ul><li><a href="/" >Home</a></li><li><a href="/about" >About</a></li><li><a href="/contact" >Contact</a></li></ul></nav></header><section class="post"><h1>Effortlessly Loading and Processing Images with Lance</h1><p>Working with large image datasets in machine learning can be challenging, often requiring significant computational resources and efficient data-handling techniques. While widely used for image storage, traditional file formats like JPEG or PNG are not optimized for efficient data loading and processing in Machine learning workflows. This is where the Lance format shines, offering a modern, columnar data storage solution designed specifically for machine learning applications.</p><p><img src="https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/loading_and_processing_image_with_lance/image.png?raw=true" alt="meme_for_ml_workloads" /></p><p>The Lance format stores data in a compressed columnar format, enabling efficient storage, fast data loading, and fast random access to data subsets. Additionally, the Lance format is maintained on disk, which provides a couple of advantages: It will persist through a system failure and doesn’t rely on keeping everything in memory, which can run out. This also lends itself to enhanced data privacy and security, as the data doesn’t need to be transferred over a network.</p><p>One of the other key advantages of the Lance format is its ability to store diverse data types, such as images, text, and numerical data, in a unified format. Imagine having a data lake where each kind of data can be stored seamlessly without separating underlying data types. This flexibility is particularly valuable in machine learning pipelines, where different data types often need to be processed together. This unparalleled flexibility is a game-changer in machine learning pipelines, where different modalities of data often need to be processed together for tasks like multimodal learning, audio-visual analysis, or natural language processing with visual inputs.</p><p>With Lance, you can effortlessly consider all kinds of data, from images to videos and audio files to text data and numerical values, all within the same columnar storage format. This means you can have a single, streamlined data pipeline that can handle any combination of data types without the need for complex data transformations or conversions. Lance easily handles it without worrying about compatibility issues or dealing with separate storage formats for different data types. And the best part? You can store and retrieve all these diverse data types within the same column.</p><p>In contrast, while efficient for tabular data, traditional formats like Parquet may need to handle diverse data types better. By converting all data into a single, unified format using Lance, you can retrieve and process any type of data without dealing with multiple formats or complex data structures. In this article, I’ll walk through a Python code example that demonstrates how to convert a dataset of GTA5 images into the Lance format and subsequently load them into a Pandas DataFrame for further processing.</p><pre><code class="language-python">import os
 import pandas as pd
 import pyarrow as pa
 import lance
 import time
 from tqdm import tqdm
 </code></pre><p>We start by importing the necessary libraries, including os for directory handling, pandas for data manipulation, pyarrow for working with Arrow data formats, lance for interacting with the Lance format, and tqdm for displaying progress bars.</p><pre><code class="language-python">def process_images():
-    # Get the current directory path
     current_dir = os.getcwd()
     images_folder = os.path.join(current_dir, "./image")
 
     # Define schema for RecordBatch
     schema = pa.schema([('image', pa.binary())])
 
-    # Get the list of image files
     image_files = [filename for filename in os.listdir(images_folder)
-          		 if filename.endswith((".png", ".jpg", ".jpeg"))]
+                if filename.endswith((".png", ".jpg", ".jpeg"))]
 
     # Iterate over all images in the folder with tqdm
     for filename in tqdm(image_files, desc="Processing Images"):
-        	# Construct the full path to the image
-        	image_path = os.path.join(images_folder, filename)
+        # Construct the full path to the image
+        image_path = os.path.join(images_folder, filename)
 
-        	# Read and convert the image to a binary format
-        	with open(image_path, 'rb') as f:
-            	binary_data = f.read()
+        # Read and convert the image to a binary format
+        with open(image_path, 'rb') as f:
+            binary_data = f.read()
 
-        	image_array = pa.array([binary_data], type=pa.binary())
+        image_array = pa.array([binary_data], type=pa.binary())
 
-        	# Yield RecordBatch for each image
-        	yield pa.RecordBatch.from_arrays([image_array], schema=schema)
+        # Yield RecordBatch for each image
+        yield pa.RecordBatch.from_arrays([image_array], schema=schema)
 </code></pre><p>The process_images function is responsible for iterating over all image files in a specified directory and converting them into PyArrow RecordBatch objects. It first defines the schema for the RecordBatch, specifying that each batch will contain a single binary column named ‘image’.</p><p>It then iterates over all image files in the directory, reads each image’s binary data, and yields a RecordBatch containing that image’s binary data.</p><pre><code class="language-python">def write_to_lance():
-	# Create an empty RecordBatchIterator
-	schema = pa.schema([
-    	pa.field("image", pa.binary())
-	])
+    schema = pa.schema([
+        pa.field("image", pa.binary())
+    ])
 
-	reader = pa.RecordBatchReader.from_batches(schema, process_images())
-	lance.write_dataset(
-    	reader,
-    	"image_dataset.lance",
-    	schema,
-	)
+    reader = pa.RecordBatchReader.from_batches(schema, process_images())
+    lance.write_dataset(
+        reader,
+        "image_dataset.lance",
+        schema,
+    )
 </code></pre><p>The write_to_lance function creates a RecordBatchReader from the process_images generator and writes the resulting data to a Lance dataset named “image_dataset.lance”. This step converts the image data into the efficient, columnar Lance format, optimizing it for fast data loading and random access.</p><pre><code class="language-python">def loading_into_pandas():
-	uri = "image_dataset.lance"
-	ds = lance.dataset(uri)
+    uri = "image_dataset.lance"
+    ds = lance.dataset(uri)
 
-	# Accumulate data from batches into a list
-	data = []
-	for batch in ds.to_batches(columns=["image"], batch_size=10):
-    	tbl = batch.to_pandas()
-    	data.append(tbl)
+    # Accumulate data from batches into a list
+    data = []
+    for batch in ds.to_batches(columns=["image"], batch_size=10):
+        tbl = batch.to_pandas()
+        data.append(tbl)
 
-	# Concatenate all DataFrames into a single DataFrame
-	df = pd.concat(data, ignore_index=True)
-	print("Pandas DataFrame is ready")
-	print("Total Rows: ", df.shape[0])
+    # Concatenate all DataFrames into a single DataFrame
+    df = pd.concat(data, ignore_index=True)
+    print("Pandas DataFrame is ready")
+    print("Total Rows: ", df.shape[0])
 </code></pre><p>The loading_into_pandas function demonstrates how to load the image data from the Lance dataset into a Pandas DataFrame. It first creates a Lance dataset object from the “image_dataset.lance” file. Then, it iterates over batches of data, converting each batch into a Pandas DataFrame and appending it to a list. Finally, it concatenates all the DataFrames in the list into a single DataFrame, making the image data accessible for further processing or analysis.</p><pre><code class="language-python">if __name__ == "__main__":
-	start = time.time()
-	write_to_lance()
-	loading_into_pandas()
-	end = time.time()
-	print(f"Time(sec): {end - start}")
+    start = time.time()
+    write_to_lance()
+    loading_into_pandas()
+    end = time.time()
+    print(f"Time(sec): {end - start}")
 </code></pre><p>The central part of the script calls the write_to_lance and loading_into_pandas functions, measuring the total execution time for the entire process. By leveraging the Lance format, this code demonstrates how to efficiently store and load large image datasets for machine learning applications. The columnar storage and compression techniques Lance uses result in reduced storage requirements and faster data loading times, making it an ideal choice for working with large-scale image data.</p><p>Moreover, the random access capabilities of Lance allow for selective loading of specific data subsets, enabling efficient data augmentation techniques and custom data loading strategies tailored to your machine learning workflow.</p><p>TLDR: Lance format provides a powerful and efficient solution for handling multimodal data in machine learning pipelines, streamlining data storage, loading, and processing tasks. By adopting Lance, we can improve our machine learning projects’ overall performance and resource efficiency while also benefiting from the ability to store diverse data types in a unified format and maintain data locality and privacy. Here is the whole script for your reference.</p><pre><code class="language-python">import os
 import pandas as pd
 import pyarrow as pa
@@ -69,131 +66,126 @@ import time
 from tqdm import tqdm
 
 def process_images():
-    # Get the current directory path
     current_dir = os.getcwd()
     images_folder = os.path.join(current_dir, "./image")
 
     # Define schema for RecordBatch
     schema = pa.schema([('image', pa.binary())])
 
-    # Get the list of image files
     image_files = [filename for filename in os.listdir(images_folder)
-          		 if filename.endswith((".png", ".jpg", ".jpeg"))]
+                if filename.endswith((".png", ".jpg", ".jpeg"))]
 
     # Iterate over all images in the folder with tqdm
     for filename in tqdm(image_files, desc="Processing Images"):
-        	# Construct the full path to the image
-        	image_path = os.path.join(images_folder, filename)
+        # Construct the full path to the image
+        image_path = os.path.join(images_folder, filename)
 
-        	# Read and convert the image to a binary format
-        	with open(image_path, 'rb') as f:
-            	binary_data = f.read()
+        # Read and convert the image to a binary format
+        with open(image_path, 'rb') as f:
+            binary_data = f.read()
 
-        	image_array = pa.array([binary_data], type=pa.binary())
+        image_array = pa.array([binary_data], type=pa.binary())
 
-        	# Yield RecordBatch for each image
-        	yield pa.RecordBatch.from_arrays([image_array], schema=schema)
+        # Yield RecordBatch for each image
+        yield pa.RecordBatch.from_arrays([image_array], schema=schema)
 
-# Function to write PyArrow Table to Lance dataset
 def write_to_lance():
-	# Create an empty RecordBatchIterator
-	schema = pa.schema([
-    	pa.field("image", pa.binary())
-	])
+    
+    schema = pa.schema([
+        pa.field("image", pa.binary())
+    ])
 
-	reader = pa.RecordBatchReader.from_batches(schema, process_images())
-	lance.write_dataset(
-    	reader,
-    	"image_dataset.lance",
-    	schema,
-	)
+    reader = pa.RecordBatchReader.from_batches(schema, process_images())
+    lance.write_dataset(
+        reader,
+        "image_dataset.lance",
+        schema,
+    )
 
 def loading_into_pandas():
 
-	uri = "image_dataset.lance"
-	ds = lance.dataset(uri)
+    uri = "image_dataset.lance"
+    ds = lance.dataset(uri)
 
-	# Accumulate data from batches into a list
-	data = []
-	for batch in ds.to_batches(columns=["image"], batch_size=10):
-    	tbl = batch.to_pandas()
-    	data.append(tbl)
+    # Accumulate data from batches into a list
+    data = []
+    for batch in ds.to_batches(columns=["image"], batch_size=10):
+        tbl = batch.to_pandas()
+        data.append(tbl)
 
-	# Concatenate all DataFrames into a single DataFrame
-	df = pd.concat(data, ignore_index=True)
-	print("Pandas DataFrame is ready")
-	print("Total Rows: ", df.shape[0])
+    # Concatenate all DataFrames into a single DataFrame
+    df = pd.concat(data, ignore_index=True)
+    print("Pandas DataFrame is ready")
+    print("Total Rows: ", df.shape[0])
 
 
 if __name__ == "__main__":
-	start = time.time()
-	write_to_lance()
-	loading_into_pandas()
-	end = time.time()
-	print(f"Time(sec): {end - start}")
-</code></pre><span class="meta"><time datetime="2024-03-29T00:00:00+05:30">March 29, 2024</time></span></section><!-- --- layout: default ---<section class="post"><h2>Effortlessly Loading and Processing Images with Lance</h2><p>Working with large image datasets in machine learning can be challenging, often requiring significant computational resources and efficient data-handling techniques. While widely used for image storage, traditional file formats like JPEG or PNG are not optimized for efficient data loading and processing in Machine learning workflows. This is where the Lance format shines, offering a modern, columnar data storage solution designed specifically for machine learning applications.</p><p><img src="" alt="meme_for_ml_workloads" /></p><p>The Lance format stores data in a compressed columnar format, enabling efficient storage, fast data loading, and fast random access to data subsets. Additionally, the Lance format is maintained on disk, which provides a couple of advantages: It will persist through a system failure and doesn’t rely on keeping everything in memory, which can run out. This also lends itself to enhanced data privacy and security, as the data doesn’t need to be transferred over a network.</p><p>One of the other key advantages of the Lance format is its ability to store diverse data types, such as images, text, and numerical data, in a unified format. Imagine having a data lake where each kind of data can be stored seamlessly without separating underlying data types. This flexibility is particularly valuable in machine learning pipelines, where different data types often need to be processed together. This unparalleled flexibility is a game-changer in machine learning pipelines, where different modalities of data often need to be processed together for tasks like multimodal learning, audio-visual analysis, or natural language processing with visual inputs.</p><p>With Lance, you can effortlessly consider all kinds of data, from images to videos and audio files to text data and numerical values, all within the same columnar storage format. This means you can have a single, streamlined data pipeline that can handle any combination of data types without the need for complex data transformations or conversions. Lance easily handles it without worrying about compatibility issues or dealing with separate storage formats for different data types. And the best part? You can store and retrieve all these diverse data types within the same column.</p><p>In contrast, while efficient for tabular data, traditional formats like Parquet may need to handle diverse data types better. By converting all data into a single, unified format using Lance, you can retrieve and process any type of data without dealing with multiple formats or complex data structures. In this article, I’ll walk through a Python code example that demonstrates how to convert a dataset of GTA5 images into the Lance format and subsequently load them into a Pandas DataFrame for further processing.</p><pre><code class="language-python">import os
+    start = time.time()
+    write_to_lance()
+    loading_into_pandas()
+    end = time.time()
+    print(f"Time(sec): {end - start}")
+
+</code></pre><p>Imagine using Lance-formatted image data to make machine learning and deep learning projects faster. Something big is coming up, stay tuned.</p><span class="meta"><time datetime="2024-03-29T00:00:00+05:30">March 29, 2024</time></span></section><!-- --- layout: default ---<section class="post"><h2>Effortlessly Loading and Processing Images with Lance</h2><p>Working with large image datasets in machine learning can be challenging, often requiring significant computational resources and efficient data-handling techniques. While widely used for image storage, traditional file formats like JPEG or PNG are not optimized for efficient data loading and processing in Machine learning workflows. This is where the Lance format shines, offering a modern, columnar data storage solution designed specifically for machine learning applications.</p><p><img src="https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/loading_and_processing_image_with_lance/image.png?raw=true" alt="meme_for_ml_workloads" /></p><p>The Lance format stores data in a compressed columnar format, enabling efficient storage, fast data loading, and fast random access to data subsets. Additionally, the Lance format is maintained on disk, which provides a couple of advantages: It will persist through a system failure and doesn’t rely on keeping everything in memory, which can run out. This also lends itself to enhanced data privacy and security, as the data doesn’t need to be transferred over a network.</p><p>One of the other key advantages of the Lance format is its ability to store diverse data types, such as images, text, and numerical data, in a unified format. Imagine having a data lake where each kind of data can be stored seamlessly without separating underlying data types. This flexibility is particularly valuable in machine learning pipelines, where different data types often need to be processed together. This unparalleled flexibility is a game-changer in machine learning pipelines, where different modalities of data often need to be processed together for tasks like multimodal learning, audio-visual analysis, or natural language processing with visual inputs.</p><p>With Lance, you can effortlessly consider all kinds of data, from images to videos and audio files to text data and numerical values, all within the same columnar storage format. This means you can have a single, streamlined data pipeline that can handle any combination of data types without the need for complex data transformations or conversions. Lance easily handles it without worrying about compatibility issues or dealing with separate storage formats for different data types. And the best part? You can store and retrieve all these diverse data types within the same column.</p><p>In contrast, while efficient for tabular data, traditional formats like Parquet may need to handle diverse data types better. By converting all data into a single, unified format using Lance, you can retrieve and process any type of data without dealing with multiple formats or complex data structures. In this article, I’ll walk through a Python code example that demonstrates how to convert a dataset of GTA5 images into the Lance format and subsequently load them into a Pandas DataFrame for further processing.</p><pre><code class="language-python">import os
 import pandas as pd
 import pyarrow as pa
 import lance
 import time
 from tqdm import tqdm
 </code></pre><p>We start by importing the necessary libraries, including os for directory handling, pandas for data manipulation, pyarrow for working with Arrow data formats, lance for interacting with the Lance format, and tqdm for displaying progress bars.</p><pre><code class="language-python">def process_images():
-    # Get the current directory path
     current_dir = os.getcwd()
     images_folder = os.path.join(current_dir, "./image")
 
     # Define schema for RecordBatch
     schema = pa.schema([('image', pa.binary())])
 
-    # Get the list of image files
     image_files = [filename for filename in os.listdir(images_folder)
-          		 if filename.endswith((".png", ".jpg", ".jpeg"))]
+                if filename.endswith((".png", ".jpg", ".jpeg"))]
 
     # Iterate over all images in the folder with tqdm
     for filename in tqdm(image_files, desc="Processing Images"):
-        	# Construct the full path to the image
-        	image_path = os.path.join(images_folder, filename)
+        # Construct the full path to the image
+        image_path = os.path.join(images_folder, filename)
 
-        	# Read and convert the image to a binary format
-        	with open(image_path, 'rb') as f:
-            	binary_data = f.read()
+        # Read and convert the image to a binary format
+        with open(image_path, 'rb') as f:
+            binary_data = f.read()
 
-        	image_array = pa.array([binary_data], type=pa.binary())
+        image_array = pa.array([binary_data], type=pa.binary())
 
-        	# Yield RecordBatch for each image
-        	yield pa.RecordBatch.from_arrays([image_array], schema=schema)
+        # Yield RecordBatch for each image
+        yield pa.RecordBatch.from_arrays([image_array], schema=schema)
 </code></pre><p>The process_images function is responsible for iterating over all image files in a specified directory and converting them into PyArrow RecordBatch objects. It first defines the schema for the RecordBatch, specifying that each batch will contain a single binary column named ‘image’.</p><p>It then iterates over all image files in the directory, reads each image’s binary data, and yields a RecordBatch containing that image’s binary data.</p><pre><code class="language-python">def write_to_lance():
-	# Create an empty RecordBatchIterator
-	schema = pa.schema([
-    	pa.field("image", pa.binary())
-	])
+    schema = pa.schema([
+        pa.field("image", pa.binary())
+    ])
 
-	reader = pa.RecordBatchReader.from_batches(schema, process_images())
-	lance.write_dataset(
-    	reader,
-    	"image_dataset.lance",
-    	schema,
-	)
+    reader = pa.RecordBatchReader.from_batches(schema, process_images())
+    lance.write_dataset(
+        reader,
+        "image_dataset.lance",
+        schema,
+    )
 </code></pre><p>The write_to_lance function creates a RecordBatchReader from the process_images generator and writes the resulting data to a Lance dataset named “image_dataset.lance”. This step converts the image data into the efficient, columnar Lance format, optimizing it for fast data loading and random access.</p><pre><code class="language-python">def loading_into_pandas():
-	uri = "image_dataset.lance"
-	ds = lance.dataset(uri)
+    uri = "image_dataset.lance"
+    ds = lance.dataset(uri)
 
-	# Accumulate data from batches into a list
-	data = []
-	for batch in ds.to_batches(columns=["image"], batch_size=10):
-    	tbl = batch.to_pandas()
-    	data.append(tbl)
+    # Accumulate data from batches into a list
+    data = []
+    for batch in ds.to_batches(columns=["image"], batch_size=10):
+        tbl = batch.to_pandas()
+        data.append(tbl)
 
-	# Concatenate all DataFrames into a single DataFrame
-	df = pd.concat(data, ignore_index=True)
-	print("Pandas DataFrame is ready")
-	print("Total Rows: ", df.shape[0])
+    # Concatenate all DataFrames into a single DataFrame
+    df = pd.concat(data, ignore_index=True)
+    print("Pandas DataFrame is ready")
+    print("Total Rows: ", df.shape[0])
 </code></pre><p>The loading_into_pandas function demonstrates how to load the image data from the Lance dataset into a Pandas DataFrame. It first creates a Lance dataset object from the “image_dataset.lance” file. Then, it iterates over batches of data, converting each batch into a Pandas DataFrame and appending it to a list. Finally, it concatenates all the DataFrames in the list into a single DataFrame, making the image data accessible for further processing or analysis.</p><pre><code class="language-python">if __name__ == "__main__":
-	start = time.time()
-	write_to_lance()
-	loading_into_pandas()
-	end = time.time()
-	print(f"Time(sec): {end - start}")
+    start = time.time()
+    write_to_lance()
+    loading_into_pandas()
+    end = time.time()
+    print(f"Time(sec): {end - start}")
 </code></pre><p>The central part of the script calls the write_to_lance and loading_into_pandas functions, measuring the total execution time for the entire process. By leveraging the Lance format, this code demonstrates how to efficiently store and load large image datasets for machine learning applications. The columnar storage and compression techniques Lance uses result in reduced storage requirements and faster data loading times, making it an ideal choice for working with large-scale image data.</p><p>Moreover, the random access capabilities of Lance allow for selective loading of specific data subsets, enabling efficient data augmentation techniques and custom data loading strategies tailored to your machine learning workflow.</p><p>TLDR: Lance format provides a powerful and efficient solution for handling multimodal data in machine learning pipelines, streamlining data storage, loading, and processing tasks. By adopting Lance, we can improve our machine learning projects’ overall performance and resource efficiency while also benefiting from the ability to store diverse data types in a unified format and maintain data locality and privacy. Here is the whole script for your reference.</p><pre><code class="language-python">import os
 import pandas as pd
 import pyarrow as pa
@@ -202,66 +194,64 @@ import time
 from tqdm import tqdm
 
 def process_images():
-    # Get the current directory path
     current_dir = os.getcwd()
     images_folder = os.path.join(current_dir, "./image")
 
     # Define schema for RecordBatch
     schema = pa.schema([('image', pa.binary())])
 
-    # Get the list of image files
     image_files = [filename for filename in os.listdir(images_folder)
-          		 if filename.endswith((".png", ".jpg", ".jpeg"))]
+                if filename.endswith((".png", ".jpg", ".jpeg"))]
 
     # Iterate over all images in the folder with tqdm
     for filename in tqdm(image_files, desc="Processing Images"):
-        	# Construct the full path to the image
-        	image_path = os.path.join(images_folder, filename)
+        # Construct the full path to the image
+        image_path = os.path.join(images_folder, filename)
 
-        	# Read and convert the image to a binary format
-        	with open(image_path, 'rb') as f:
-            	binary_data = f.read()
+        # Read and convert the image to a binary format
+        with open(image_path, 'rb') as f:
+            binary_data = f.read()
 
-        	image_array = pa.array([binary_data], type=pa.binary())
+        image_array = pa.array([binary_data], type=pa.binary())
 
-        	# Yield RecordBatch for each image
-        	yield pa.RecordBatch.from_arrays([image_array], schema=schema)
+        # Yield RecordBatch for each image
+        yield pa.RecordBatch.from_arrays([image_array], schema=schema)
 
-# Function to write PyArrow Table to Lance dataset
 def write_to_lance():
-	# Create an empty RecordBatchIterator
-	schema = pa.schema([
-    	pa.field("image", pa.binary())
-	])
+    
+    schema = pa.schema([
+        pa.field("image", pa.binary())
+    ])
 
-	reader = pa.RecordBatchReader.from_batches(schema, process_images())
-	lance.write_dataset(
-    	reader,
-    	"image_dataset.lance",
-    	schema,
-	)
+    reader = pa.RecordBatchReader.from_batches(schema, process_images())
+    lance.write_dataset(
+        reader,
+        "image_dataset.lance",
+        schema,
+    )
 
 def loading_into_pandas():
 
-	uri = "image_dataset.lance"
-	ds = lance.dataset(uri)
+    uri = "image_dataset.lance"
+    ds = lance.dataset(uri)
 
-	# Accumulate data from batches into a list
-	data = []
-	for batch in ds.to_batches(columns=["image"], batch_size=10):
-    	tbl = batch.to_pandas()
-    	data.append(tbl)
+    # Accumulate data from batches into a list
+    data = []
+    for batch in ds.to_batches(columns=["image"], batch_size=10):
+        tbl = batch.to_pandas()
+        data.append(tbl)
 
-	# Concatenate all DataFrames into a single DataFrame
-	df = pd.concat(data, ignore_index=True)
-	print("Pandas DataFrame is ready")
-	print("Total Rows: ", df.shape[0])
+    # Concatenate all DataFrames into a single DataFrame
+    df = pd.concat(data, ignore_index=True)
+    print("Pandas DataFrame is ready")
+    print("Total Rows: ", df.shape[0])
 
 
 if __name__ == "__main__":
-	start = time.time()
-	write_to_lance()
-	loading_into_pandas()
-	end = time.time()
-	print(f"Time(sec): {end - start}")
-</code></pre><span class="meta"><time datetime="2024-03-29T00:00:00+05:30">March 29, 2024</time> &middot; <a href="/tag/Lance">Lance</a>, <a href="/tag/LanceDB">LanceDB</a></span>--> <!--</section>--></main><script async src="https://www.googletagmanager.com/gtag/js?id=G-JBZRCCYMBP"></script> <script> window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-JBZRCCYMBP'); </script></body></html>
+    start = time.time()
+    write_to_lance()
+    loading_into_pandas()
+    end = time.time()
+    print(f"Time(sec): {end - start}")
+
+</code></pre><p>Imagine using Lance-formatted image data to make machine learning and deep learning projects faster. Something big is coming up, stay tuned.</p><span class="meta"><time datetime="2024-03-29T00:00:00+05:30">March 29, 2024</time> &middot; <a href="/tag/Lance">Lance</a>, <a href="/tag/LanceDB">LanceDB</a></span>--> <!--</section>--></main><script async src="https://www.googletagmanager.com/gtag/js?id=G-JBZRCCYMBP"></script> <script> window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-JBZRCCYMBP'); </script></body></html>

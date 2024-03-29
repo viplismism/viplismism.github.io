@@ -4,15 +4,14 @@ title: Effortlessly Loading and Processing Images with Lance
 description: How you can use the lance format to work with big sized data
 summary: This post tells us how we can use the lance format to work around the big dataset of various images and why it's better than other cases. Used GTA5 image dataset for this post
 tags: [Lance, LanceDB]
-version: Released
+version: Draft
 release: 29-03-2024
 ---
 
 
 Working with large image datasets in machine learning can be challenging, often requiring significant computational resources and efficient data-handling techniques. While widely used for image storage, traditional file formats like JPEG or PNG are not optimized for efficient data loading and processing in Machine learning workflows. This is where the Lance format shines, offering a modern, columnar data storage solution designed specifically for machine learning applications.
 
-![meme_for_ml_workloads]()
-
+![meme_for_ml_workloads](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/loading_and_processing_image_with_lance/image.png?raw=true)
 
 The Lance format stores data in a compressed columnar format, enabling efficient storage, fast data loading, and fast random access to data subsets. Additionally, the Lance format is maintained on disk, which provides a couple of advantages: It will persist through a system failure and doesn’t rely on keeping everything in memory, which can run out. This also lends itself to enhanced data privacy and security, as the data doesn’t need to be transferred over a network.
 
@@ -36,30 +35,28 @@ We start by importing the necessary libraries, including os for directory handli
 
 ```python
 def process_images():
-    # Get the current directory path
     current_dir = os.getcwd()
     images_folder = os.path.join(current_dir, "./image")
 
     # Define schema for RecordBatch
     schema = pa.schema([('image', pa.binary())])
 
-    # Get the list of image files
     image_files = [filename for filename in os.listdir(images_folder)
-          		 if filename.endswith((".png", ".jpg", ".jpeg"))]
+                if filename.endswith((".png", ".jpg", ".jpeg"))]
 
     # Iterate over all images in the folder with tqdm
     for filename in tqdm(image_files, desc="Processing Images"):
-        	# Construct the full path to the image
-        	image_path = os.path.join(images_folder, filename)
+        # Construct the full path to the image
+        image_path = os.path.join(images_folder, filename)
 
-        	# Read and convert the image to a binary format
-        	with open(image_path, 'rb') as f:
-            	binary_data = f.read()
+        # Read and convert the image to a binary format
+        with open(image_path, 'rb') as f:
+            binary_data = f.read()
 
-        	image_array = pa.array([binary_data], type=pa.binary())
+        image_array = pa.array([binary_data], type=pa.binary())
 
-        	# Yield RecordBatch for each image
-        	yield pa.RecordBatch.from_arrays([image_array], schema=schema)
+        # Yield RecordBatch for each image
+        yield pa.RecordBatch.from_arrays([image_array], schema=schema)
 ```
 
 The process_images function is responsible for iterating over all image files in a specified directory and converting them into PyArrow RecordBatch objects. It first defines the schema for the RecordBatch, specifying that each batch will contain a single binary column named 'image'. 
@@ -68,47 +65,46 @@ It then iterates over all image files in the directory, reads each image's binar
 
 ```python
 def write_to_lance():
-	# Create an empty RecordBatchIterator
-	schema = pa.schema([
-    	pa.field("image", pa.binary())
-	])
+    schema = pa.schema([
+        pa.field("image", pa.binary())
+    ])
 
-	reader = pa.RecordBatchReader.from_batches(schema, process_images())
-	lance.write_dataset(
-    	reader,
-    	"image_dataset.lance",
-    	schema,
-	)
+    reader = pa.RecordBatchReader.from_batches(schema, process_images())
+    lance.write_dataset(
+        reader,
+        "image_dataset.lance",
+        schema,
+    )
 ```
 
 The write_to_lance function creates a RecordBatchReader from the process_images generator and writes the resulting data to a Lance dataset named "image_dataset.lance". This step converts the image data into the efficient, columnar Lance format, optimizing it for fast data loading and random access.
 
 ```python
 def loading_into_pandas():
-	uri = "image_dataset.lance"
-	ds = lance.dataset(uri)
+    uri = "image_dataset.lance"
+    ds = lance.dataset(uri)
 
-	# Accumulate data from batches into a list
-	data = []
-	for batch in ds.to_batches(columns=["image"], batch_size=10):
-    	tbl = batch.to_pandas()
-    	data.append(tbl)
+    # Accumulate data from batches into a list
+    data = []
+    for batch in ds.to_batches(columns=["image"], batch_size=10):
+        tbl = batch.to_pandas()
+        data.append(tbl)
 
-	# Concatenate all DataFrames into a single DataFrame
-	df = pd.concat(data, ignore_index=True)
-	print("Pandas DataFrame is ready")
-	print("Total Rows: ", df.shape[0])
+    # Concatenate all DataFrames into a single DataFrame
+    df = pd.concat(data, ignore_index=True)
+    print("Pandas DataFrame is ready")
+    print("Total Rows: ", df.shape[0])
 ```
 
 The loading_into_pandas function demonstrates how to load the image data from the Lance dataset into a Pandas DataFrame. It first creates a Lance dataset object from the "image_dataset.lance" file. Then, it iterates over batches of data, converting each batch into a Pandas DataFrame and appending it to a list. Finally, it concatenates all the DataFrames in the list into a single DataFrame, making the image data accessible for further processing or analysis.
 
 ```python
 if __name__ == "__main__":
-	start = time.time()
-	write_to_lance()
-	loading_into_pandas()
-	end = time.time()
-	print(f"Time(sec): {end - start}")
+    start = time.time()
+    write_to_lance()
+    loading_into_pandas()
+    end = time.time()
+    print(f"Time(sec): {end - start}")
 ```
 
 The central part of the script calls the write_to_lance and loading_into_pandas functions, measuring the total execution time for the entire process.
@@ -127,67 +123,66 @@ import time
 from tqdm import tqdm
 
 def process_images():
-    # Get the current directory path
     current_dir = os.getcwd()
     images_folder = os.path.join(current_dir, "./image")
 
     # Define schema for RecordBatch
     schema = pa.schema([('image', pa.binary())])
 
-    # Get the list of image files
     image_files = [filename for filename in os.listdir(images_folder)
-          		 if filename.endswith((".png", ".jpg", ".jpeg"))]
+                if filename.endswith((".png", ".jpg", ".jpeg"))]
 
     # Iterate over all images in the folder with tqdm
     for filename in tqdm(image_files, desc="Processing Images"):
-        	# Construct the full path to the image
-        	image_path = os.path.join(images_folder, filename)
+        # Construct the full path to the image
+        image_path = os.path.join(images_folder, filename)
 
-        	# Read and convert the image to a binary format
-        	with open(image_path, 'rb') as f:
-            	binary_data = f.read()
+        # Read and convert the image to a binary format
+        with open(image_path, 'rb') as f:
+            binary_data = f.read()
 
-        	image_array = pa.array([binary_data], type=pa.binary())
+        image_array = pa.array([binary_data], type=pa.binary())
 
-        	# Yield RecordBatch for each image
-        	yield pa.RecordBatch.from_arrays([image_array], schema=schema)
+        # Yield RecordBatch for each image
+        yield pa.RecordBatch.from_arrays([image_array], schema=schema)
 
-# Function to write PyArrow Table to Lance dataset
 def write_to_lance():
-	# Create an empty RecordBatchIterator
-	schema = pa.schema([
-    	pa.field("image", pa.binary())
-	])
+    
+    schema = pa.schema([
+        pa.field("image", pa.binary())
+    ])
 
-	reader = pa.RecordBatchReader.from_batches(schema, process_images())
-	lance.write_dataset(
-    	reader,
-    	"image_dataset.lance",
-    	schema,
-	)
+    reader = pa.RecordBatchReader.from_batches(schema, process_images())
+    lance.write_dataset(
+        reader,
+        "image_dataset.lance",
+        schema,
+    )
 
 def loading_into_pandas():
 
-	uri = "image_dataset.lance"
-	ds = lance.dataset(uri)
+    uri = "image_dataset.lance"
+    ds = lance.dataset(uri)
 
-	# Accumulate data from batches into a list
-	data = []
-	for batch in ds.to_batches(columns=["image"], batch_size=10):
-    	tbl = batch.to_pandas()
-    	data.append(tbl)
+    # Accumulate data from batches into a list
+    data = []
+    for batch in ds.to_batches(columns=["image"], batch_size=10):
+        tbl = batch.to_pandas()
+        data.append(tbl)
 
-	# Concatenate all DataFrames into a single DataFrame
-	df = pd.concat(data, ignore_index=True)
-	print("Pandas DataFrame is ready")
-	print("Total Rows: ", df.shape[0])
+    # Concatenate all DataFrames into a single DataFrame
+    df = pd.concat(data, ignore_index=True)
+    print("Pandas DataFrame is ready")
+    print("Total Rows: ", df.shape[0])
 
 
 if __name__ == "__main__":
-	start = time.time()
-	write_to_lance()
-	loading_into_pandas()
-	end = time.time()
-	print(f"Time(sec): {end - start}")
+    start = time.time()
+    write_to_lance()
+    loading_into_pandas()
+    end = time.time()
+    print(f"Time(sec): {end - start}")
+
 ```
 
+Imagine using Lance-formatted image data to make machine learning and deep learning projects faster. Something big is coming up, stay tuned.
