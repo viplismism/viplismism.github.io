@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-03-15T17:44:45+05:30</updated>
+ <updated>2024-03-29T14:45:21+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -13,7 +13,190 @@
 
  
  <entry>
-   <title>Why LanceDB is shitty</title>
+   <title>Effortlessly Loading and Processing Images with Lance</title>
+   <link href="http://localhost:4000/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough"/>
+   <updated>2024-03-29T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough</id>
+   <content type="html">&lt;p&gt;Working with large image datasets in machine learning can be challenging, often requiring significant computational resources and efficient data-handling techniques. While widely used for image storage, traditional file formats like JPEG or PNG are not optimized for efficient data loading and processing in Machine learning workflows. This is where the Lance format shines, offering a modern, columnar data storage solution designed specifically for machine learning applications.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;&quot; alt=&quot;meme_for_ml_workloads&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The Lance format stores data in a compressed columnar format, enabling efficient storage, fast data loading, and fast random access to data subsets. Additionally, the Lance format is maintained on disk, which provides a couple of advantages: It will persist through a system failure and doesn’t rely on keeping everything in memory, which can run out. This also lends itself to enhanced data privacy and security, as the data doesn’t need to be transferred over a network.&lt;/p&gt;
+
+&lt;p&gt;One of the other key advantages of the Lance format is its ability to store diverse data types, such as images, text, and numerical data, in a unified format. Imagine having a data lake where each kind of data can be stored seamlessly without separating underlying data types. This flexibility is particularly valuable in machine learning pipelines, where different data types often need to be processed together. This unparalleled flexibility is a game-changer in machine learning pipelines, where different modalities of data often need to be processed together for tasks like multimodal learning, audio-visual analysis, or natural language processing with visual inputs.&lt;/p&gt;
+
+&lt;p&gt;With Lance, you can effortlessly consider all kinds of data, from images to videos and audio files to text data and numerical values, all within the same columnar storage format. This means you can have a single, streamlined data pipeline that can handle any combination of data types without the need for complex data transformations or conversions. Lance easily handles it without worrying about compatibility issues or dealing with separate storage formats for different data types. And the best part? You can store and retrieve all these diverse data types within the same column.&lt;/p&gt;
+
+&lt;p&gt;In contrast, while efficient for tabular data, traditional formats like Parquet may need to handle diverse data types better. By converting all data into a single, unified format using Lance, you can retrieve and process any type of data without dealing with multiple formats or complex data structures.
+In this article, I’ll walk through a Python code example that demonstrates how to convert a dataset of GTA5 images into the Lance format and subsequently load them into a Pandas DataFrame for further processing.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import os
+import pandas as pd
+import pyarrow as pa
+import lance
+import time
+from tqdm import tqdm
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We start by importing the necessary libraries, including os for directory handling, pandas for data manipulation, pyarrow for working with Arrow data formats, lance for interacting with the Lance format, and tqdm for displaying progress bars.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;def process_images():
+    # Get the current directory path
+    current_dir = os.getcwd()
+    images_folder = os.path.join(current_dir, &quot;./image&quot;)
+
+    # Define schema for RecordBatch
+    schema = pa.schema([(&apos;image&apos;, pa.binary())])
+
+    # Get the list of image files
+    image_files = [filename for filename in os.listdir(images_folder)
+          		 if filename.endswith((&quot;.png&quot;, &quot;.jpg&quot;, &quot;.jpeg&quot;))]
+
+    # Iterate over all images in the folder with tqdm
+    for filename in tqdm(image_files, desc=&quot;Processing Images&quot;):
+        	# Construct the full path to the image
+        	image_path = os.path.join(images_folder, filename)
+
+        	# Read and convert the image to a binary format
+        	with open(image_path, &apos;rb&apos;) as f:
+            	binary_data = f.read()
+
+        	image_array = pa.array([binary_data], type=pa.binary())
+
+        	# Yield RecordBatch for each image
+        	yield pa.RecordBatch.from_arrays([image_array], schema=schema)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The process_images function is responsible for iterating over all image files in a specified directory and converting them into PyArrow RecordBatch objects. It first defines the schema for the RecordBatch, specifying that each batch will contain a single binary column named ‘image’.&lt;/p&gt;
+
+&lt;p&gt;It then iterates over all image files in the directory, reads each image’s binary data, and yields a RecordBatch containing that image’s binary data.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;def write_to_lance():
+	# Create an empty RecordBatchIterator
+	schema = pa.schema([
+    	pa.field(&quot;image&quot;, pa.binary())
+	])
+
+	reader = pa.RecordBatchReader.from_batches(schema, process_images())
+	lance.write_dataset(
+    	reader,
+    	&quot;image_dataset.lance&quot;,
+    	schema,
+	)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The write_to_lance function creates a RecordBatchReader from the process_images generator and writes the resulting data to a Lance dataset named “image_dataset.lance”. This step converts the image data into the efficient, columnar Lance format, optimizing it for fast data loading and random access.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;def loading_into_pandas():
+	uri = &quot;image_dataset.lance&quot;
+	ds = lance.dataset(uri)
+
+	# Accumulate data from batches into a list
+	data = []
+	for batch in ds.to_batches(columns=[&quot;image&quot;], batch_size=10):
+    	tbl = batch.to_pandas()
+    	data.append(tbl)
+
+	# Concatenate all DataFrames into a single DataFrame
+	df = pd.concat(data, ignore_index=True)
+	print(&quot;Pandas DataFrame is ready&quot;)
+	print(&quot;Total Rows: &quot;, df.shape[0])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The loading_into_pandas function demonstrates how to load the image data from the Lance dataset into a Pandas DataFrame. It first creates a Lance dataset object from the “image_dataset.lance” file. Then, it iterates over batches of data, converting each batch into a Pandas DataFrame and appending it to a list. Finally, it concatenates all the DataFrames in the list into a single DataFrame, making the image data accessible for further processing or analysis.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;if __name__ == &quot;__main__&quot;:
+	start = time.time()
+	write_to_lance()
+	loading_into_pandas()
+	end = time.time()
+	print(f&quot;Time(sec): {end - start}&quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The central part of the script calls the write_to_lance and loading_into_pandas functions, measuring the total execution time for the entire process.
+By leveraging the Lance format, this code demonstrates how to efficiently store and load large image datasets for machine learning applications. The columnar storage and compression techniques Lance uses result in reduced storage requirements and faster data loading times, making it an ideal choice for working with large-scale image data.&lt;/p&gt;
+
+&lt;p&gt;Moreover, the random access capabilities of Lance allow for selective loading of specific data subsets, enabling efficient data augmentation techniques and custom data loading strategies tailored to your machine learning workflow.&lt;/p&gt;
+
+&lt;p&gt;TLDR: Lance format provides a powerful and efficient solution for handling multimodal data in machine learning pipelines, streamlining data storage, loading, and processing tasks. By adopting Lance, we can improve our machine learning projects’ overall performance and resource efficiency while also benefiting from the ability to store diverse data types in a unified format and maintain data locality and privacy. Here is the whole script for your reference.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import os
+import pandas as pd
+import pyarrow as pa
+import lance
+import time
+from tqdm import tqdm
+
+def process_images():
+    # Get the current directory path
+    current_dir = os.getcwd()
+    images_folder = os.path.join(current_dir, &quot;./image&quot;)
+
+    # Define schema for RecordBatch
+    schema = pa.schema([(&apos;image&apos;, pa.binary())])
+
+    # Get the list of image files
+    image_files = [filename for filename in os.listdir(images_folder)
+          		 if filename.endswith((&quot;.png&quot;, &quot;.jpg&quot;, &quot;.jpeg&quot;))]
+
+    # Iterate over all images in the folder with tqdm
+    for filename in tqdm(image_files, desc=&quot;Processing Images&quot;):
+        	# Construct the full path to the image
+        	image_path = os.path.join(images_folder, filename)
+
+        	# Read and convert the image to a binary format
+        	with open(image_path, &apos;rb&apos;) as f:
+            	binary_data = f.read()
+
+        	image_array = pa.array([binary_data], type=pa.binary())
+
+        	# Yield RecordBatch for each image
+        	yield pa.RecordBatch.from_arrays([image_array], schema=schema)
+
+# Function to write PyArrow Table to Lance dataset
+def write_to_lance():
+	# Create an empty RecordBatchIterator
+	schema = pa.schema([
+    	pa.field(&quot;image&quot;, pa.binary())
+	])
+
+	reader = pa.RecordBatchReader.from_batches(schema, process_images())
+	lance.write_dataset(
+    	reader,
+    	&quot;image_dataset.lance&quot;,
+    	schema,
+	)
+
+def loading_into_pandas():
+
+	uri = &quot;image_dataset.lance&quot;
+	ds = lance.dataset(uri)
+
+	# Accumulate data from batches into a list
+	data = []
+	for batch in ds.to_batches(columns=[&quot;image&quot;], batch_size=10):
+    	tbl = batch.to_pandas()
+    	data.append(tbl)
+
+	# Concatenate all DataFrames into a single DataFrame
+	df = pd.concat(data, ignore_index=True)
+	print(&quot;Pandas DataFrame is ready&quot;)
+	print(&quot;Total Rows: &quot;, df.shape[0])
+
+
+if __name__ == &quot;__main__&quot;:
+	start = time.time()
+	write_to_lance()
+	loading_into_pandas()
+	end = time.time()
+	print(f&quot;Time(sec): {end - start}&quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Embedded Databases</title>
    <link href="http://localhost:4000/2024/03/15/embedded-databases"/>
    <updated>2024-03-15T00:00:00+05:30</updated>
    <id>http://localhost:4000/2024/03/15/embedded-databases</id>
@@ -29,7 +212,7 @@
 
 &lt;p&gt;This implies that when you need to perform column-oriented operations like updating columns, aggregations, or selecting a column entry, column-oriented databases outperform row-oriented ones in terms of speed. However, if you need to add a new data point entry with multiple columns, then row-oriented databases perform better.&lt;/p&gt;
 
-&lt;p&gt;Now, the point is, there’s something called Apache Arrow, which is a language-independent columnar memory format for flat and hierarchical data, organized for efficient analytic operations on modern hardware like CPUs and GPUs.&lt;/p&gt;
+&lt;p&gt;Now, the point is, there’s something called Apache Arrow, which is a language-agnostic columnar memory format for flat and hierarchical data, organized for efficient analytic operations on modern hardware like CPUs and GPUs.&lt;/p&gt;
 
 &lt;p&gt;This is too technical. Let me break it down for you. Machine learning is all about feeding huge amounts of data into complex mathematical models to find patterns and make predictions, right? Now, Apache Arrow turbocharges this process by providing a standardized way to store and work with data that’s &lt;a href=&quot;https://developer.nvidia.com/blog/accelerating-apache-spark-3-0-with-gpus-and-rapids/&quot;&gt;optimized&lt;/a&gt; for modern hardware like powerful GPUs. So Instead of dealing with clunky row-based formats, Arrow’s columnar layout lets you focus on the specific data features you need, drastically cutting down processing time. And since Arrow keeps data in memory, AKA RAM, rather than on sluggish disk storage like hard drives or SSDs, your models can crunch through datasets at blistering speeds. The end result? You can iterate faster, train better models, and stay ahead of the competition.&lt;/p&gt;
 
@@ -43,9 +226,9 @@
 
 &lt;p&gt;Designed from the ground up with modern ML workflows in mind, Lance is an absolute speed demon when it comes to querying and prepping data for training models. But it’s not just about raw speed – Lance has some seriously impressive versatility under the hood.&lt;/p&gt;
 
-&lt;p&gt;Unlike formats limited to tabular data, Lance can handle all kinds of data types like images, videos, 3D point clouds, audio, and more. It’s like a Swiss Army knife of data formats for ML. And btw, Don’t just take my word for it because I love LanceDB, instead – &lt;a href=&quot;https://blog.lancedb.com/announcing-lancedb-5cb0deaa46ee-2/&quot;&gt;benchmarks&lt;/a&gt; have shown that Lance can provide random data access a mind-boggling 100 times faster than Parquet, another popular columnar format.&lt;/p&gt;
+&lt;p&gt;Unlike formats limited to tabular data, Lance can handle all kinds of data types like images, videos, 3D point clouds, audio, and more. It’s like a Swiss Army knife of data formats for ML. Btw, Don’t just take my word for it because I love LanceDB, instead – &lt;a href=&quot;https://blog.lancedb.com/announcing-lancedb-5cb0deaa46ee-2/&quot;&gt;benchmarks&lt;/a&gt; have shown that Lance can provide random data access involving read and write operation a mind-boggling approximately 1000 times faster than Parquet, another popular columnar format. This blistering speed comes from unique storage memory layout used by Lance.&lt;/p&gt;
 
-&lt;p&gt;This blistering speed comes from clever tricks like zero-copy versioning and optimized vector operations. So basically, zero-copy versioning means that when you create a new version of your data, Lance doesn’t have to make an entire copy – it just stores the changes efficiently. This saves a ton of time and storage space compared to traditional versioning methods. And optimized vector operations allow Lance to process data in bulk, taking full advantage of modern hardware like GPUs and vectorized CPUs. It’s all part of Lance’s cloud-native design.&lt;/p&gt;
+&lt;p&gt;The other important thing LanceDB provides is the usage of Zero-copy versioning, essentially it means that when you create a new version of your data, LanceDB doesn’t have to make an entire copy – it just stores the changes efficiently. This saves a ton of time and storage space compared to traditional versioning methods. And optimized vector operations allow Lance to process data in bulk, taking full advantage of modern hardware like GPUs and vectorized CPUs. It’s all part of Lance’s cloud-native design.&lt;/p&gt;
 
 &lt;h3 id=&quot;in-process&quot;&gt;In-process&lt;/h3&gt;
 
@@ -77,9 +260,9 @@
 
 &lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/lancedb_scaled.png?raw=true&quot; alt=&quot;lancedb_scaled&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Ok so you decided to work on the simple RAG system and wanted to test it out or just maybe play with it and came up with the various vector databases, you did your experiment,  you are happy and done. Now when you got serious and came up with something and wanted to scale your RAG system for let’s say 1 billion embeddings, you open up your earlier setup, ingested more data, created more embeddings and when the time came, your traditional embedding database gave you nightmare in terms of the latency as well as storage capabilities.&lt;/p&gt;
+&lt;p&gt;Ok so you decided to work on the simple RAG system and wanted to test it out or just maybe play with it and came up with the various vector databases, you did your experiment,  you are happy and done. Now when you got serious and came up with something and wanted to scale your RAG system for let’s say 1 billion embeddings, you open up your earlier setup, ingested more data, created more embeddings and when the time came, your traditional embedding database gave you nightmares in terms of the latency as well as stability.&lt;/p&gt;
 
-&lt;p&gt;Now think of an embedding database which is open source, works for all kinds of setups, scales up to billions of embeddings, fetch the relevant embeddings with amazing searching capabilities and data never leaves your local machine, feels too good to be true right?! Well there is LanceDB again. I mean from the moment you dirty your hands for your next RAG system all upto the time you put something as big as production, LanceDB scales amazingly well…&lt;/p&gt;
+&lt;p&gt;Now, Think of an open-source embedding database designed to seamlessly handle a variety of setups and effortlessly scales up to billions of vectors locally., scales up to billions of embeddings, fetch the relevant embeddings with amazing searching capabilities and data never leaves your local machine, feels too good to be true right?! Well there is LanceDB again. I mean from the moment you dirty your hands for your next RAG system all upto the time you put something as big as production, LanceDB scales amazingly well…&lt;/p&gt;
 
 &lt;h3 id=&quot;multimodality&quot;&gt;Multimodality&lt;/h3&gt;
 
@@ -114,7 +297,7 @@
 
 &lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/gen_ai_applications.png?raw=true&quot; alt=&quot;gen_ai_application&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Well all of them are bundled together with no cost upfront, ready to serve in one installation click and voila baby, you have your new best friend, maybe more than that, who knows? So what are you waiting for? Here is the reference, see you soon.&lt;/p&gt;
+&lt;p&gt;Well all of them are bundled together with no cost upfront, ready to serve in one installation click and voila baby, you have your new best friend, maybe more than that, who knows? So what are you waiting for? Here is the &lt;a href=&quot;https://lancedb.com/&quot;&gt;reference&lt;/a&gt;, see you soon.&lt;/p&gt;
 </content>
  </entry>
  

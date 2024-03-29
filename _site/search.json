@@ -2,7 +2,18 @@
   
     {
 
-      "title"    : "Why LanceDB is shitty",
+      "title"    : "Effortlessly Loading and Processing Images with Lance",
+      "description" : "How you can use the lance format to work with big sized data",
+      "url"      : "/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough",
+      "category" : "",
+      "tags"     : "Lance, LanceDB",
+      "date"     : "2024-03-29 00:00:00 +0530"
+
+    } ,
+  
+    {
+
+      "title"    : "Embedded Databases",
       "description" : "How LanceDB is beating ass of every other Embedded Database",
       "url"      : "/2024/03/15/embedded-databases",
       "category" : "",
