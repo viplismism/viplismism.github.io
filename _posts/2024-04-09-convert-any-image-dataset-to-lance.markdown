@@ -131,7 +131,7 @@ Moreover, the function stores the DataFrames in a list, indexed by the data type
 ### Putting It All Together
 By running the provided script, you can convert your image datasets, whether they are industry-standard benchmarks or your own custom collections, into the powerful Lance format. This transformation unlocks a new level of efficiency and performance, empowering you to supercharge your machine learning projects.  I have used the same script for the `mini-imagenet` too, make sure your data directory looks like this
 
-![data_hierarchy](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/convert-any-image-dataset-to-lance/cinic.png?raw=true)
+![data_folders](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/convert-any-image-dataset-to-lance/cinic_image.png?raw=true)
 
 here is the complete script for your reference..
 
