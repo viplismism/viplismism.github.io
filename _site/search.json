@@ -2,6 +2,17 @@
   
     {
 
+      "title"    : "Convert any Image dataset to Lance",
+      "description" : "This post gives a detailed overview of how we can convert any image dataset to lance",
+      "url"      : "/2024/04/09/convert-any-image-dataset-to-lance",
+      "category" : "",
+      "tags"     : "Lance, Dataset",
+      "date"     : "2024-04-09 00:00:00 +0530"
+
+    } ,
+  
+    {
+
       "title"    : "Effortlessly Loading and Processing Images with Lance",
       "description" : "How you can use the lance format to work with big sized data",
       "url"      : "/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough",
