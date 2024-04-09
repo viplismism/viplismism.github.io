@@ -8,7 +8,9 @@ version: Released
 release: 09-04-2024
 ---
 
-In our [previous](https://vipul-maheshwari.github.io/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough) article, we explored the remarkable capabilities of the Lance format, a modern, columnar data storage solution designed to revolutionize the way we work with large image datasets in machine learning. For the same purpose, I have converted the `cinic` and `mini-imagenet` datasets to their lance versions. For this write-up, I will use the example of `cinic` dataset to explain how to convert any image dataset into the Lance format and  unlocking the full potential of this powerful technology.
+In our [previous](https://vipul-maheshwari.github.io/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough) article, we explored the remarkable capabilities of the Lance format, a modern, columnar data storage solution designed to revolutionize the way we work with large image datasets in machine learning. For the same purpose, I have converted the `cinic` and `mini-imagenet` datasets to their lance versions. For this write-up, I will use the example of `cinic` dataset to explain how to convert any image dataset into the Lance format with a single script and  unlocking the full potential of this powerful technology.
+
+![lance_converter](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/convert-any-image-dataset-to-lance/meme_reaction.png?raw=true)
 
 ### Processing Images
 The `process_images` function is the heart of our data conversion process. It is responsible for iterating over the image files in the specified dataset, reading the data of each image, and converting it into a PyArrow RecordBatch object on the binary scale. This function also extracts additional metadata, such as the filename, category, and data type (e.g., train, test, or validation), and stores it alongside the image data.
