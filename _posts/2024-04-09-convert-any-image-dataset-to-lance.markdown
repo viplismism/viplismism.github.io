@@ -131,7 +131,7 @@ Moreover, the function stores the DataFrames in a list, indexed by the data type
 ### Putting It All Together
 By running the provided script, you can convert your image datasets, whether they are industry-standard benchmarks or your own custom collections, into the powerful Lance format. This transformation unlocks a new level of efficiency and performance, empowering you to supercharge your machine learning projects.  I have used the same script for the `mini-imagenet` too, make sure your data directory looks like this
 
-![data_hierarchy]()
+![data_hierarchy](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/convert-any-image-dataset-to-lance/cinic.png?raw=true)
 
 here is the complete script for your reference..
 
@@ -237,7 +237,6 @@ if __name__ == "__main__":
     data_frames = loading_into_pandas()
     end = time.time()
     print(f"Time(sec): {end - start}")
-
 ```
 
 Take the different splits of the train, test and validation through different dataframes and utilize the information for your next image classifcation task
@@ -248,7 +247,7 @@ test = data_frames['test']
 val = data_frames['val']
 ```
 
-and this is how the dataframe looks like
+and this is how the training dataframe looks like
 
 ```python
 train.head()
@@ -256,11 +255,12 @@ train.head()
 
 ```
 image	filename	category	data_type
-0	b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00...	n0279516900000601.jpg	n02795169	train
-1	b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00...	n0279516900000167.jpg	n02795169	train
-2	b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00...	n0279516900000198.jpg	n02795169	train
-3	b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00...	n0279516900001292.jpg	n02795169	train
-4	b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00...	n0279516900000403.jpg	n02795169	train
+	image	filename	category	data_type
+0	b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...	n02130308_1836.png	cat	train
+1	b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...	cifar10-train-21103.png	cat	train
+2	b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...	cifar10-train-44957.png	cat	train
+3	b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...	n02129604_14997.png	cat	train
+4	b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...	n02123045_1463.png	cat	train
 ```
 
 The benefits of this approach are numerous:
