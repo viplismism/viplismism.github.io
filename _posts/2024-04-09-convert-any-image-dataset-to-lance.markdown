@@ -2,7 +2,6 @@
 layout: post
 title: Convert any Image dataset to Lance
 description: This post gives a detailed overview of how we can convert any image dataset to lance
-summary: This post shows how you can convert any image dataset to the lance and use it for the convience.
 tags: [Lance, Dataset]
 version: Released
 release: 09-04-2024
@@ -274,4 +273,4 @@ The benefits of this approach are numerous:
 3. Random Access: The ability to selectively load specific data subsets from the Lance dataset allows for efficient data augmentation techniques and custom data loading strategies tailored to your unique requirements.
 4. Unified Data Format: Lance can store diverse data types, such as images, text, and numerical data, in a single, streamlined format. This flexibility is invaluable in machine learning, where different modalities of data often need to be processed together.
 
-By adopting the Lance format, we can litearlly elevate our machine learning workflow to new heights, unlocking unprecedented levels of efficiency, performance, and flexibility. Take the first step by running the provided script and converting your image datasets to the Lance format – the future of machine learning data management is awaiting for you, who knows if you find your second love with lance format.
+By adopting the Lance format, we can literally elevate our machine learning workflow to new heights, unlocking unprecedented levels of efficiency, performance, and flexibility. Take the first step by running the provided script and converting your image datasets to the Lance format – the future of machine learning data management is awaiting for you, who knows if you find your second love with lance format.
