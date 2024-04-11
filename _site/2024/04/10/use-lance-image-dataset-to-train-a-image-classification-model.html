@@ -1,0 +1,275 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Jekyll v4.3.3" /><meta property="og:title" content="Use a Lance Image Dataset to train a Image Classification model" /><meta property="og:locale" content="en_US" /><meta name="description" content="This post gives a detailed view on how you can use the Lance Image Dataset to train a classification model" /><meta property="og:description" content="This post gives a detailed view on how you can use the Lance Image Dataset to train a classification model" /><link rel="canonical" href="http://localhost:4000/2024/04/10/use-lance-image-dataset-to-train-a-image-classification-model" /><meta property="og:url" content="http://localhost:4000/2024/04/10/use-lance-image-dataset-to-train-a-image-classification-model" /><meta property="og:site_name" content="Blixxi Labs" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2024-04-10T00:00:00+05:30" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="Use a Lance Image Dataset to train a Image Classification model" /><meta name="twitter:site" content="@PinakaX" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-04-10T00:00:00+05:30","datePublished":"2024-04-10T00:00:00+05:30","description":"This post gives a detailed view on how you can use the Lance Image Dataset to train a classification model","headline":"Use a Lance Image Dataset to train a Image Classification model","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2024/04/10/use-lance-image-dataset-to-train-a-image-classification-model"},"url":"http://localhost:4000/2024/04/10/use-lance-image-dataset-to-train-a-image-classification-model"}</script><title> Use a Lance Image Dataset to train a Image Classification model - Blixxi Labs</title><link rel="shortcut icon" href="/favicon.png"><link rel="alternate" type="application/atom+xml" title="Blixxi Labs" href="/atom.xml"><link rel="alternate" type="application/json" title="Blixxi Labs" href="http://localhost:4000/feed.json" /><link rel="sitemap" type="application/xml" title="sitemap" href="/sitemap.xml" /><style> *,:after,:before{box-sizing:border-box;background-color:inherit;color:inherit;margin:0;padding:0}body{font-family:system-ui,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.5;font-size:1rem;color:#16171a}nav ul{border-right:1px solid #edf2f7}a{color:#000;text-decoration-skip-ink:auto;text-decoration:underline}pre{margin:.5rem 0;padding:.5rem}.post p{margin:.5rem 0}.post h1,.post h2,.post h3,.post h4{margin:1rem 0}.post h2:first-child,.project h2:first-child,.photo h2:first-child{margin-top:0}.meta{margin:2rem 0}code,pre{background:#f5f5f5;max-width:100%;overflow-x:auto}code{padding:.1rem;font-size:.85rem}pre code{border:none}pre{padding:1rem;overflow-x:auto}img{max-width:100%;background:none;display:block;margin:auto}hr{background:#000;height:1px;border:0}header{flex-basis:10rem;flex-grow:1;position:relative}header a{text-decoration:none}header li{margin-bottom:.2rem;text-align:right;margin-right:2rem}header a.active{font-weight:bold}header,section{padding:1rem}blockquote{font-style:italic;border-left:5px solid #ececec;padding-left:1rem}h1,h2,h3,h4,h5{line-height:1;margin:1rem 0;font-weight:600}section h1:first-child{margin-top:0}strong,b{font-weight:bold}.photos ul{list-style:none}.photos li{margin-bottom:1.5rem}.photo picture,.project picture{margin-bottom:.5rem}.posts ul,header ul{list-style:none}.posts li{align-items:center;display:flex;justify-content:space-between;margin-bottom:.5rem}.posts li a,.posts li div,.projects li a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none}.posts li time,.projects li time{padding-left:1rem;white-space:nowrap;font-variant-numeric:tabular-nums}.post ol,.project ul,.post ol,.post ul{padding-left:1rem}main{display:flex;flex-wrap:wrap;max-width:60rem;margin:2rem auto;padding:1rem}@media screen and (max-width: 45rem){header li{display:inline;margin-right:1rem}.logo{padding-bottom:1rem}header ul{border-bottom:1px solid #edf2f7;padding-bottom:2rem}nav ul{border-right:0px}.photos ul{margin-top:.5rem}}section{flex-basis:0;flex-grow:999;min-width:70%;display:flex;flex-direction:column}figcaption{font-size:smaller}@media print{.no-print,.no-print *{display:none !important}}.back-to-top{position:fixed;bottom:20px;right:20px;background-color:#fff;color:#000;padding:10px;text-decoration:none;border-radius:5px;display:block;margin-right:20%}</style></head><body><main><header aria-hidden="true" class="no-print"> <!--<h1 class="logo">Blixxi Labs</h1>--><nav role="navigation" aria-hidden="true"><ul><li><a href="/" >Home</a></li><li><a href="/about" >About</a></li><li><a href="/contact" >Contact</a></li></ul></nav></header><section class="post"><h1>Use a Lance Image Dataset to train a Image Classification model</h1><p>In a <a href="">previous</a> post, I showed you how you can convert any Image Dataset to Lance format for faster retrieval and faster I/O operations. But can we use the same Lance formatted image dataset to train a image classification model? Well here it comes…</p><h3 id="lance-a-saga-for-efficient-image-datasets">LANCE: A Saga for Efficient Image Datasets</h3><p>Convolutional Neural Networks (CNNs) have become the go-to architecture for a wide range of image-related tasks, including image classification, object detection, and semantic segmentation. The ability of CNNs to automatically learn relevant features from the input data, combined with their strong performance on complex visual tasks, makes them a natural choice for image classification models.</p><p>When working with large-scale image datasets, the management and processing of data can become a significant challenge. Traditional file formats like JPEG and PNG, while widely used, are not optimized for the unique requirements of machine learning workflows. This is where the LANCE (Lightweight Annotated Neural Classification Encoding) format shines, providing a game-changing solution for managing and leveraging image datasets.</p><p>The LANCE format offers several key advantages that make it a powerful choice for machine learning applications:</p><ol><li><p>Columnar Storage: LANCE stores data in a compressed columnar format, enabling efficient storage, fast data loading, and quick random access to subsets of the data. This is particularly beneficial when working with large-scale image datasets.</p></li><li><p>Multimodal Data Handling: LANCE is designed to handle diverse data types, including images, text, and numerical data, within a unified format. This flexibility is a game-changer in machine learning pipelines, where different modalities of data often need to be processed together.</p></li><li><p>Data Persistence and Privacy: LANCE maintains data on disk, ensuring that the data persists through system failures and doesn’t need to be constantly transferred over a network. This also enhances data privacy and security, as the data can be stored and accessed locally without relying on external data sources.</p></li></ol><h3 id="integrating-lance-and-convolutional-neural-networks">Integrating LANCE and Convolutional Neural Networks</h3><p>The structured and efficient data organization of the LANCE format allows for seamless integration with Convolutional Neural Network (CNN) architectures, streamlining the data loading and preprocessing steps. By leveraging the LANCE format, you can overcome the challenges of working with large-scale image datasets and focus more on the core aspects of model development and optimization.</p><p>In our previous article, we discussed the process of converting various image datasets, such as CINIC-10 and mini-ImageNet, into the LANCE format. Now, we will explore how we can utilize this LANCE-formatted data to train a CNN-based image classification model.</p><p>Before diving into the model training, let’s take a closer look at the structure of the LANCE-formatted data we created earlier. Referring to the script from the previous article, we can see how the LANCE dataset is organized:</p><pre><code class="language-python">import os
+import pandas as pd
+import pyarrow as pa
+import lance
+import time
+from tqdm import tqdm
+
+def process_images(data_type):
+    # Get the current directory path
+    images_folder = os.path.join("cinic", data_type)
+
+    # Define schema for RecordBatch
+    schema = pa.schema([('image', pa.binary()), 
+                        ('filename', pa.string()), 
+                        ('category', pa.string()), 
+                        ('data_type', pa.string())])
+
+    # Iterate over the categories within each data type
+    for category in os.listdir(images_folder):
+        category_folder = os.path.join(images_folder, category)
+        
+        # Iterate over the images within each category
+        for filename in tqdm(os.listdir(category_folder), desc=f"Processing {data_type} - {category}"):
+            # Construct the full path to the image
+            image_path = os.path.join(category_folder, filename)
+
+            # Read and convert the image to a binary format
+            with open(image_path, 'rb') as f:
+                binary_data = f.read()
+
+            image_array = pa.array([binary_data], type=pa.binary())
+            filename_array = pa.array([filename], type=pa.string())
+            category_array = pa.array([category], type=pa.string())
+            data_type_array = pa.array([data_type], type=pa.string())
+
+            # Yield RecordBatch for each image
+            yield pa.RecordBatch.from_arrays(
+                [image_array, filename_array, category_array, data_type_array],
+                schema=schema
+            )
+
+# Function to write PyArrow Table to Lance dataset
+def write_to_lance():
+    # Create an empty RecordBatchIterator
+    schema = pa.schema([
+        pa.field("image", pa.binary()),
+        pa.field("filename", pa.string()),
+        pa.field("category", pa.string()),
+        pa.field("data_type", pa.string())
+    ])
+
+    # Specify the path where you want to save the Lance files
+    images_folder = "cinic"
+    
+    for data_type in ['train', 'test', 'val']:
+        lance_file_path = os.path.join(images_folder, f"cinic_{data_type}.lance")
+        
+        reader = pa.RecordBatchReader.from_batches(schema, process_images(data_type))
+        lance.write_dataset(
+            reader,
+            lance_file_path,
+            schema,
+        )
+
+def loading_into_pandas():
+    # Load Lance files from the same folder
+    current_dir = os.getcwd()
+    print(current_dir)
+    images_folder = os.path.join(current_dir, "cinic")
+    
+    data_frames = {}  # Dictionary to store DataFrames for each data type
+    
+    for data_type in ['test', 'train', 'val']:
+        uri = os.path.join(images_folder, f"cinic_{data_type}.lance")
+
+        ds = lance.dataset(uri)
+
+        # Accumulate data from batches into a list
+        data = []
+        for batch in tqdm(ds.to_batches(columns=["image", "filename", "category", "data_type"], batch_size=10), desc=f"Loading {data_type} batches"):
+            tbl = batch.to_pandas()
+            data.append(tbl)
+
+        # Concatenate all DataFrames into a single DataFrame
+        df = pd.concat(data, ignore_index=True)
+        
+        # Store the DataFrame in the dictionary
+        data_frames[data_type] = df
+        
+        print(f"Pandas DataFrame for {data_type} is ready")
+        print("Total Rows: ", df.shape[0])
+    
+    return data_frames
+
+
+if __name__ == "__main__":
+    start = time.time()
+    write_to_lance()
+    data_frames = loading_into_pandas()
+    end = time.time()
+    print(f"Time(sec): {end - start}")
+</code></pre><p>The script above creates LANCE-formatted files for the training, testing, and validation sets of the CINIC-10 dataset</p><pre><code class="language-python"># Load the LANCE-formatted datasets
+train = data_frames['train']
+test = data_frames['test'] 
+val = data_frames['val']
+</code></pre><p>and The <code>data_frames</code> dictionary contains the Pandas DataFrames for the training, testing, and validation sets, where each DataFrame has the following structure:</p><pre><code>image                                      filename category data_type
+0  b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...  n02130308_1836.png      cat     train
+1  b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...  cifar10-train-21103.png      cat     train
+2  b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...  cifar10-train-44957.png      cat     train
+3  b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...  n02129604_14997.png      cat     train
+4  b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...  n02123045_1463.png      cat     train
+</code></pre><p>Now that we have the LANCE-formatted data ready, we can use it to train a Convolutional Neural Network (CNN) for image classification. To do this, we’ll first need to create PyTorch Dataset and DataLoader objects from the LANCE-formatted Pandas DataFrames.</p><h2 id="load-the-lance-files-to-create-the-dataloaders">Load the lance files to create the dataloaders</h2><p>When working with LANCE-formatted image data, we need to consider that the images are stored in a binary format within the Pandas DataFrame. To use this data with a Convolutional Neural Network (CNN), we need to convert the binary data back into a format that the CNN can process, such as PIL Image objects. Here’s how we we’ll do that:</p><ol><li>Retrieve the binary image data: The image data is stored in binary format within the Pandas DataFrame. We’ll need to extract this binary data for each image.</li><li>Convert to PIL Image: Once we have the binary data, we’ll convert it into a PIL Image object. This will give us a readable image format that we can work with.</li><li>Handle grayscale images: Some of the images might be in grayscale mode. We’ll need to convert these to RGB format so they’re compatible with a CNN that expects 3-channel color images.</li><li>Apply transformations: Before feeding the images to the CNN, we may need to apply some transformations, like resizing or normalization. We can do this using the provided transform function.</li><li>Determine the labels: Each image has a category or class associated with it. We’ll look up the class index for the image’s category in the provided list of classes.</li><li>Return the data: Finally, we’ll return the transformed image and its corresponding label, which can be used to train the CNN model.</li></ol><p>To accomplish this, we’ll create a custom PyTorch Dataset class that can handle the all the heavy lifting and give us this sweet dataset to work with</p><pre><code class="language-python">from torch.utils import data
+from PIL import Image
+import io
+
+class CustomImageDataset(data.Dataset):
+    def __init__(self, df, classes, transform=None):
+        self.df = df
+        self.classes = classes
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        img_data = self.df.iloc[idx]['image']
+        img = Image.open(io.BytesIO(img_data))
+
+        # Convert grayscale images to RGB
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+
+        if self.transform:
+            img = self.transform(img)
+
+        label = self.classes.index(self.df.iloc[idx]['category'])
+        return img, label
+</code></pre><p>oh boy, we are ready to roll for training our model.</p><span class="meta"><time datetime="2024-04-10T00:00:00+05:30">April 10, 2024</time></span></section><!-- --- layout: default ---<section class="post"><h2>Use a Lance Image Dataset to train a Image Classification model</h2><p>In a <a href="">previous</a> post, I showed you how you can convert any Image Dataset to Lance format for faster retrieval and faster I/O operations. But can we use the same Lance formatted image dataset to train a image classification model? Well here it comes…</p><h3 id="lance-a-saga-for-efficient-image-datasets">LANCE: A Saga for Efficient Image Datasets</h3><p>Convolutional Neural Networks (CNNs) have become the go-to architecture for a wide range of image-related tasks, including image classification, object detection, and semantic segmentation. The ability of CNNs to automatically learn relevant features from the input data, combined with their strong performance on complex visual tasks, makes them a natural choice for image classification models.</p><p>When working with large-scale image datasets, the management and processing of data can become a significant challenge. Traditional file formats like JPEG and PNG, while widely used, are not optimized for the unique requirements of machine learning workflows. This is where the LANCE (Lightweight Annotated Neural Classification Encoding) format shines, providing a game-changing solution for managing and leveraging image datasets.</p><p>The LANCE format offers several key advantages that make it a powerful choice for machine learning applications:</p><ol><li><p>Columnar Storage: LANCE stores data in a compressed columnar format, enabling efficient storage, fast data loading, and quick random access to subsets of the data. This is particularly beneficial when working with large-scale image datasets.</p></li><li><p>Multimodal Data Handling: LANCE is designed to handle diverse data types, including images, text, and numerical data, within a unified format. This flexibility is a game-changer in machine learning pipelines, where different modalities of data often need to be processed together.</p></li><li><p>Data Persistence and Privacy: LANCE maintains data on disk, ensuring that the data persists through system failures and doesn’t need to be constantly transferred over a network. This also enhances data privacy and security, as the data can be stored and accessed locally without relying on external data sources.</p></li></ol><h3 id="integrating-lance-and-convolutional-neural-networks">Integrating LANCE and Convolutional Neural Networks</h3><p>The structured and efficient data organization of the LANCE format allows for seamless integration with Convolutional Neural Network (CNN) architectures, streamlining the data loading and preprocessing steps. By leveraging the LANCE format, you can overcome the challenges of working with large-scale image datasets and focus more on the core aspects of model development and optimization.</p><p>In our previous article, we discussed the process of converting various image datasets, such as CINIC-10 and mini-ImageNet, into the LANCE format. Now, we will explore how we can utilize this LANCE-formatted data to train a CNN-based image classification model.</p><p>Before diving into the model training, let’s take a closer look at the structure of the LANCE-formatted data we created earlier. Referring to the script from the previous article, we can see how the LANCE dataset is organized:</p><pre><code class="language-python">import os
+import pandas as pd
+import pyarrow as pa
+import lance
+import time
+from tqdm import tqdm
+
+def process_images(data_type):
+    # Get the current directory path
+    images_folder = os.path.join("cinic", data_type)
+
+    # Define schema for RecordBatch
+    schema = pa.schema([('image', pa.binary()), 
+                        ('filename', pa.string()), 
+                        ('category', pa.string()), 
+                        ('data_type', pa.string())])
+
+    # Iterate over the categories within each data type
+    for category in os.listdir(images_folder):
+        category_folder = os.path.join(images_folder, category)
+        
+        # Iterate over the images within each category
+        for filename in tqdm(os.listdir(category_folder), desc=f"Processing {data_type} - {category}"):
+            # Construct the full path to the image
+            image_path = os.path.join(category_folder, filename)
+
+            # Read and convert the image to a binary format
+            with open(image_path, 'rb') as f:
+                binary_data = f.read()
+
+            image_array = pa.array([binary_data], type=pa.binary())
+            filename_array = pa.array([filename], type=pa.string())
+            category_array = pa.array([category], type=pa.string())
+            data_type_array = pa.array([data_type], type=pa.string())
+
+            # Yield RecordBatch for each image
+            yield pa.RecordBatch.from_arrays(
+                [image_array, filename_array, category_array, data_type_array],
+                schema=schema
+            )
+
+# Function to write PyArrow Table to Lance dataset
+def write_to_lance():
+    # Create an empty RecordBatchIterator
+    schema = pa.schema([
+        pa.field("image", pa.binary()),
+        pa.field("filename", pa.string()),
+        pa.field("category", pa.string()),
+        pa.field("data_type", pa.string())
+    ])
+
+    # Specify the path where you want to save the Lance files
+    images_folder = "cinic"
+    
+    for data_type in ['train', 'test', 'val']:
+        lance_file_path = os.path.join(images_folder, f"cinic_{data_type}.lance")
+        
+        reader = pa.RecordBatchReader.from_batches(schema, process_images(data_type))
+        lance.write_dataset(
+            reader,
+            lance_file_path,
+            schema,
+        )
+
+def loading_into_pandas():
+    # Load Lance files from the same folder
+    current_dir = os.getcwd()
+    print(current_dir)
+    images_folder = os.path.join(current_dir, "cinic")
+    
+    data_frames = {}  # Dictionary to store DataFrames for each data type
+    
+    for data_type in ['test', 'train', 'val']:
+        uri = os.path.join(images_folder, f"cinic_{data_type}.lance")
+
+        ds = lance.dataset(uri)
+
+        # Accumulate data from batches into a list
+        data = []
+        for batch in tqdm(ds.to_batches(columns=["image", "filename", "category", "data_type"], batch_size=10), desc=f"Loading {data_type} batches"):
+            tbl = batch.to_pandas()
+            data.append(tbl)
+
+        # Concatenate all DataFrames into a single DataFrame
+        df = pd.concat(data, ignore_index=True)
+        
+        # Store the DataFrame in the dictionary
+        data_frames[data_type] = df
+        
+        print(f"Pandas DataFrame for {data_type} is ready")
+        print("Total Rows: ", df.shape[0])
+    
+    return data_frames
+
+
+if __name__ == "__main__":
+    start = time.time()
+    write_to_lance()
+    data_frames = loading_into_pandas()
+    end = time.time()
+    print(f"Time(sec): {end - start}")
+</code></pre><p>The script above creates LANCE-formatted files for the training, testing, and validation sets of the CINIC-10 dataset</p><pre><code class="language-python"># Load the LANCE-formatted datasets
+train = data_frames['train']
+test = data_frames['test'] 
+val = data_frames['val']
+</code></pre><p>and The <code>data_frames</code> dictionary contains the Pandas DataFrames for the training, testing, and validation sets, where each DataFrame has the following structure:</p><pre><code>image                                      filename category data_type
+0  b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...  n02130308_1836.png      cat     train
+1  b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...  cifar10-train-21103.png      cat     train
+2  b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...  cifar10-train-44957.png      cat     train
+3  b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...  n02129604_14997.png      cat     train
+4  b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...  n02123045_1463.png      cat     train
+</code></pre><p>Now that we have the LANCE-formatted data ready, we can use it to train a Convolutional Neural Network (CNN) for image classification. To do this, we’ll first need to create PyTorch Dataset and DataLoader objects from the LANCE-formatted Pandas DataFrames.</p><h2 id="load-the-lance-files-to-create-the-dataloaders">Load the lance files to create the dataloaders</h2><p>When working with LANCE-formatted image data, we need to consider that the images are stored in a binary format within the Pandas DataFrame. To use this data with a Convolutional Neural Network (CNN), we need to convert the binary data back into a format that the CNN can process, such as PIL Image objects. Here’s how we we’ll do that:</p><ol><li>Retrieve the binary image data: The image data is stored in binary format within the Pandas DataFrame. We’ll need to extract this binary data for each image.</li><li>Convert to PIL Image: Once we have the binary data, we’ll convert it into a PIL Image object. This will give us a readable image format that we can work with.</li><li>Handle grayscale images: Some of the images might be in grayscale mode. We’ll need to convert these to RGB format so they’re compatible with a CNN that expects 3-channel color images.</li><li>Apply transformations: Before feeding the images to the CNN, we may need to apply some transformations, like resizing or normalization. We can do this using the provided transform function.</li><li>Determine the labels: Each image has a category or class associated with it. We’ll look up the class index for the image’s category in the provided list of classes.</li><li>Return the data: Finally, we’ll return the transformed image and its corresponding label, which can be used to train the CNN model.</li></ol><p>To accomplish this, we’ll create a custom PyTorch Dataset class that can handle the all the heavy lifting and give us this sweet dataset to work with</p><pre><code class="language-python">from torch.utils import data
+from PIL import Image
+import io
+
+class CustomImageDataset(data.Dataset):
+    def __init__(self, df, classes, transform=None):
+        self.df = df
+        self.classes = classes
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        img_data = self.df.iloc[idx]['image']
+        img = Image.open(io.BytesIO(img_data))
+
+        # Convert grayscale images to RGB
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+
+        if self.transform:
+            img = self.transform(img)
+
+        label = self.classes.index(self.df.iloc[idx]['category'])
+        return img, label
+</code></pre><p>oh boy, we are ready to roll for training our model.</p><span class="meta"><time datetime="2024-04-10T00:00:00+05:30">April 10, 2024</time> &middot; <a href="/tag/Lance">Lance</a>, <a href="/tag/Dataset">Dataset</a></span>--> <!--</section>--></main><script async src="https://www.googletagmanager.com/gtag/js?id=G-JBZRCCYMBP"></script> <script> window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-JBZRCCYMBP'); </script></body></html>

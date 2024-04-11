@@ -2,6 +2,17 @@
   
     {
 
+      "title"    : "Use a Lance Image Dataset to train a Image Classification model",
+      "description" : "This post gives a detailed view on how you can use the Lance Image Dataset to train a classification model",
+      "url"      : "/2024/04/10/use-lance-image-dataset-to-train-a-image-classification-model",
+      "category" : "",
+      "tags"     : "Lance, Dataset",
+      "date"     : "2024-04-10 00:00:00 +0530"
+
+    } ,
+  
+    {
+
       "title"    : "Convert any Image dataset to Lance",
       "description" : "This post gives a detailed overview of how we can convert any image dataset to lance",
       "url"      : "/2024/04/09/convert-any-image-dataset-to-lance",
