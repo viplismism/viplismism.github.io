@@ -3,13 +3,13 @@ layout: post
 title: Use a Lance Image Dataset to train a Image Classification model
 description: This post gives a detailed view on how you can use the Lance Image Dataset to train a classification model
 tags: [Lance, Dataset]
-version: Draft
+version: Released
 release: 10-04-2024
 ---
 
-![image]()
+![image](https://raw.githubusercontent.com/vipul-maheshwari/vipul-maheshwari.github.io/15418ff16a807a748797dba2983ec39990ea85d0/images/training-with-lance-data/less-time.png)
 
-In a [previous]() post, I showed you how you can convert any Image Dataset to Lance format for faster retrieval and faster I/O operations. But can we use the same Lance formatted image dataset to train a image classification model? Well here it comes...
+In a [previous](https://vipul-maheshwari.github.io/2024/04/09/convert-any-image-dataset-to-lance) post, I showed you how you can convert any Image Dataset to Lance format for faster retrieval and faster I/O operations. But can we use the same Lance formatted image dataset to train a image classification model? Well here it comes...
 
 ### LANCE: A Saga for Efficient Image Datasets
 Convolutional Neural Networks (CNNs) have become the go-to architecture for a wide range of image-related tasks, including image classification, object detection, and semantic segmentation. The ability of CNNs to automatically learn relevant features from the input data, combined with their strong performance on complex visual tasks, makes them a natural choice for image classification models.
