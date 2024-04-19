@@ -3,8 +3,8 @@ layout: post
 title: Use a Lance Image Dataset to train a Image Classification model
 description: This post gives a detailed view on how you can use the Lance Image Dataset to train a classification model
 tags: [Lance, Dataset]
-version: Released
-release: 10-04-2024
+version: Draft
+release: 19-04-2024
 ---
 
 ![image](https://raw.githubusercontent.com/vipul-maheshwari/vipul-maheshwari.github.io/15418ff16a807a748797dba2983ec39990ea85d0/images/training-with-lance-data/less-time.png)
