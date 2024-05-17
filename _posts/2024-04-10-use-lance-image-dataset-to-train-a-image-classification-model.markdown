@@ -29,29 +29,23 @@ The structured and efficient data organization of the LANCE format allows for se
 
 In our previous article, we discussed the process of converting various image datasets, such as CINIC-10 and mini-ImageNet, into the LANCE format. Now, we will explore how we can utilize this LANCE-formatted data to train a CNN-based image classification model.
 
-Before diving into the model training, let's take a closer look at the structure of the LANCE-formatted data we created earlier. Referring to the script from the previous article, we can see how the LANCE dataset is organized:
+Before diving into the model training, let's take a closer look at the structure of the LANCE-formatted data we created earlier. Referring to the script from the previous article, we can see how the LANCE dataset is created:
 
 ```python
 import os
+import argparse
 import pandas as pd
 import pyarrow as pa
 import lance
 import time
 from tqdm import tqdm
 
-def process_images(split):
-    # Get the current directory path
-    images_folder = os.path.join("cinic", split)
-
-    # Define schema for RecordBatch
-    schema = pa.schema([('image', pa.binary()), 
-                        ('filename', pa.string()), 
-                        ('label', pa.string()), 
-                        ('split', pa.string())])
+def process_images(images_folder, split, schema):
 
     # Iterate over the categories within each data type
-    for label in os.listdir(images_folder):
-        label_folder = os.path.join(images_folder, label)
+    label_folder = os.path.join(images_folder, split)
+    for label in os.listdir(label_folder):
+        label_folder = os.path.join(images_folder, split, label)
         
         # Iterate over the images within each label
         for filename in tqdm(os.listdir(label_folder), desc=f"Processing {split} - {label}"):
@@ -74,44 +68,29 @@ def process_images(split):
             )
 
 # Function to write PyArrow Table to Lance dataset
-def write_to_lance():
-    # Create an empty RecordBatchIterator
-    schema = pa.schema([
-        pa.field("image", pa.binary()),
-        pa.field("filename", pa.string()),
-        pa.field("label", pa.string()),
-        pa.field("split", pa.string())
-    ])
-
-    # Specify the path where you want to save the Lance files
-    images_folder = "cinic"
-    
-    for split in ['train', 'test', 'val']:
-        lance_file_path = os.path.join(images_folder, f"cinic_{split}.lance")
+def write_to_lance(images_folder, dataset_name, schema):
+    for split in ['test', 'train', 'val']:
+        lance_file_path = os.path.join(images_folder, f"{dataset_name}_{split}.lance")
         
-        reader = pa.RecordBatchReader.from_batches(schema, process_images(split))
+        reader = pa.RecordBatchReader.from_batches(schema, process_images(images_folder, split, schema))
         lance.write_dataset(
             reader,
             lance_file_path,
             schema,
         )
 
-def loading_into_pandas():
-    # Load Lance files from the same folder
-    current_dir = os.getcwd()
-    print(current_dir)
-    images_folder = os.path.join(current_dir, "cinic")
-    
+def loading_into_pandas(images_folder, dataset_name):
     data_frames = {}  # Dictionary to store DataFrames for each data type
     
+    batch_size = args.batch_size
     for split in ['test', 'train', 'val']:
-        uri = os.path.join(images_folder, f"cinic_{split}.lance")
+        uri = os.path.join(images_folder, f"{dataset_name}_{split}.lance")
 
         ds = lance.dataset(uri)
 
         # Accumulate data from batches into a list
         data = []
-        for batch in tqdm(ds.to_batches(columns=["image", "filename", "label", "split"], batch_size=10), desc=f"Loading {split} batches"):
+        for batch in tqdm(ds.to_batches(columns=["image", "filename", "label", "split"], batch_size=batch_size), desc=f"Loading {split} batches"):
             tbl = batch.to_pandas()
             data.append(tbl)
 
@@ -126,13 +105,45 @@ def loading_into_pandas():
     
     return data_frames
 
-
 if __name__ == "__main__":
-    start = time.time()
-    write_to_lance()
-    data_frames = loading_into_pandas()
-    end = time.time()
-    print(f"Time(sec): {end - start}")
+    parser = argparse.ArgumentParser(description='Process image dataset.')
+    parser.add_argument('--batch_size', type=int, default=10, help='Batch size for processing images')
+    parser.add_argument('--dataset', type=str, help='Path to the image dataset folder')
+    
+    try:
+        args = parser.parse_args()
+        dataset_path = args.dataset
+        if dataset_path is None:
+            raise ValueError("Please provide the path to the image dataset folder using the --dataset argument.")
+        
+        # Extract dataset name
+        dataset_name = os.path.basename(dataset_path)
+
+        start = time.time()
+        schema = pa.schema([
+            pa.field("image", pa.binary()),
+            pa.field("filename", pa.string()),
+            pa.field("label", pa.string()),
+            pa.field("split", pa.string())
+        ])
+        write_to_lance(dataset_path, dataset_name, schema)
+        data_frames = loading_into_pandas(dataset_path, dataset_name)
+        end = time.time()
+        print(f"Time(sec): {end - start:.2f}")
+
+    except ValueError as e:
+        print(e)
+        print("Example:")
+        print("python3 convert-any-image-dataset-to-lance.py --batch_size 10 --dataset image_dataset_folder")
+        exit(1)
+
+    except FileNotFoundError:
+        print("The provided dataset path does not exist.")
+        exit(1)
+
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        exit(1)
 ```
 
 The script above creates LANCE-formatted files for the training, testing, and validation sets of the CINIC-10 dataset
@@ -144,7 +155,7 @@ test = data_frames['test']
 val = data_frames['val']
 ```
 
-and The `data_frames` dictionary contains the Pandas DataFrames for the training, testing, and validation sets, where each DataFrame has the following structure:
+here the `data_frames` dictionary contains the Pandas DataFrames for the training, testing, and validation sets, where each DataFrame has the following structure:
 
 ```markdown
    image                                              filename                    label    split
@@ -155,37 +166,41 @@ and The `data_frames` dictionary contains the Pandas DataFrames for the training
 4  b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\...  n02123045_1463.png           cat     train
 ```
 
-Now that we have the LANCE-formatted data ready, we can use it to train a Convolutional Neural Network (CNN) for image classification. To do this, we'll first need to create PyTorch Dataset and DataLoader objects from the LANCE-formatted Pandas DataFrames.
+Now that we have the LANCE-formatted data ready, we can use it to train a Convolutional Neural Network (CNN) for image classification. To do this, we'll first need to create Dataset and DataLoader objects from the LANCE-formatted files.
 
 ## Load the lance files to create the dataloaders
 
-When working with LANCE-formatted image data, we need to consider that the images are stored in a binary format within the Pandas DataFrame. To use this data with a Convolutional Neural Network (CNN), we need to convert the binary data back into a format that the CNN can process, such as PIL Image objects. Here's how we we'll do that:
+When working with LANCE-formatted image data, we need to consider that the images are stored in a binary format. To use this data with a Convolutional Neural Network (CNN), we need to convert the binary data back into a format that the CNN can process, such as PIL Image objects. 
 
-1. Retrieve the binary image data: The image data is stored in binary format within the Pandas DataFrame. We'll need to extract this binary data for each image.
+Here's how we we'll do that:
+1. Retrieve the binary image data: The image data is stored in binary format within the lance files. We need to extract the relevant image data first.
 2. Convert to PIL Image: Once we have the binary data, we'll convert it into a PIL Image object. This will give us a readable image format that we can work with.
 3. Handle grayscale images: Some of the images might be in grayscale mode. We'll need to convert these to RGB format so they're compatible with a CNN that expects 3-channel color images.
 4. Apply transformations: Before feeding the images to the CNN, we may need to apply some transformations, like resizing or normalization. We can do this using the provided transform function.
 4. Determine the labels: Each image has a label or class associated with it. We'll look up the class index for the image's label in the provided list of classes.
 5. Return the data: Finally, we'll return the transformed image and its corresponding label, which can be used to train the CNN model.
 
-To accomplish this, we'll create a custom PyTorch Dataset class that can handle the all the heavy lifting and give us this sweet dataset to work with
+To accomplish this, we'll create a custom Dataset class that can handle the all the heavy lifting and give us this sweet dataset to work with
 
 ```python
 from torch.utils import data
 from PIL import Image
 import io
 
+# Define the custom dataset class
 class CustomImageDataset(data.Dataset):
-    def __init__(self, df, classes, transform=None):
-        self.df = df
+    def __init__(self, table, classes, transform=None):
+        self.table = table
         self.classes = classes
         self.transform = transform
 
     def __len__(self):
-        return len(self.df)
+        return len(self.table)
 
     def __getitem__(self, idx):
-        img_data = self.df.iloc[idx]['image']
+        img_data = self.table["image"][idx].as_py()
+        label = self.table["label"][idx].as_py()
+
         img = Image.open(io.BytesIO(img_data))
 
         # Convert grayscale images to RGB
@@ -195,168 +210,226 @@ class CustomImageDataset(data.Dataset):
         if self.transform:
             img = self.transform(img)
 
-        label = self.classes.index(self.df.iloc[idx]['label'])
+        label = self.classes.index(label)
         return img, label
 ```
 
-This custom dataset class handles all the necessary steps to prepare our LANCE-formatted dataframe for use with a CNN model. By using this class, you can easily integrate the LANCE data into your PyTorch-based training pipeline.
-oh boy, we are ready to roll for training our model.
+This custom dataset class handles all the necessary steps to prepare our LANCE-formatted data for use with a CNN model. By using this class, you can easily integrate the LANCE data into your PyTorch-based training pipeline. Btw, if you are confused what `table` means here, it is simply converting the `lance` files to a more readable form, have a look in their [docs](https://lancedb.github.io/lance/read_and_write.html) and you will know why. 
+
+But TLDR, it's just iterating over the `lance` files to get the relevant images and labels. Now we are ready to roll for training our model.
 
 ### Training a CNN
 
 So we have written our custom dataset class, we will just import it in our main CNN script and utilize it's functionalities, as it's pretty easy now
 
-First we will load our lance files, then we will convert those lance files to our pandas dataframe objects and then finally the customimagedataset to utilize the binary data of the images to give us this image dataset..
+First we will load our lance files, then we will extract our images from it and then finally the customimagedataset to utilize the binary data of the images to give us this image dataset.. 
 
-That's it, other than that, it's simple CNN network doing the training..
-
+That's it, other than that, it's simple CNN network doing the training.. btw, I have used ResNet-34 to make things smoother and better for us, afterall who doesn't want to spice up some accuracy! 
 
 ```python
-import torch 
+import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torchvision.transforms as transforms
-from custom_dataset import CustomImageDataset
-import pandas as pd
-import matplotlib.pyplot as plt
-import lance
-from tqdm import tqdm
 import torch.optim as optim
+import torchvision.transforms as transforms
+from torch.utils import data
+import torchvision.models as models
 
-# Define the classes
-classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse','ship', 'truck')
+import io
+import tqdm
+import lance
+import wandb
 
-# Define the image transformations
-transform = transforms.Compose([
+from PIL import Image
+from tqdm import tqdm
+
+import time
+import warnings
+warnings.simplefilter('ignore')
+
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+    print("CUDA is available")
+else:
+    device = torch.device("cpu")
+    print("CUDA is not available, using CPU instead")
+
+lr = 1e-3
+momentum = 0.9
+number_of_epochs = 50
+train_dataset_path = "cinic/cinic_train.lance"
+test_dataset_path = "cinic/cinic_test.lance"
+validation_dataset_path = "cinic/cinic_val.lance"
+model_batch_size = 64
+batches_to_train = 256
+
+# Define the image classes
+classes = ('airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+
+# transformation function 
+transform_train = transforms.Compose([
     transforms.Resize((32, 32)),
+    transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
 ])
 
-def loading_into_pandas(uri):
-    ds = lance.dataset(uri)
+transform_test = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Resize((32, 32)),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+])
 
-    # Accumulate data from batches into a list
-    data = []
-    for batch in tqdm(ds.to_batches(columns=["image", "filename", "label", "split"], batch_size=10), desc="Loading batches"):
-        tbl = batch.to_pandas()
-        data.append(tbl)
+transform_val = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Resize((32, 32)),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+])
 
-    # Concatenate all DataFrames into a single DataFrame
-    df = pd.concat(data, ignore_index=True)
-    print("Pandas DataFrame is ready")
-    print("Total Rows: ", df.shape[0])
-    return df
 
-def train_model(train_loader, model, criterion, optimizer, device, num_epochs=10):
-    model.to(device)  # Move model to the specified device
+# Define the custom dataset class
+class CustomImageDataset(data.Dataset):
+    def __init__(self, table, classes, transform=None):
+        self.table = table
+        self.classes = classes
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.table)
+
+    def __getitem__(self, idx):
+        img_data = self.table["image"][idx].as_py()
+        label = self.table["label"][idx].as_py()
+
+        img = Image.open(io.BytesIO(img_data))
+
+        # Convert grayscale images to RGB
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+
+        if self.transform:
+            img = self.transform(img)
+
+        label = self.classes.index(label)
+        return img, label
+
+class Net(nn.Module):
+    def __init__(self, num_classes):
+        super(Net, self).__init__()
+        self.resnet = models.resnet34(pretrained=True)
+        num_ftrs = self.resnet.fc.in_features
+        self.resnet.fc = nn.Linear(num_ftrs, num_classes)
+
+    def forward(self, x):
+        return self.resnet(x)
+
+def train_model(train_loader, val_loader, model, criterion, optimizer, device, num_epochs, batch_to_train):
+    model.train()
+    total_start = time.time()
+
     for epoch in range(num_epochs):
         running_loss = 0.0
-        for i, data in enumerate(train_loader, 0):
-            # get the inputs; data is a list of [inputs, labels]
-            inputs, labels = data[0].to(device), data[1].to(device)  # Move data to the specified device
+        total_batch_start = time.time()
 
-            # zero the parameter gradients
-            optimizer.zero_grad()
-            
-            # forward + backward + optimize
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
+        with tqdm(enumerate(train_loader), total=batch_to_train, desc=f"Epoch {epoch+1}") as pbar_epoch:
+            for i, data in pbar_epoch:
+                if i >= batch_to_train:
+                    break
 
-            # print statistics
-            running_loss += loss.item()
-            if i % 64 == 63:  # Print every 64 mini-batches (batch size)
-                print(f'[{epoch + 1}, {i + 1:2d}] loss: {running_loss / 64:.3f}')
-                running_loss = 0.0
+                optimizer.zero_grad()
+                inputs, labels = data[0].to(device), data[1].to(device)
 
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+
+                loss.backward()
+                optimizer.step()
+
+                running_loss += loss.item()
+
+                if i % 10 == 0:
+                    pbar_epoch.set_postfix({'Loss': loss.item()})
+                    pbar_epoch.update(10)
+
+        per_epoch_time = time.time() - total_batch_start
+        avg_loss = running_loss / batch_to_train
+        print(f'Epoch {epoch+1}/{num_epochs} | Avg Loss: {avg_loss:.4f} | Time: {per_epoch_time:.4f} sec')
+        wandb.log({"Loss": loss.item()})
+        wandb.log({"Epoch Duration": per_epoch_time})
+
+    total_training_time = (time.time() - total_start) / 60
+    print(f"Total Training Time: {total_training_time:.4f} mins")
+
+
+    # Validation
+    model.eval()
+    correct_val = 0
+    total_val = 0
+
+    with torch.no_grad():
+        for data in val_loader:
+            images_val, labels_val = data[0].to(device), data[1].to(device)
+            outputs_val = model(images_val)
+            _, predicted_val = torch.max(outputs_val.data, 1)
+            total_val += labels_val.size(0)
+            correct_val += (predicted_val == labels_val).sum().item()
+
+    val_accuracy = 100 * correct_val / total_val
+    print(f'Validation Accuracy: {val_accuracy:.2f}%')
+    wandb.log({"Validation Accuracy": val_accuracy})
     print('Finished Training')
+    return model
 
-def main():
-    if torch.backends.mps.is_available():
-        device = torch.device("mps")
-        print("MPS Device:", device)
-    else:
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        print("Device:", device)    
+train_ds = lance.dataset(train_dataset_path)
+test_ds = lance.dataset(test_dataset_path)
+val_ds = lance.dataset(validation_dataset_path)
 
-    # Load datasets
-    training_df = loading_into_pandas('cinic/cinic_train.lance')
-    testing_df = loading_into_pandas('cinic/cinic_test.lance')
-    validation_df = loading_into_pandas('cinic/cinic_val.lance')
+train_ds_table = train_ds.to_table()
+test_ds_table = test_ds.to_table()
+val_ds_table = val_ds.to_table()
 
-    # Create datasets
-    train_dataset = CustomImageDataset(training_df, classes, transform=transform)
-    test_dataset = CustomImageDataset(testing_df, classes, transform=transform)
-    val_dataset = CustomImageDataset(validation_df, classes, transform=transform)
+train_dataset = CustomImageDataset(train_ds_table, classes, transform=transform_train)
+test_dataset = CustomImageDataset(test_ds_table, classes, transform=transform_test)
+val_dataset = CustomImageDataset(val_ds_table, classes, transform=transform_val)
 
-    # Create data loaders
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=True)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=64, shuffle=True)
-    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=64, shuffle=True)
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=model_batch_size, shuffle=True)
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=model_batch_size, shuffle=True)
+val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=model_batch_size, shuffle=True)
 
-    # Define the neural network
-    class Net(nn.Module):
-        def __init__(self):
-            super(Net, self).__init__()
-            self.conv1 = nn.Conv2d(3, 6, 5) # 3 input channels, 6 output channels, 5x5 kernel
-            self.pool = nn.MaxPool2d(2, 2) # 2x2 pooling
-            self.conv2 = nn.Conv2d(6, 16, 5) # 6 input channels, 16 output channels, 5x5 kernel
-            self.fc1 = nn.Linear(16 * 5 * 5, 120) 
-            self.fc2 = nn.Linear(120, 84) 
-            self.fc3 = nn.Linear(84, 10) # There are 10 classes
+wandb.init(project="cinic")
 
-        def forward(self, x):
-            x = self.pool(F.relu(self.conv1(x)))
-            x = self.pool(F.relu(self.conv2(x)))
-            x = torch.flatten(x, 1) # flatten all dimensions except batch
-            x = F.relu(self.fc1(x))
-            x = F.relu(self.fc2(x))
-            x = self.fc3(x)
-            return x
+net = Net(len(classes)).to(device)
 
-    # Instantiate the model
-    net = Net()
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(net.parameters(), lr=lr, momentum=momentum)
 
-    # Define loss function and optimizer
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+trained_model = train_model(train_loader, val_loader, net, criterion, optimizer, device, number_of_epochs, batches_to_train)
 
-    # Train the model
-    train_model(train_loader, net, criterion, optimizer, device, num_epochs=10)
+PATH = '/cinic/cinic_resnet.pth'
+torch.save(trained_model.state_dict(), PATH)
 
-    PATH = './cinic_net.pth'
-    torch.save(net.state_dict(), PATH)
+def test_model(test_loader, model, device):
+    model.eval()
+    correct_test = 0
+    total_test = 0
 
-    net = Net()
-    net.load_state_dict(torch.load(PATH))
-
-    correct = 0
-    total = 0
-
-    # since we're not training, we don't need to calculate the gradients for our outputs
     with torch.no_grad():
         for data in test_loader:
-            images, labels = data
-            # calculate outputs by running images through the network
-            outputs = net(images)
-            # the class with the highest energy is what we choose as prediction
-            _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
+            images_test, labels_test = data[0].to(device), data[1].to(device)
+            outputs_test = model(images_test)
+            _, predicted_test = torch.max(outputs_test.data, 1)
+            total_test += labels_test.size(0)
+            correct_test += (predicted_test == labels_test).sum().item()
 
-    # Calculate accuracy
-    accuracy = 100 * correct / total
-    print('Accuracy of the network on the test images: %.2f %%' % accuracy)
+    test_accuracy = 100 * correct_test / total_test
+    print(f'Test Accuracy: {test_accuracy:.2f}%')
 
-if __name__ == "__main__":
-    main()
-
+test_model(test_loader, trained_model, device)
 ```
 
 We've just wrapped up training a Convolutional Neural Network (CNN) with a dataset of lance images with just a single script. 
 
-And if you are Curious about why Lance-backed training outperforms our vanilla approaches? I've got a [report](https://wandb.ai/vipulmaheshwari/cinic-10/reports/CINIC-10-CNN-Training-Showdown-Lance-Vs-Vanilla--Vmlldzo3NTQxMTY5?accessToken=k2tk2e7u6x4ya5vivhtzieoh3lzm25e5z1inqhmaue41prct5ca65xufi3eznhj4) for you, showcasing how Lance-backed training excels in terms of I/O operations and training epochs compared to traditional methods.
+And if you are Curious about why Lance-backed training outperforms our vanilla approaches? I've got a [report](https://wandb.ai/vipulmaheshwari/cinic/reports/Training-a-ResNet-with-Lance-VS-Vanilla-Dataloader--Vmlldzo3NjgzNzI0?accessToken=3y8hveyqv9i0g34if82pj3vwhpi4dver7qptvd6q9kh7jaxxbq2gmoca140ht1ao) for you, showcasing how Lance-backed training delivers faster epoch durations compared to standard methods while sticking to the same CNN setting.
 
-By the way, you can dive into various deep learning techniques that utilize lance-formatted data on this [repository](https://github.com/lancedb/lance-deeplearning-recipes)
+By the way, you can dive into various deep learning techniques that utilize lance-formatted data on this [repository](https://github.com/lancedb/lance-deeplearning-recipes).
+
+Here is the [colab](https://colab.research.google.com/drive/1EepmyICbOnFTXtjof4_NMyL-sF0M_e1t?usp=sharing) for your reference. Adios Amigos
