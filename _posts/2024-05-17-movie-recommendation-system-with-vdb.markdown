@@ -9,7 +9,7 @@ release: 17-05-2024
 
 ### Movie recommendation system using VectorDB and Genre spectrum embeddings
 
-This article provides a comprehensive guide on creating a scalable and production-grade movie recommendation system by leveraging the power of Genre Spectrum Embeddings and VectorDB. Inspired by the implementation outlined in this paper, We'll explore how combining these two techniques can significantly enhance the recommendation experience, addressing key challenges faced by traditional systems.
+This article provides a comprehensive guide on creating a scalable and production-grade movie recommendation system by leveraging the power of Genre Spectrum Embeddings and VectorDB. Inspired by the implementation outlined in this [paper](https://arxiv.org/pdf/2309.08787), We'll explore how combining these two techniques can significantly enhance the recommendation experience, addressing key challenges faced by traditional systems.
 
 Here's what we cover below:
 
@@ -32,61 +32,76 @@ The Genre Spectrum approach involves combining the various movie genres or chara
 
 These embeddings serve dual purposes: they can either be directly inputted into a classification model for genre classification or stored in a VectorDB. By storing embeddings in a VectorDB, efficient retrieval and query search for recommendations become possible at a later stage. This architecture offers a holistic understanding of the underlying processes involved.
 
-![image]()
+![image](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/movie-recommendation-using-rag/movie_recommendation_architecture.png?raw=true)
 
 ## Data Ingestion and preprocessing techniques for movie metadata
 
 Our initial task involves gathering and organizing information about movies. This includes gathering extensive details such as the movie's type, plot summary, genres, audience ratings, and more.
 
-Thankfully, we have access to a robust dataset on [Kaggle](https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset) containing information from various sources for approximately 45,000 movies. If you require additional data, you can supplement the dataset by extracting information from platforms like Rotten Tomatoes, IMDb, or even box-office records. 
+Thankfully, we have access to a robust dataset on [Kaggle](https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset) containing information from various sources for approximately 45,000 movies. Please dowload the data from the Kaggle and place it inside your working directory. Watch for a file named `movies_metadata.csv`. If you require additional data, you can supplement the dataset by extracting information from platforms like Rotten Tomatoes, IMDb, or even box-office records. 
 
 Our next step is to extract the core details from this dataset and generate a universal summary for each movie. Initially, I'll combine the movie's title, genre, and overview into a single textual string. Then, this text will be tagged to create TaggedDocument instances, which will be utilized to train the Doc2Vec model later on.
 
 Before moving forward, let's install the relevant libraries to make our life easier..
 
 ```python
-pip install torch scikit-learn pylance nltk gensim lancedb scipy==1.12
+pip install torch scikit-learn pylance lancedb nltk gensim lancedb scipy==1.12
 ```
 
-Next, we'll proceed with the ingestion and preprocessing of the data. To simplify the process, we'll work with chunks of 1000 movies at a time. For clarity, we'll only include movie indices with non-null values for genres, accurate titles, and complete overviews. This approach ensures that we're working with high-quality, relevant data for our analysis.
+Next, we'll proceed with the ingestion and preprocessing of the data. To simplify the process, we'll work with chunks of 1000 movies at a time. For clarity, I'll only include movie indices with non-null values for genres, accurate titles, and complete overviews, this approach ensures that we're working with high-quality, relevant data for our analysis.
 
 ```python
-import tqdm
 import pandas as pd
-
-from tqdm import tqdm
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from nltk import word_tokenize
+from torch.utils.data import DataLoader, TensorDataset
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
-from nltk.tokenize import word_tokenize
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.model_selection import train_test_split
+from tqdm import tqdm
 
+import nltk
+nltk.download('punkt')
+
+# Read data from CSV file
 movie_data = pd.read_csv('movies_metadata.csv', low_memory=False)
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 def preprocess_data(movie_data_chunk):
     tagged_docs = []
     valid_indices = []
+    movie_info = []
 
     # Wrap your loop with tqdm
     for i, row in tqdm(movie_data_chunk.iterrows(), total=len(movie_data_chunk)):
         try:
             # Constructing movie text
             movies_text = ''
-            movies_text += "Overview: " + row['overview'] + '\n'
             genres = ', '.join([genre['name'] for genre in eval(row['genres'])])
             movies_text += "Genres: " + genres + '\n'
             movies_text += "Title: " + row['title'] + '\n'
             tagged_docs.append(TaggedDocument(words=word_tokenize(movies_text.lower()), tags=[str(i)]))
             valid_indices.append(i)
+            movie_info.append((row['title'], genres))
         except Exception as e:
             continue
 
-    return tagged_docs, valid_indices
+    return tagged_docs, valid_indices, movie_info
 
+# Preprocess data and extract genres for the first 1000 movies
 chunk_size = 1000
 tagged_data = []
 valid_indices = []
+movie_info = []
 for chunk_start in range(0, len(movie_data), chunk_size):
     movie_data_chunk = movie_data.iloc[chunk_start:chunk_start+chunk_size]
-    chunk_tagged_data, chunk_valid_indices = preprocess_data(movie_data_chunk)
+    chunk_tagged_data, chunk_valid_indices, chunk_movie_info = preprocess_data(movie_data_chunk)
     tagged_data.extend(chunk_tagged_data)
     valid_indices.extend(chunk_valid_indices)
+    movie_info.extend(chunk_movie_info)
 ```
 
 ## Generating embeddings using Doc2Vec
@@ -95,11 +110,12 @@ Next, we'll utilize the Doc2Vec model to generate embeddings for each movie base
 
 ```python
 def train_doc2vec_model(tagged_data, num_epochs=10):
-    model = Doc2Vec(vector_size=100, min_count=2, epochs=num_epochs)
-    model.build_vocab(tqdm(tagged_data, desc="Building Vocabulary"))
-
+    doc2vec_model = Doc2Vec(vector_size=100, min_count=2, epochs=num_epochs)
+    doc2vec_model.build_vocab(tqdm(tagged_data, desc="Building Vocabulary"))
     for epoch in range(num_epochs):
-        model.train(tqdm(tagged_data, desc=f"Epoch {epoch+1}"), total_examples=model.corpus_count, epochs = model.epochs)
+        doc2vec_model.train(tqdm(tagged_data, desc=f"Epoch {epoch+1}"), total_examples=doc2vec_model.corpus_count, epochs=doc2vec_model.epochs)
+    
+    return doc2vec_model
 
 doc2vec_model = train_doc2vec_model(tagged_data)
 doc2vec_model.save("doc2vec_model")
@@ -139,18 +155,16 @@ from sklearn.model_selection import train_test_split
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# Extracting unique genre labels from the valid movies
+# Extract genre labels for the valid indices
 genres_list = []
 for i in valid_indices:
     row = movie_data.loc[i]
     genres = [genre['name'] for genre in eval(row['genres'])]
     genres_list.append(genres)
 
-# Using a MultiLableBinarier to encode the genre_labels with each movie
 mlb = MultiLabelBinarizer()
 genre_labels = mlb.fit_transform(genres_list)
 
-# Creating the Training and Testing data for the model training
 embeddings = []
 for i in valid_indices:
     embeddings.append(doc2vec_model.dv[str(i)])
@@ -166,45 +180,49 @@ y_train_tensor = torch.tensor(y_train_np)
 X_test_tensor = torch.tensor(X_test_np)
 y_test_tensor = torch.tensor(y_test_np)
 
-# Genre Classifier Neural Network
 class GenreClassifier(nn.Module):
     def __init__(self, input_size, output_size):
         super(GenreClassifier, self).__init__()
         self.fc1 = nn.Linear(input_size, 512)
+        self.bn1 = nn.BatchNorm1d(512)
         self.fc2 = nn.Linear(512, 256)
+        self.bn2 = nn.BatchNorm1d(256)
         self.fc3 = nn.Linear(256, 128)
+        self.bn3 = nn.BatchNorm1d(128)
         self.fc4 = nn.Linear(128, output_size)
         self.relu = nn.ReLU()
-        self.softmax = nn.Softmax(dim=1)
+        self.dropout = nn.Dropout(p=0.2)  # Adjust the dropout rate as needed
 
     def forward(self, x):
         x = self.fc1(x)
+        x = self.bn1(x)
         x = self.relu(x)
+        x = self.dropout(x)
         x = self.fc2(x)
+        x = self.bn2(x)
         x = self.relu(x)
+        x = self.dropout(x)
         x = self.fc3(x)
+        x = self.bn3(x)
         x = self.relu(x)
+        x = self.dropout(x)
         x = self.fc4(x)
-        x = self.softmax(x)
         return x
 
-# Step 1: Creating the Model Instance with adequate device
+# Move model to the selected device
 model = GenreClassifier(input_size=100, output_size=len(mlb.classes_)).to(device)
 
-# Step 2: Defining the Model Hyperparameters
+# Define loss function and optimizer
+criterion = nn.BCEWithLogitsLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+# Training loop
 epochs = 50
 batch_size = 64
-learning_rate = 0.001
 
-# Step 3: Define loss function and optimizer
-criterion = nn.BCELoss()  # Binary Cross-Entropy Loss
-optimizer = optim.Adam(model.parameters(), lr=0.001)  # Adam optimizer
-
-# Step 4: Creating the DataLoaders
 train_dataset = TensorDataset(X_train_tensor.to(device), y_train_tensor.to(device))
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-# Step 5: Training Loop
 for epoch in range(epochs):
     model.train()
     running_loss = 0.0
@@ -218,8 +236,13 @@ for epoch in range(epochs):
         running_loss += loss.item() * inputs.size(0)
     epoch_loss = running_loss / len(train_loader.dataset)
     print(f'Epoch [{epoch + 1}/{epochs}], Loss: {epoch_loss:.4f}')
+```
 
-# Step 6: Evaluation Time
+That's it! We've successfully trained a Neural network for our genre classification task. You can check if the model is performing well  or not in terms of the genre classification.
+
+```python
+from sklearn.metrics import f1_score
+
 model.eval()
 with torch.no_grad():
     X_test_tensor, y_test_tensor = X_test_tensor.to(device), y_test_tensor.to(device)  # Move test data to device
@@ -227,12 +250,33 @@ with torch.no_grad():
     test_loss = criterion(outputs, y_test_tensor)
     print(f'Test Loss: {test_loss.item():.4f}')
 
-# Step 7 : Save the Model
-model_path = 'model.pth'
-torch.save(model.state_dict(), model_path)
+
+thresholds = [0.1] * len(mlb.classes_) 
+thresholds_tensor = torch.tensor(thresholds, device=device).unsqueeze(0)
+
+# Convert the outputs to binary predictions using varying thresholds
+predicted_labels = (outputs > thresholds_tensor).cpu().numpy()
+
+# Convert binary predictions and actual labels to multi-label format
+predicted_multilabels = mlb.inverse_transform(predicted_labels)
+actual_multilabels = mlb.inverse_transform(y_test_np)
+
+# Print the Predicted and Actual Labels for each movie
+for i, (predicted, actual) in enumerate(zip(predicted_multilabels, actual_multilabels)):
+    print(f'Movie {i+1}:')
+    print(f'    Predicted Labels: {predicted}')
+    print(f'    Actual Labels: {actual}')
+
+
+# Compute F1-score
+f1 = f1_score(y_test_np, predicted_labels, average='micro')
+print(f'F1-score: {f1:.4f}')
+
+# Saving the trained model
+torch.save(model.state_dict(), 'trained_model.pth')
 ```
 
-That's it! We've successfully trained a Neural network for our genre classification task. Now, our next step is to take a query and generate the three most relevant genres based on our trained model.
+Now, our next step is to take a query and generate the three most relevant genres based on our trained model.
 
 ```python
 def test_model(movie_descriptions, doc2vec_model, model, mlb):
@@ -318,7 +362,6 @@ import lancedb
 import pandas as pd
 from lancedb.pydantic import LanceModel, Vector
 
-
 data = pd.read_csv("movie_embeddings.csv")
 data.drop(columns=["movie_index"], inplace=True)
 
@@ -366,61 +409,46 @@ def get_recommendation(title):
     )
     return result
 
-get_recommendation("Toy Story")
+result = get_recommendation("Toy Story")
+result[['title']]
 ```
 
-![getrecommendation]()
-
-Let me break down the things for you.
+Well let me break down some things for you.
  
 First, we initialize our LanceDB table containing our relevant data. Then, for a given movie title, we check if we have this title in our dataset. If it exists, we perform a cosine similarity search on all other movies, returning the top 5 most relevant movie titles.
 
-And just like that, you've crafted an impressive movie recommendation system that can swiftly provide you with the best selection of movies. This is made possible by leveraging genre_embeddings created with the assistance of a neural network and storing them in LanceDB vector database.
+And just like that, you've crafted an impressive movie recommendation system that can swiftly provide you with the best selection of movies. This is made possible by leveraging `genre_embeddings` created with the assistance of a neural network and storing them in LanceDB vector database.
 
-Just to clarify, I've utilized a basic deep learning model architecture to demonstrate how we can enhance our recommendation system. We might not see the best results in terms of the movie recommendations, However, the folks at Tubi would be the right folks who can provide you with the precise model architecture they've employed to develop this.. 
+Doing all this will provide you with a list of recommended movies.
 
-Well keeping the things aside, Here's an overview of the entire training code..
+*Just to clarify, I've employed a rudimentary deep learning model architecture to showcase how we can improve our recommendation system. While the movie recommendations may not yield optimal results, the team at Tubi would be the experts to provide you with the exact model architecture they've utilized for developing this system.*
+
+That being said, Here's an overview of the entire training code..
 
 ```python
 import pandas as pd
 import numpy as np
-
-import lance
-import tqdm
-from tqdm import tqdm
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from nltk import word_tokenize
 from torch.utils.data import DataLoader, TensorDataset
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
-from nltk.tokenize import word_tokenize
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.model_selection import train_test_split
+from tqdm import tqdm
+
+import nltk
+nltk.download('punkt')
 
 # Read data from CSV file
-movie_data = pd.read_csv('movies_metadata.csv', low_memory=False)
+movie_data = pd.read_csv('data/movies_metadata.csv', low_memory=False)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-def test_model(movie_descriptions, doc2vec_model, model, mlb):
-    tagged_docs = [TaggedDocument(words=word_tokenize(desc.lower()), tags=[str(i)]) for i, desc in enumerate(movie_descriptions)]
-    embeddings = [doc2vec_model.infer_vector(doc.words) for doc in tagged_docs]
-    X_test_np = np.array(embeddings, dtype=np.float32)
-    X_test_tensor = torch.tensor(X_test_np).to(device)
-    
-    model.eval()
-    with torch.no_grad():
-        outputs = model(X_test_tensor)
-    
-    # Get top N genres with the highest probabilities
-    N = 3  # Number of top genres to select
-    top_n_indices = np.argsort(-outputs.cpu().numpy())[:, :N]
-    predicted_genres = mlb.classes_[top_n_indices]
-
-    return predicted_genres
 
 def preprocess_data(movie_data_chunk):
     tagged_docs = []
     valid_indices = []
+    movie_info = []
 
     # Wrap your loop with tqdm
     for i, row in tqdm(movie_data_chunk.iterrows(), total=len(movie_data_chunk)):
@@ -433,13 +461,11 @@ def preprocess_data(movie_data_chunk):
             movies_text += "Title: " + row['title'] + '\n'
             tagged_docs.append(TaggedDocument(words=word_tokenize(movies_text.lower()), tags=[str(i)]))
             valid_indices.append(i)
+            movie_info.append((row['title'], genres))
         except Exception as e:
             continue
 
-    return tagged_docs, valid_indices
-
-from gensim.models.doc2vec import Doc2Vec
-from tqdm import tqdm
+    return tagged_docs, valid_indices, movie_info
 
 def train_doc2vec_model(tagged_data, num_epochs=10):
     # Initialize Doc2Vec model
@@ -450,16 +476,17 @@ def train_doc2vec_model(tagged_data, num_epochs=10):
     
     return doc2vec_model
 
-
 # Preprocess data and extract genres for the first 1000 movies
 chunk_size = 1000
 tagged_data = []
 valid_indices = []
+movie_info = []
 for chunk_start in range(0, len(movie_data), chunk_size):
     movie_data_chunk = movie_data.iloc[chunk_start:chunk_start+chunk_size]
-    chunk_tagged_data, chunk_valid_indices = preprocess_data(movie_data_chunk)
+    chunk_tagged_data, chunk_valid_indices, chunk_movie_info = preprocess_data(movie_data_chunk)
     tagged_data.extend(chunk_tagged_data)
     valid_indices.extend(chunk_valid_indices)
+    movie_info.extend(chunk_movie_info)
 
 doc2vec_model = train_doc2vec_model(tagged_data)
 doc2vec_model.save("doc2vec_model")
@@ -493,32 +520,40 @@ class GenreClassifier(nn.Module):
     def __init__(self, input_size, output_size):
         super(GenreClassifier, self).__init__()
         self.fc1 = nn.Linear(input_size, 512)
+        self.bn1 = nn.BatchNorm1d(512)
         self.fc2 = nn.Linear(512, 256)
+        self.bn2 = nn.BatchNorm1d(256)
         self.fc3 = nn.Linear(256, 128)
+        self.bn3 = nn.BatchNorm1d(128)
         self.fc4 = nn.Linear(128, output_size)
         self.relu = nn.ReLU()
-        self.softmax = nn.Softmax(dim=1)
+        self.dropout = nn.Dropout(p=0.2)  # Adjust the dropout rate as needed
 
     def forward(self, x):
         x = self.fc1(x)
+        x = self.bn1(x)
         x = self.relu(x)
+        x = self.dropout(x)
         x = self.fc2(x)
+        x = self.bn2(x)
         x = self.relu(x)
+        x = self.dropout(x)
         x = self.fc3(x)
+        x = self.bn3(x)
         x = self.relu(x)
+        x = self.dropout(x)
         x = self.fc4(x)
-        x = self.softmax(x)
         return x
 
 # Move model to the selected device
 model = GenreClassifier(input_size=100, output_size=len(mlb.classes_)).to(device)
 
-# Step 2: Define loss function and optimizer
-criterion = nn.BCELoss()  # Binary Cross-Entropy Loss
-optimizer = optim.Adam(model.parameters(), lr=0.001)  # Adam optimizer
+# Define loss function and optimizer
+criterion = nn.BCEWithLogitsLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# Step 4: Training loop
-epochs = 10
+# Training loop
+epochs = 50
 batch_size = 64
 
 train_dataset = TensorDataset(X_train_tensor.to(device), y_train_tensor.to(device))
@@ -537,54 +572,6 @@ for epoch in range(epochs):
         running_loss += loss.item() * inputs.size(0)
     epoch_loss = running_loss / len(train_loader.dataset)
     print(f'Epoch [{epoch + 1}/{epochs}], Loss: {epoch_loss:.4f}')
-
-model.eval()
-with torch.no_grad():
-    X_test_tensor, y_test_tensor = X_test_tensor.to(device), y_test_tensor.to(device)  # Move test data to device
-    outputs = model(X_test_tensor)
-    test_loss = criterion(outputs, y_test_tensor)
-    print(f'Test Loss: {test_loss.item():.4f}')
-
-# Saving the trained model
-torch.save(model.state_dict(), 'trained_model.pth')
-
-# Example movie descriptions to test the model
-example_movie_descriptions = [
-    "A boy discovers some powers and ready to conquer the world",
-    "Ailens comes from the future and start destorying the earth",
-    "A romantic comedy"
-]
-
-# Test the model
-predicted_genres = test_model(example_movie_descriptions, doc2vec_model, model, mlb)
-print(predicted_genres)
-
-
-### Saving the relevant embeddings with the movie_index, title, genre_embeddings and the genre_labels to a dataframe
-def extract_genre_embeddings(model, X_data):
-    model.eval()
-    with torch.no_grad():
-        embeddings = model.fc3(model.relu(model.fc2(model.relu(model.fc1(X_data.to(device))))))
-    return embeddings.cpu().numpy()
-
-train_embeddings = extract_genre_embeddings(model, X_train_tensor)
-test_embeddings = extract_genre_embeddings(model, X_test_tensor)
-
-# Combine training and test data
-all_indices = valid_indices[:len(X_train_tensor)] + valid_indices[len(X_train_tensor):]
-all_embeddings = np.concatenate((train_embeddings, test_embeddings), axis=0)
-all_genres = np.concatenate((y_train_np, y_test_np), axis=0)
-
-# Create a dataframe
-movie_embeddings_df = pd.DataFrame({
-    'movie_index': all_indices,
-    'title': [movie_data.loc[idx, 'title'] for idx in all_indices],
-    'genre_embeddings': [list(embeddings) for embeddings in all_embeddings],  # Convert each array of embeddings to a list
-    'genre_labels': [mlb.classes_[labels.nonzero()[0]] for labels in all_genres]
-})
-
-# Save the data as a csv file
-movie_embeddings_df.to_csv("movie_embeddings.csv", index=False)
 ```
 
-Here is the ![collab]() for your reference..
+Here is the [Colab notebook](https://colab.research.google.com/drive/1B6I5SEXzuuEVaHcy4IwaJlrMy8wJfPSx?usp=sharing) for your reference, where you can dive into each component step by step and gain a comprehensive understanding of the process.
