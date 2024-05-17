@@ -440,7 +440,7 @@ import nltk
 nltk.download('punkt')
 
 # Read data from CSV file
-movie_data = pd.read_csv('data/movies_metadata.csv', low_memory=False)
+movie_data = pd.read_csv('movies_metadata.csv', low_memory=False)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def preprocess_data(movie_data_chunk):
