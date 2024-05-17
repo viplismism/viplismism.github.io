@@ -7,8 +7,6 @@ version: Released
 release: 17-05-2024
 ---
 
-### Movie recommendation system using VectorDB and Genre spectrum embeddings
-
 This article provides a comprehensive guide on creating a scalable and production-grade movie recommendation system by leveraging the power of Genre Spectrum Embeddings and VectorDB. Inspired by the implementation outlined in this [paper](https://arxiv.org/pdf/2309.08787), We'll explore how combining these two techniques can significantly enhance the recommendation experience, addressing key challenges faced by traditional systems.
 
 Here's what we cover below:
