@@ -10,7 +10,8 @@ layout: default
         {% if post.version == "Draft" %}
           <span>Draft</span>
         {% else %}
-          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d-%m-%Y" }}</time>
+          <!--<time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d-%m-%Y" }}</time>-->
+          <time datetime="{{}}">{{ }}</time>
         {% endif %}
       </li>
     {% endfor %}

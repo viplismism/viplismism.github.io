@@ -2,12 +2,12 @@
   
     {
 
-      "title"    : "Use a Lance Image Dataset to train a Image Classification model",
-      "description" : "This post gives a detailed view on how you can use the Lance Image Dataset to train a classification model",
-      "url"      : "/2024/04/10/use-lance-image-dataset-to-train-a-image-classification-model",
+      "title"    : "Create a Movie Recommendation System using RAG",
+      "description" : "This post gives a detailed view on how you can use the embeddings to create a Movie Recommendation sys",
+      "url"      : "/2024/05/17/movie-recommendation-system-with-vdb",
       "category" : "",
-      "tags"     : "Lance, Dataset",
-      "date"     : "2024-04-10 00:00:00 +0530"
+      "tags"     : "LLM, RAG",
+      "date"     : "2024-05-17 00:00:00 +0530"
 
     } ,
   

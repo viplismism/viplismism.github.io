@@ -4,7 +4,7 @@ title: Embedded Databases
 description: How LanceDB is beating ass of every other Embedded Database
 summary: Everything related to the Embedded database
 tags: [LLM, Embedded Databases, LanceDB]
-version: Released
+version: Published
 release: 15-03-2024
 ---
 
