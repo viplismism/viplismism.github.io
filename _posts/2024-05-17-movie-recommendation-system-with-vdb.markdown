@@ -28,8 +28,7 @@ These embeddings serve dual purposes: they can either be directly inputted into 
 
 This architecture offers a holistic understanding of the underlying processes involved.
 
-![image]()
-
+![image](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/movie-recommendation-using-rag/doc2vec_final.png?raw=true)
 
 ### Data Ingestion and preprocessing techniques for movie metadata
 Our initial task involves gathering and organizing information about movies. This includes gathering extensive details such as the movie's type, plot summary, genres, audience ratings, and more. 
@@ -319,6 +318,8 @@ And now, after all the groundwork, we've arrived at the final piece of the puzzl
 get_recommendations("Vertical Limit")
 ```
 
+![movie_recommendation](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/movie-recommendation-using-rag/movie_recommendation.png?raw=true)
+
 Some of the movies are even the closest match and just like that, we've crafted an impressive movie recommendation system that can swiftly provide us with the best selection of movies. This is made possible by leveraging embeddings and a Vectordb. 
 
-That being said, here is the [colab]() link for the reference.
+That being said, here is the [colab](https://colab.research.google.com/drive/17cfqJXzuS7cKeZ0Cby8QeGAKMniqNtlv?usp=sharing) link for the reference.
