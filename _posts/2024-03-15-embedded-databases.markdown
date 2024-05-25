@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Embedded Databases
+title: Databases for ML Worflows
 description: How LanceDB is beating ass of every other Embedded Database
 summary: Everything related to the Embedded database
 tags: [LLM, Embedded Databases, LanceDB]
