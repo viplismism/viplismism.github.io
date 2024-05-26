@@ -322,4 +322,4 @@ get_recommendations("Vertical Limit")
 
 Some of the movies are even the closest match and just like that, we've crafted an impressive movie recommendation system that can swiftly provide us with the best selection of movies. This is made possible by leveraging embeddings and a Vectordb. 
 
-That being said, here is the [colab](https://colab.research.google.com/drive/17cfqJXzuS7cKeZ0Cby8QeGAKMniqNtlv?usp=sharing) link for the reference.
+That being said, here is the [colab](https://colab.research.google.com/drive/1B6I5SEXzuuEVaHcy4IwaJlrMy8wJfPSx?authuser=1#scrollTo=BV1mjqD93Mud) link for the reference.
