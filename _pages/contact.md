@@ -5,7 +5,7 @@ title: Contact
 
 Cuss words, feedback, collaborations, freelancing, gigs—anything, just shoot! I am all ears!
 
-- [Email](mailto:vipulmaheshwari.deogarh@gmail.com)
+- [Email](mailto:vim.code.level@gmail.com)
   
 - [Twitter](https://twitter.com/PinakaX)
   
