@@ -4,7 +4,7 @@ title: Create a Movie Recommendation System using RAG
 description: This post gives a detailed view on how you can use the embeddings to create a Movie Recommendation sys
 tags: [LLM, RAG]
 version: Published
-release: 17-05-2024
+release: 31-05-2024
 ---
 
 This article provides a comprehensive guide on creating a movie recommendation system by using vector similarity search and multi-label genre classification.
