@@ -4,7 +4,7 @@
  <title>Blixxi Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-07-14T15:06:09+05:30</updated>
+ <updated>2024-07-14T15:51:54+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -17,7 +17,9 @@
    <link href="http://localhost:4000/2024/07/14/zero-shot-image-classification"/>
    <updated>2024-07-14T00:00:00+05:30</updated>
    <id>http://localhost:4000/2024/07/14/zero-shot-image-classification</id>
-   <content type="html">&lt;p&gt;For those who don’t know, “zero-shot” means an AI can do a task without any prior training. Imagine an AI chatting with you in a language it was never taught, or suddenly playing soccer with you (a bit of an exaggeration, but you get the idea!). Simply put, if an AI can perform a task it hasn’t been trained for, that’s zero-shot.&lt;/p&gt;
+   <content type="html">&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/cat.png?raw=true&quot; alt=&quot;cat-woah&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;For those who don’t know what “zero-shot,” means, it refers to an AI’s ability to perform a task without any prior specific training for that task. Imagine an AI having a conversation in a language it was never explicitly taught or suddenly playing a new game without any practice. In essence, if an AI can handle a task it hasn’t been directly trained for, that’s what we call zero-shot capability.&lt;/p&gt;
 
 &lt;h3 id=&quot;zero-shot-classification&quot;&gt;Zero-Shot classification&lt;/h3&gt;
 
@@ -25,9 +27,9 @@
 
 &lt;p&gt;Fine-tuning can be challenging; it requires a well-labeled dataset and, if your use case is specific to an enterprise, it may also need significant computing power.&lt;/p&gt;
 
-&lt;p&gt;So, what does “zero-shot image classification” really means? Imagine a deep learning model trained only to distinguish between cats and dogs. Now, if you show it a picture of a person lounging on the couch playing video games, and the model identifies it as a “corporate employee enjoying a Sunday afternoon,” that’s zero-shot image classification. It means the model can correctly identify something it was never specifically trained to recognize. To help you follow along, here is the complete architecture..&lt;/p&gt;
+&lt;p&gt;So, what does “Zero-Shot image classification” really means? Imagine a deep learning model trained only to distinguish between cats and dogs. Now, if you show it a picture of a person lounging on the couch playing video games, and the model identifies it as a “corporate employee enjoying a Sunday afternoon,” that’s zero-shot image classification. It means the model can correctly identify something it was never specifically trained to recognize. To help you follow along, here is the complete architecture..&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/zero-shot-image-classification-with-lancedb/zero-shot-image-classification.png&quot; alt=&quot;architecture&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/zero-shot-image-classification.png?raw=true&quot; alt=&quot;architecture&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;fundamentals&quot;&gt;Fundamentals&lt;/h3&gt;
 
@@ -48,7 +50,7 @@
 
 &lt;p&gt;The authors of CLIP demonstrated its superior zero-shot classification performance by comparing it to the ResNet-101 model trained specifically on ImageNet. When both models were tested on other datasets derived from ImageNet, CLIP outperformed the state-of-the-art ResNet-101, showing a better understanding of the dataset than the fine-tuned version of ResNet-101 trained on ImageNet data.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/zero-shot-image-classification-with-lancedb/comparison-matrix.png&quot; alt=&quot;image-classification-matrix&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/comparison-matrix.png?raw=true&quot; alt=&quot;image-classification-matrix&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;reasoning-of-clip&quot;&gt;Reasoning of CLIP&lt;/h3&gt;
 
@@ -264,9 +266,9 @@ selected_image = imagedata[index][&apos;img&apos;]
 selected_image
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;When you execute this code, you’ll be presented with a visual representation of a data point from our dataset. In my case, the output displayed a pixelated image of a whale. Let’s take a look at what appears for you.&lt;/p&gt;
+&lt;p&gt;When you execute this code, you’ll be presented with a visual representation of a data point from our dataset. In my case, the output displayed a pixelated image of a whale.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/zero-shot-image-classification-with-lancedb/whale.png&quot; alt=&quot;whale&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/whale.png?raw=true&quot; alt=&quot;whale&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Before we can analyze our image with CLIP, we need to preprocess it properly. First, we’ll run the image through our CLIP processor. This step ensures the image is resized first, then the pixels are normalized, then converting it into the tensor and finally adding a batch dimension. All of these things are settled up for the model.&lt;/p&gt;
 

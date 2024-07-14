@@ -7,7 +7,9 @@ version: Published
 release: 14-07-2024
 ---
 
-For those unfamiliar with the term "zero-shot," it refers to an AI's ability to perform a task without any prior specific training for that task. Imagine an AI having a conversation in a language it was never explicitly taught or suddenly playing a new game without any practice. In essence, if an AI can handle a task it hasn't been directly trained for, that's what we call zero-shot capability.
+![cat-woah](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/cat.png?raw=true)
+
+For those who don't know what "zero-shot," means, it refers to an AI's ability to perform a task without any prior specific training for that task. Imagine an AI having a conversation in a language it was never explicitly taught or suddenly playing a new game without any practice. In essence, if an AI can handle a task it hasn't been directly trained for, that's what we call zero-shot capability.
 
 ### Zero-Shot classification
 
@@ -15,9 +17,9 @@ There are many state-of-the-art (SOTA) computer vision models that excel at vari
 
 Fine-tuning can be challenging; it requires a well-labeled dataset and, if your use case is specific to an enterprise, it may also need significant computing power.
 
-So, what does "zero-shot image classification" really means? Imagine a deep learning model trained only to distinguish between cats and dogs. Now, if you show it a picture of a person lounging on the couch playing video games, and the model identifies it as a "corporate employee enjoying a Sunday afternoon," that's zero-shot image classification. It means the model can correctly identify something it was never specifically trained to recognize. To help you follow along, here is the complete architecture..
+So, what does "Zero-Shot image classification" really means? Imagine a deep learning model trained only to distinguish between cats and dogs. Now, if you show it a picture of a person lounging on the couch playing video games, and the model identifies it as a "corporate employee enjoying a Sunday afternoon," that's zero-shot image classification. It means the model can correctly identify something it was never specifically trained to recognize. To help you follow along, here is the complete architecture..
 
-![architecture](../images/zero-shot-image-classification-with-lancedb/zero-shot-image-classification.png)
+![architecture](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/zero-shot-image-classification.png?raw=true)
 
 ### Fundamentals
 
@@ -36,7 +38,7 @@ So, here's what we get from using CLIP:
 
 The authors of CLIP demonstrated its superior zero-shot classification performance by comparing it to the ResNet-101 model trained specifically on ImageNet. When both models were tested on other datasets derived from ImageNet, CLIP outperformed the state-of-the-art ResNet-101, showing a better understanding of the dataset than the fine-tuned version of ResNet-101 trained on ImageNet data.
 
-![image-classification-matrix](../images/zero-shot-image-classification-with-lancedb/comparison-matrix.png)
+![image-classification-matrix](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/comparison-matrix.png?raw=true)
 
 ### Reasoning of CLIP
 
@@ -265,9 +267,9 @@ selected_image = imagedata[index]['img']
 selected_image
 ```
 
-When you execute this code, you'll be presented with a visual representation of a data point from our dataset. In my case, the output displayed a pixelated image of a whale. Let's take a look at what appears for you.
+When you execute this code, you'll be presented with a visual representation of a data point from our dataset. In my case, the output displayed a pixelated image of a whale.
 
-![whale](../images/zero-shot-image-classification-with-lancedb/whale.png)
+![whale](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/whale.png?raw=true)
 
 Before we can analyze our image with CLIP, we need to preprocess it properly. First, we'll run the image through our CLIP processor. This step ensures the image is resized first, then the pixels are normalized, then converting it into the tensor and finally adding a batch dimension. All of these things are settled up for the model. 
 
