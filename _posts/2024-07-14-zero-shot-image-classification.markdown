@@ -9,13 +9,13 @@ release: 14-07-2024
 
 ![cat-woah](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/cat.png?raw=true)
 
-For those who don't know what "zero-shot," means, it refers to an AI's ability to perform a task without any prior specific training for that task. Imagine an AI having a conversation in a language it was never explicitly taught or suddenly playing a new game without any practice. In essence, if an AI can handle a task it hasn't been directly trained for, that's what we call zero-shot capability.
+Imagine an AI having a conversation in a language it was never explicitly taught or suddenly playing a new game without any practice. In essence, if an AI can handle a task it hasn't been directly trained for, that's what we call zero-shot capability.
 
 ### Zero-Shot classification
 
 There are many state-of-the-art (SOTA) computer vision models that excel at various classification tasks, such as identifying animals, cars, fraud, and products in e-commerce. They can handle almost any image classification job. However, these models are often specialised and need fine-tuning for different use cases to be truly effective. 
 
-Fine-tuning can be challenging; it requires a well-labeled dataset and, if your use case is specific to an enterprise, it may also need significant computing power.
+Fine-tuning can be challenging; it requires a well-labeled dataset, and if your use case is specific to an enterprise, it may also need significant computing power.
 
 So, what does "Zero-Shot image classification" really means? Imagine a deep learning model trained only to distinguish between cats and dogs. Now, if you show it a picture of a person lounging on the couch playing video games, and the model identifies it as a "corporate employee enjoying a Sunday afternoon," that's zero-shot image classification. It means the model can correctly identify something it was never specifically trained to recognize. To help you follow along, here is the complete architecture..
 
@@ -23,11 +23,9 @@ So, what does "Zero-Shot image classification" really means? Imagine a deep lear
 
 ### Fundamentals
 
-To make this work, we need a multimodal embedding model and a vector database. Let's start with something called CLIP, which stands for **Contrastive Language-Image Pre-Training.** Think of CLIP as a smart box that can understand different types of files. Whether you give it an image, text, audio, or something else, it can grasp the context behind them all. 
+To make this work, we need a multimodal embedding model and a vector database. Let's start with something called CLIP, which stands for **Contrastive Language-Image Pre-Training.** Think of CLIP as a smart box that can understand different types of files. Whether you give it an image or text, it can grasp the context behind them all. 
 
-But how it's working behind the scenes?
-
-To stay focused, let's consider just images and text for now. Now inside the box, there are two smaller boxes: a **Text Encoder** and an **Image Encoder**. When OpenAI trained CLIP, they made sure these two encoders understand text and images in the same vector space.
+But how it's working behind the scenes? Consider there are two smaller boxes in that box: a **Text Encoder** and an **Image Encoder**. When OpenAI trained CLIP, they made sure these two encoders understand text and images in the same vector space.
 
 They achieved this by training the model to place similar image-text pairs close together in vector space while separating the vectors of non-pairs. Although OpenAI hasn't specified the exact data used, the CLIP paper mentions that the model was trained on 400 million image-text pairs collected from the internet. This extensive training gives the model an impressive ability to understand relevant image-text pairs.
 
@@ -46,7 +44,7 @@ So, the implementation is quite straightforward. But before going into that, Let
 
 Initially, each image in a traditional classification model has assigned class labels. We input these images into the model along with their respective class labels as the expected outputs. Through training, the model's weights are adjusted based on calculated losses. Over time, the model learns to distinguish between various images by recognizing distinct features.
 
-However, zero-shot classification takes this concept further by utilizing two key components: a Text Encoder and an Image Encoder. Yes those two small boxes that I described earlier, Now these encoders produce 512-dimensional vectors for both images and text, mapping them to the same vector space. This means the 512-dimensional vector of an image of a "cat" would be semantically similar to the vector of a text description like "a photo of a cat".
+However, zero-shot classification takes this concept further by utilizing two key components: a Text Encoder and an Image Encoder. Yes those two small boxes that I described earlier, Now these encoders produce n-dimensional vectors for both images and text, mapping them to the same vector space. This means the n-dimensional vector of an image of a "cat" would be semantically similar to the vector of a text description like "a photo of a cat".
 
 By leveraging this shared vector space, zero-shot classification enables the model to classify images into categories it hasn't explicitly seen during training. Instead of relying solely on predefined class labels, the model can compare the vector representation of a new image to vector representations of textual descriptions of various categories. 
 
@@ -56,18 +54,15 @@ To enhance the effectiveness of our zero-shot classification, we should transfor
 
 By adopting a similar approach, our classification task aligns more closely with the model's pretrained understanding of how images relate to their textual descriptions.
 
-Well doing this we are decreasing the gap between the model's pretraining and our specific classification task. Now doing this all, we can do the classification based on the semantic similarity rather than exact matches to trained classes. For instance, even if the model was never explicitly trained on the class "horse", it could potentially classify an image of a horse correctly if it can match the image's vector representation closely with the vector of the text description "a large mammal like horse". 
-
-This approach significantly expands the model's ability to generalize to new, unseen categories, making it more flexible and adaptable in real-world applications where new classes may frequently emerge.
-
 ### Final thoughts
 
 Let's take a step back and solidify our understanding before implementation. The CLIP model is pre-trained on a massive dataset of image-text pairs, learning that "a photo of a cat" corresponds to an actual image of a cat, and vice versa. This means whenever we feed an image or text into CLIP, we can expect it to grasp the relevance between the two.
 
-Now, if you want to get into the nitty-gritty of the algorithm, it's not overly complex. At its core, CLIP encodes each image and text as a 512-dimensional embedding vector. Let's say T1 is the vector for "a photo of a cat", T2 for "a photo of a bird", and T3 for "a photo of a horse". If we have an image of a cat with embedding V1, the similarity score between V1 and T1 should be the highest among all text embeddings. This high similarity tells us that the V1 vector indeed represents "a photo of a cat". 
+Now, if you want to get into the nitty-gritty of the algorithm, it's not overly complex. At its core, CLIP encodes each image and text as a n-dimensional embedding vector. Let's say T1 is the vector for "a photo of a cat", T2 for "a photo of a bird", and T3 for "a photo of a horse". If we have an image of a cat with embedding V1, the similarity score between V1 and T1 should be the highest among all text embeddings. This high similarity tells us that the V1 vector indeed represents "a photo of a cat". 
 
-So, when we pass an image of a cat to our CLIP model, it should reason like "this is a cat, I know this already". Or if we input an image of bananas on a table, it might get the nerve and put up something like "I think this image shows bananas placed on a table". Pretty cool, right? We've achieved our goal of classifying images without explicitly training a model on specific categories. 
-And this is how CLIP does the heavy lifting for us, leveraging its pre-training to generalize to a wide range of concepts and enable zero-shot classification.
+So, when we pass an image of a cat to our CLIP model, it should reason like "this is a cat, I know this already". Or if we input an image of bananas on a table, it might get the nerve and put up something like "I think this image shows bananas placed on a table". Pretty cool, right? 
+
+We've achieved our goal of classifying images without explicitly training a model on specific categories. And this is how CLIP does the heavy lifting for us, leveraging its pre-training to generalize to a wide range of concepts and enable zero-shot classification.
 
 ### Using LanceDB
 
