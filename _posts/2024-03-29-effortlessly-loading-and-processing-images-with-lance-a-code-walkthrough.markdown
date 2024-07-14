@@ -2,8 +2,7 @@
 layout: post
 title: Effortlessly Loading and Processing Images with Lance
 description: How you can use the lance format to work with big sized data
-summary: This post tells us how we can use the lance format to work around the big dataset of various images and why it's better than other cases. Used GTA5 image dataset for this post
-tags: [Lance, LanceDB]
+tags: [LanceDB]
 version: Published
 release: 29-03-2024
 ---
