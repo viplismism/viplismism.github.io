@@ -48,7 +48,7 @@ However, zero-shot classification takes this concept further by utilizing two ke
 
 By leveraging this shared vector space, zero-shot classification enables the model to classify images into categories it hasn't explicitly seen during training. Instead of relying solely on predefined class labels, the model can compare the vector representation of a new image to vector representations of textual descriptions of various categories. 
 
-![same-vector-space.png](../images/zero-shot-image-classification-with-lancedb/same-vector-space.png)
+![same-vector-space.png](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/same-vector-space.png?raw=true)
 
 To enhance the effectiveness of our zero-shot classification, we should transform our class labels from simple words like "cat," "dog," and "horse" into more descriptive phrases such as "a photo of a cat," "a photo of a dog," or "a photo of a horse." This transformation is crucial because it mirrors the text-image pairs used during the model's pretraining phase. OpenAI used prompts like `"a photo of a {label}"` paired with each label to create these image-text pairs.[[1]](https://openai.com/index/clip/) 
 
