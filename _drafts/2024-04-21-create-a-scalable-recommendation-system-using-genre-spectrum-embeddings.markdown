@@ -15,7 +15,6 @@ Here's something interesting: those companies could be missing out on a lot of m
 Scope of the Genre Spectrum Embeddings:
 That's where Genre Spectrum Embeddings come in. Instead of just putting movies into one genre box, they look at all the different aspects of a movie to understand what makes it unique. Imagine if a recommendation system not only knew what you liked but also understood what makes each movie special. That's pretty cool, right?
 
-
 The Genre Spectrum approach involves combining multiple genres or characteristics of a movie to create embeddings that represent a more comprehensive understanding of its content. Instead of assigning a single fixed genre label to a movie, the Genre Spectrum considers a spectrum of genres that capture the diverse elements present in the movie.
 By creating embeddings based on this spectrum of genres, the approach aims to provide a more nuanced and detailed representation of a movie's content. This allows for a richer understanding of the unique characteristics of each movie, enabling more accurate recommendations in movie recommender systems tailored to individual preferences.
 How Genre Spectrum Embeddings enhance Collaborative filtering

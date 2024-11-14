@@ -7,7 +7,7 @@ Cuss words, feedback, collaborations, freelancing, gigs—anything, just shoot! 
 
 - [Email](mailto:vim.code.level@gmail.com)
   
-- [Twitter](https://twitter.com/PinakaX)
+- [Twitter](https://x.com/fuxssss)
   
 - [LinkedIn](https://www.linkedin.com/in/vipulmaheshwarii/)
 

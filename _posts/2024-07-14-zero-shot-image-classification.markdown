@@ -13,7 +13,7 @@ Imagine an AI having a conversation in a language it was never explicitly taught
 
 ### Zero-Shot classification
 
-There are many state-of-the-art (SOTA) computer vision models that excel at various classification tasks, such as identifying animals, cars, fraud, and products in e-commerce. They can handle almost any image classification job. However, these models are often specialised and need fine-tuning for different use cases to be truly effective. 
+There are many state-of-the-art (SOTA) computer vision models that excel at various classification tasks, such as identifying animals, cars, fraud, and products in e-commerce. They can handle almost any image classification job. However, these models are often specialized and need fine-tuning for different use cases to be truly effective.
 
 Fine-tuning can be challenging; it requires a well-labeled dataset, and if your use case is specific to an enterprise, it may also need significant computing power.
 
