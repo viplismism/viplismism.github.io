@@ -3,4 +3,4 @@ layout: page
 title: Projects
 ---
 
-Deploying all them of soon...
+Deploying all of them soon..
