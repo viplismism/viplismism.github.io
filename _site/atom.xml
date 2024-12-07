@@ -4,13 +4,157 @@
  <title>Deox Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-11-14T19:04:34+05:30</updated>
+ <updated>2024-12-04T19:00:34+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>Python Package to convert image datasets to lance type</title>
+   <link href="http://localhost:4000/2024/12/04/lance-converter-package"/>
+   <updated>2024-12-04T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2024/12/04/lance-converter-package</id>
+   <content type="html">&lt;p&gt;A few months ago, I wrote two articles on how the Lance format can supercharge your machine learning workflows. In the &lt;a href=&quot;https://vipul-maheshwari.github.io/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough&quot;&gt;first&lt;/a&gt;, I showed how Lance’s columnar storage can make handling large image datasets much more efficient for the ML workflows. Then, I followed up with a &lt;a href=&quot;https://vipul-maheshwari.github.io/2024/04/09/convert-any-image-dataset-to-lance&quot;&gt;guide&lt;/a&gt; on converting datasets like cinic and mini-imagenet into Lance format using a custom Python script in Google Colab. While that worked well, it was a bit manual.&lt;/p&gt;
+
+&lt;p&gt;Today, I’m excited to share a much easier solution: the lance-image-converter Python package. With just a few lines of code, you can now convert any image dataset to the Lance format, making the process quicker and more accessible for everyone.&lt;/p&gt;
+
+&lt;h3 id=&quot;what-is-lance-image-converter&quot;&gt;What is &lt;code&gt;lance-image-converter&lt;/code&gt;?&lt;/h3&gt;
+
+&lt;p&gt;The &lt;code&gt;lance-image-converter&lt;/code&gt; package is a Python utility designed to make the conversion of any image dataset into the efficient, columnar Lance format quick and easy. Whether you’re working with small or large image datasets, this package allows you to transform them into Lance datasets without the need for complex scripts or Google Colab notebooks.&lt;/p&gt;
+
+&lt;p&gt;In this updated blog, I will walk you through how to use the &lt;code&gt;lance-image-converter&lt;/code&gt; package to convert image datasets and how it improves upon the previous method.&lt;/p&gt;
+
+&lt;h3 id=&quot;installing-the-package&quot;&gt;Installing the Package&lt;/h3&gt;
+
+&lt;p&gt;Before diving into the conversion process, let’s start by installing the &lt;code&gt;lance-image-converter&lt;/code&gt; package. You can easily install it via pip:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;pip install lance-image-converter
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;converting-your-image-dataset-to-lance&quot;&gt;Converting Your Image Dataset to Lance&lt;/h3&gt;
+
+&lt;p&gt;Once you’ve installed the package, converting any image dataset to the Lance format is as simple as running the following Python code. The &lt;code&gt;lance-image-converter&lt;/code&gt; package abstracts away the complexity of the previous approach, providing a simple interface to convert image datasets:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from lance_image_converter import convert_dataset
+
+# Specify the path to your image dataset folder
+image_dataset_path = &apos;path_to_your_image_dataset&apos;
+
+# Convert the dataset to Lance format
+convert_dataset(image_dataset_path, output_dir=&apos;path_to_output_lance_files&apos;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;convert_dataset&lt;/code&gt; function automatically handles the following:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;Reading the image data&lt;/strong&gt; – It reads image files and their metadata (filename, category, data split).&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Converting to Lance&lt;/strong&gt; – The images are converted into the Lance format with proper schema.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Saving the Lance files&lt;/strong&gt; – Lance files are saved for each dataset split (train, test, validation).&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;This method is far more concise than manually iterating over directories, creating schemas, and writing to Lance files as we did in the previous version using raw Python and PyArrow.&lt;/p&gt;
+
+&lt;h3 id=&quot;whats-happened-behind-the-scenes&quot;&gt;What’s Happened Behind the Scenes?&lt;/h3&gt;
+
+&lt;p&gt;To give you a better understanding, here’s a brief overview of what happens when you use &lt;code&gt;lance-image-converter&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Image Data&lt;/strong&gt;: The package reads images from your dataset directory and converts them into a binary format.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Metadata Extraction&lt;/strong&gt;: Metadata such as the image’s filename, category (label), and data split (train/test/validation) are automatically extracted.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;PyArrow RecordBatch&lt;/strong&gt;: The image data and metadata are packaged into a PyArrow &lt;code&gt;RecordBatch&lt;/code&gt; for efficient columnar storage.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Lance Dataset Creation&lt;/strong&gt;: These &lt;code&gt;RecordBatch&lt;/code&gt; objects are then written to Lance datasets, which are optimized for performance and storage.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This process mirrors the manual steps we previously took but in a much more user-friendly manner, significantly reducing the boilerplate code and improving maintainability.&lt;/p&gt;
+
+&lt;h3 id=&quot;advantages-of-using-lance-image-converter&quot;&gt;Advantages of Using &lt;code&gt;lance-image-converter&lt;/code&gt;&lt;/h3&gt;
+
+&lt;p&gt;With the new package, you can expect several key benefits over the manual script method:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;Simplicity&lt;/strong&gt;: No need to write custom processing functions or deal with complex loops; the package handles all of it for you.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Flexibility&lt;/strong&gt;: It supports any image dataset, from well-known benchmarks like &lt;code&gt;cinic&lt;/code&gt; and &lt;code&gt;mini-imagenet&lt;/code&gt; to your own custom datasets.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Performance&lt;/strong&gt;: By leveraging the Lance format, datasets are stored in a highly compressed, columnar format that makes loading and accessing data lightning-fast.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Integration&lt;/strong&gt;: The converted Lance datasets can easily be integrated with tools like Pandas and machine learning frameworks, allowing you to focus on model training instead of data wrangling.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;loading-your-dataset-into-pandas&quot;&gt;Loading Your Dataset into Pandas&lt;/h3&gt;
+
+&lt;p&gt;Once your image dataset has been converted into the Lance format, you can seamlessly load it into Pandas DataFrames for further analysis or training. Here’s how to do it:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import lance
+import pandas as pd
+
+# Load Lance dataset
+ds = lance.dataset(&apos;path_to_output_lance_files&apos;)
+
+# Convert Lance dataset to Pandas DataFrame
+df = ds.to_pandas()
+
+# Display the first few rows of the DataFrame
+print(df.head())
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This makes it incredibly easy to integrate the Lance format into your existing data pipelines, providing a consistent interface for working with large image datasets.&lt;/p&gt;
+
+&lt;h3 id=&quot;a-quick-comparison-manual-script-vs-lance-image-converter&quot;&gt;A Quick Comparison: Manual Script vs. &lt;code&gt;lance-image-converter&lt;/code&gt;&lt;/h3&gt;
+
+&lt;p&gt;Here’s a comparison between the old manual method and the new package approach:&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Aspect&lt;/th&gt;
+      &lt;th&gt;Manual Method&lt;/th&gt;
+      &lt;th&gt;&lt;code&gt;lance-image-converter&lt;/code&gt; Package&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;Ease of Use&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;Moderate&lt;/td&gt;
+      &lt;td&gt;Very Easy&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;Customizability&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;High&lt;/td&gt;
+      &lt;td&gt;Moderate&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;Setup Complexity&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;High&lt;/td&gt;
+      &lt;td&gt;Minimal&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;Code Length&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;Long&lt;/td&gt;
+      &lt;td&gt;Short&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;strong&gt;Error Handling&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;Custom&lt;/td&gt;
+      &lt;td&gt;Built-in&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;As you can see, while the manual method provides more flexibility for fine-tuned control, the &lt;code&gt;lance-image-converter&lt;/code&gt; package offers a more streamlined and accessible solution.&lt;/p&gt;
+
+&lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;With the release of the &lt;code&gt;lance-image-converter&lt;/code&gt; package, converting your image datasets to the efficient and scalable Lance format has never been easier. It provides the same performance benefits as before—such as faster data loading and reduced storage footprint—while simplifying the workflow significantly.&lt;/p&gt;
+
+&lt;p&gt;Give it a try by installing the package and running the conversion script on your image datasets. This small change can drastically improve your machine learning pipelines, making data loading and processing faster and more efficient.&lt;/p&gt;
+
+&lt;p&gt;Feel free to explore the &lt;code&gt;lance-image-converter&lt;/code&gt; &lt;a href=&quot;https://github.com/vipul-maheshwari/lance-image-converter&quot;&gt;documentation&lt;/a&gt; for more details and examples.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;This revised blog retains the educational nature of the original while focusing on how the new Python package simplifies the process of converting datasets to the Lance format. The transition is explained clearly, and it encourages readers to move from the previous method to the new one with minimal friction.&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>Improving RAG with RAPTOR</title>
