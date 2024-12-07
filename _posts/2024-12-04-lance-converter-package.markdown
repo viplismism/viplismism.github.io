@@ -7,7 +7,7 @@ version: Released
 release: 04-12-2024
 ---
 
-![cli-lancify-title-image](../images/cli-for-lance-converter/lancify-title-image.png)
+![cli-lancify-title-image](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/cli-for-lance-converter/lancify-title-image.png?raw=true)
 
 A few months ago, I wrote two articles on how the Lance format can supercharge your machine learning workflows. In the [first](https://vipul-maheshwari.github.io/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough), I showed how Lance’s columnar storage can make handling large image datasets much more efficient for the ML workflows. Then, I followed up with a [guide](https://vipul-maheshwari.github.io/2024/04/09/convert-any-image-dataset-to-lance) on converting datasets like cinic and mini-imagenet into Lance format using a custom Python script in Google Colab. While that worked well, it was a bit manual.
 
@@ -71,7 +71,7 @@ In addition to using the `lancify` package programmatically through the imported
 
 To use the CLI, all you need to do is install the package with `pip install lancify` and then run the `lancify` command in your terminal and follow the args.
 
-![image-cli](../images/cli-for-lance-converter/cli-lancify.png)
+![image-cli](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/cli-for-lance-converter/cli-lancify.png?raw=true)
 
 ### What's Happened Behind the Scenes?
 
@@ -101,13 +101,13 @@ df = table.to_pandas()
 print(df.head())
 ```
 
-![lance-training](../images/cli-for-lance-converter/lance-training.png)
+![lance-training](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/cli-for-lance-converter/lance-training.png?raw=true)
 
 This is a simple and efficient way to convert your image datasets to the lance format using the `lancify` package, and it integrates smoothly into your deep learning projects.
 
 Switching to the Lance format makes your data pipelines faster and more efficient, especially when dealing with large image datasets. All you need to do is install the package and run the conversion script on your datasets—no hassle.
 
-![meme-maker](../images/cli-for-lance-converter/child-meme-lancify.png)
+![meme-maker](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/cli-for-lance-converter/child-meme-lancify.png?raw=true)
 
 Just this small change can really speed up your machine learning workflows—data loading and processing become much quicker, which means your models train faster.  If you need a reference, this is a [quickie](https://vipul-maheshwari.github.io/2024/06/26/train-a-cnn-with-lancedataset) on how to use the lance formatted image datasets for training you deep learning models. And if you're looking for more ideas, there are plenty of other [deep learning recipes](https://github.com/lancedb/lance-deeplearning-recipes) built on lance.
 
