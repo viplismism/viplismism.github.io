@@ -4,12 +4,12 @@ title: Python Package to convert image datasets to lance type
 description: This post gives a detailed overview of how we can convert any image dataset to lance using a python package
 tags: [LanceDB, Dataset, Python, Package]
 version: Released
-release: 04-12-2024
+release: 11-12-2024
 ---
 
 ![cli-lancify-title-image](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/cli-for-lance-converter/lancify-title-image.png?raw=true)
 
-A few months ago, I wrote two articles on how the Lance format can supercharge your machine learning workflows. In the [first](https://vipul-maheshwari.github.io/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough), I showed how Lance’s columnar storage can make handling large image datasets much more efficient for the ML workflows. Then, I followed up with a [guide](https://vipul-maheshwari.github.io/2024/04/09/convert-any-image-dataset-to-lance) on converting datasets like cinic and mini-imagenet into Lance format using a custom Python script in Google Colab. While that worked well, it was a bit manual.
+A few months ago, I wrote two articles on how the Lance format can supercharge your machine learning workflows. In the [first](https://vipul-maheshwari.github.io/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough), I showed how Lance’s columnar storage can make handling large image datasets much more efficient for the ML workflows. Then, I followed up with a [guide](https://vipul-maheshwari.github.io/2024/04/09/convert-any-image-dataset-to-lance) on converting datasets like [cinic](https://www.kaggle.com/datasets/vipulmaheshwarii/cinic-10-lance-dataset?ref=blog.lancedb.com) and [mini-imagenet](https://www.kaggle.com/datasets/vipulmaheshwarii/mini-imagenet-lance-dataset?ref=blog.lancedb.com) into Lance format using a custom Python script in [Google Colab](https://colab.research.google.com/drive/12RjdHmp6m9_Lx7YMRiat4_fYWZ2g63gx?usp=sharing&ref=blog.lancedb.com). While that worked well, it was a bit manual.
 
 Well, Some of my friends are lazy as `fuxcks` but excited enough to run the colab and use the Lance formatted datatype for some of their experiments. Being a good friend, I’m excited to share a much easier solution: the `lancify` Python package.
 
