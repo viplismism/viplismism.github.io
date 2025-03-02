@@ -4,7 +4,7 @@
  <title>Deox Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2024-12-04T19:00:34+05:30</updated>
+ <updated>2025-02-25T14:31:22+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -13,52 +13,512 @@
 
  
  <entry>
+   <title>Creating a Fintech AI agent without any framework</title>
+   <link href="http://localhost:4000/2025/02/23/create-a-fintech-agent"/>
+   <updated>2025-02-23T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2025/02/23/create-a-fintech-agent</id>
+   <content type="html">&lt;p&gt;AI agents are everywhere, and they’re only going to get more common in the next few years. To put it simply, imagine a bunch of small digital assistants—agents—that analyze what’s going on, make decisions, and get things done. This makes me wonder: how are we going to handle all these agents in the future? How do we trust them to make decisions for us and let them operate on their own?&lt;/p&gt;
+
+&lt;p&gt;Right now, there are tons of frameworks that let you quickly build AI agents. Honestly, it feels like every other day a new “low-code” tool pops up, claiming to make building agents super easy. These tools are everywhere—simple drag-and-drop boards or text boxes where you just connect a few prompts and data, and boom, you have your agent.&lt;/p&gt;
+
+&lt;p&gt;At the heart of every AI agent, there are three key parts: the Model, the Tools, and the Reasoning Loop.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;The Model: This is the Large Language Model (LLM) that powers the agent. It’s the core of the agent’s intelligence, trained on tons of text data to understand language and follow complex instructions. This model gives the agent its ability to think and respond like a human.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;The Tools: These are the specific functions that the AI agent uses to interact with its environment and carry out tasks. Whether it’s fetching data, calling APIs, or interacting with other software, tools are what make the agent capable of performing its job.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;The Reasoning Loop: This is how the agent makes decisions. It’s a process that allows the agent to solve problems, figure out the best course of action, and get things done.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;In this post, I’m going to show you something a bit different. Instead of using a framework, I’ll walk you through building a fintech agent with Python. This agent will help with decision-making when it comes to loans and insurance.&lt;/p&gt;
+
+&lt;h3 id=&quot;whats-the-deal&quot;&gt;What’s the deal?&lt;/h3&gt;
+
+&lt;p&gt;So how this fintech agent works, Well, imagine you’re a FinTech company, now customers hit you up with questions like, “Can I borrow $10K for a new kitchen? I am 26 years old” or “I crashed my car—will you cover it?” Lol, I would literally close that insurance claim for sure.&lt;/p&gt;
+
+&lt;p&gt;Ok the point is What we need is a system that’s fast, smart, and trustworthy in making the decisions on the loan queries as well the insurance claims. Now what I did is, instead of a single alone Agent with all the tools, we will have three agents, loan, insurance and the kernel ones.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Loan Agent: Takes a query, figures out intent (e.g., “home improvement”), and predicts if they’re loan-worthy based on age, income, and amount with the help of a ML model.&lt;/li&gt;
+  &lt;li&gt;Insurance Side: Reads a claim, compares it to past ones, and decides if it’s payable—think semantic search over a claims database.&lt;/li&gt;
+  &lt;li&gt;Kernel: The brains tying it together, routing queries to the right agent.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Why raw Python? It’s flexible; I mean I am just presenting a POC and the companies can literally customize it to their data and needs, no black-box framework nonsense. The &lt;a href=&quot;https://www.kaggle.com/datasets/laotse/credit-risk-dataset&quot;&gt;Credit Risk Dataset&lt;/a&gt; and synthetic claims are just stand-ins; real firms would use their own loan histories and claim records.&lt;/p&gt;
+
+&lt;p&gt;Here’s the big picture: we’ve got a Kernel Agent directing traffic, a Loan Agent predicting eligibility with ML, and an Insurance Agent checking claims against a vector database.&lt;/p&gt;
+
+&lt;p&gt;I am using the Credit Risk Dataset as a demo for loans, in real;companies can use the CIBIL score like metric to check if the given person is eligible for the loans or not. But for the sake of this POC, I have utilized the dataset, trained a random forest and use it for the predictive analysis.&lt;/p&gt;
+
+&lt;p&gt;For the insurance-agent, I have used a synthetic pipeline to generate a dataset which consists of the fake insurance queries, and the target is based on that conversation, if the insurance claim is done, the target is one, insurance—placeholders to show the ropes. Companies can plug in their own data instead.&lt;/p&gt;
+
+&lt;p&gt;Well I would say you can tune the dataset you want as you require the data. Let’s break it down step by step, with code and the why behind it all.&lt;/p&gt;
+
+&lt;h3 id=&quot;setting-the-stage-libraries-and-setup&quot;&gt;Setting the Stage: Libraries and Setup&lt;/h3&gt;
+
+&lt;p&gt;We start by grabbing our tools—libraries that handle data, models, and vectors:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import pandas as pd
+import joblib
+import pyarrow as pa
+from sentence_transformers import SentenceTransformer
+import lancedb
+from mistralai import Mistral
+import os
+from abc import ABC, abstractmethod
+from typing import Any
+
+# Abstract Tool Class
+class Tool(ABC):
+    @abstractmethod
+    def name(self) -&amp;gt; str:
+        pass
+
+    @abstractmethod
+    def description(self) -&amp;gt; str:
+        pass
+
+    @abstractmethod
+    def use(self, *args, **kwargs) -&amp;gt; Any:
+        pass
+
+# Initialize Mistral and Embedder
+api_key = os.environ.get(&quot;MISTRAL_API_KEY&quot;, &quot;xxxxxxxxxxxxx&quot;)  
+if not api_key:
+    raise ValueError(&quot;Please set the MISTRAL_API_KEY environment variable.&quot;)
+
+model = &quot;mistral-large-latest&quot;
+client = Mistral(api_key=api_key)
+embedder = SentenceTransformer(&apos;all-MiniLM-L6-v2&apos;)
+
+# Connect to LanceDB
+db = lancedb.connect(&apos;./lancedb_data&apos;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For the quick demonstration, I am going to use &lt;code&gt;mistral-large-latest&lt;/code&gt; model from the Mistral for LLM tasks and the intent classification in the Loan queries. The &lt;code&gt;Tool&lt;/code&gt; class is our way to keep the agents modular - every tool gets a clear job.&lt;/p&gt;
+
+&lt;h2 id=&quot;loan-agent-predicting-with-ml&quot;&gt;Loan Agent: Predicting with ML&lt;/h2&gt;
+
+&lt;p&gt;The Loan Agent decides who gets a loan. We’re using the Credit Risk Dataset as a demo—it’s got age, income, loan amounts, and intents, perfect for a proof-of-concept.&lt;/p&gt;
+
+&lt;p&gt;#&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Creating a Restaurant Recommendation System</title>
+   <link href="http://localhost:4000/2024/12/28/creating-a-restaurant-bot"/>
+   <updated>2024-12-28T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2024/12/28/creating-a-restaurant-bot</id>
+   <content type="html">&lt;p&gt;In 2024, I did spend significant amount of time playing with RAG and Vector Databases. Typically, LanceDB was at the core and it was one amazing hell of a ride. As the year is ending, I tried to make a simple restaurant recommendation system but it’s going to be slightly different. The idea is to use this &lt;a href=&quot;https://www.kaggle.com/datasets/abhijitdahatonde/swiggy-restuarant-dataset&quot;&gt;Restaurant Dataset&lt;/a&gt; and to answer the queries like “Is there any cafe nearby which serves Punjabi food?” or “What are the top 5 restaurants in the city which serve Chinese food?”. The twist is, we need some form of geospatial data to mould the data points into a form that can be used for queries which are related to the distance.&lt;/p&gt;
+
+&lt;p&gt;So if you want to name this stuff, it can be called “Geospatial Recommendation System”. Sounds cool.. Ok let’s get started.&lt;/p&gt;
+
+&lt;h3 id=&quot;how-to-start&quot;&gt;How to start?&lt;/h3&gt;
+
+&lt;p&gt;Well, ok so the first thing is to sort out some relevant features that are required for the recommendation system. So generally, folks who are searching for any recommendation for a restaurant, they are generally looking out for things like restaurant’s name (obviously lol), location maybe, and what kind of food they serve, or other details like ratings or maybe how much time it takes for a restaurant to deliver the food or what’s the average order prices. So, we need to extract these features from the dataset.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import pandas as pd
+
+restaurant_data = pd.read_csv(&quot;data.csv&quot;)
+restaurant_data = restaurant_data[restaurant_data.columns[1:]]
+restaurant_data.dropna(inplace=True)
+restaurant_data.drop_duplicates(inplace=True)
+restaurant_data.head()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/creating-a-restaurant-bot/data-reference.png&quot; alt=&quot;image-showing-the-table-and-the-data&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;To keep things simple, we’re just going to focus on a few key details for now: the type of food a restaurant serves, how customers rate it on average, and where it’s located. By sticking to these basics, we can quickly give people great recommendations without making things too complicated.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;data_points_vectors = []
+
+for _, row in restaurant_data.iterrows():
+    filter_cols = [&apos;Food type&apos;, &apos;Avg ratings&apos;, &apos;Address&apos;]
+    data_point = &quot;#&quot;.join(f&quot;{col}/{row[col]}&quot; for col in filter_cols)
+    data_points_vectors.append(data_point)
+
+# Add the new column to the DataFrame
+restaurant_data[&quot;query_string&quot;] = data_points_vectors
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You can see that I’ve used &lt;code&gt;#&lt;/code&gt; to separate different sections and &lt;code&gt;/&lt;/code&gt; for splitting up the key-value pairs. Just a heads up, you can pick different separators and delimiters if you like, but since I’m using FTS (full text search) from LanceDB, a few are reserved for internal representations. If you need to, you can use a backslash as a prefix to support the reserved ones and still use them. This is how a single query string might look&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;&apos;Food type/Biryani,Chinese,North Indian,South Indian#Avg ratings/4.4#Address/5Th Block&apos;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Ok, this looks good! Next, we need to turn our query string into a vector. You can choose any embedding model that fits your needs, but I’ll be using the paraphrase-MiniLM-L6-v2 model for now. Basically, all we have to do is encode our query strings into vectors and then load up the payload with the relevant information.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from sentence_transformers import SentenceTransformer
+model = SentenceTransformer(&apos;paraphrase-MiniLM-L6-v2&apos;)
+
+list_of_payloads = []
+
+for index, row in restaurant_data.iterrows():
+    encoded_vector = model.encode(row[&apos;query_string&apos;])
+    payload = {
+        &apos;Area&apos;: row[&apos;Area&apos;],
+        &apos;City&apos;: row[&apos;City&apos;],
+        &apos;Restaurant&apos;: row[&apos;Restaurant&apos;],
+        &apos;Price&apos;: row[&apos;Price&apos;],
+        &apos;Avg_ratings&apos;: row[&apos;Avg ratings&apos;],
+        &apos;Total_ratings&apos;: row[&apos;Total ratings&apos;],
+        &apos;Food_type&apos;: row[&apos;Food type&apos;],
+        &apos;Address&apos;: row[&apos;Address&apos;],
+        &apos;Delivery_time&apos;: row[&apos;Delivery time&apos;],
+        &apos;query_string&apos;: row[&apos;query_string&apos;],
+        &apos;vector&apos;: encoded_vector
+    }
+
+    list_of_payloads.append(payload)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;setting-up-the-vector-database&quot;&gt;Setting up the Vector Database&lt;/h3&gt;
+
+&lt;p&gt;So, we’ve got our &lt;code&gt;list_of_payloads&lt;/code&gt; that includes all the relevant data we’re going to store in our vector database. Let’s get LanceDB set up here:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import lancedb
+
+# Connect to the LanceDB instance
+uri = &quot;data&quot;
+db = lancedb.connect(uri)
+
+lancedb_table = db.create_table(&quot;restaurant-geocoding-app&quot;, data=list_of_payloads)
+lancedb_df = lancedb_table.to_pandas()
+lancedb_df.head()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/creating-a-restaurant-bot/lancedb-table-reference.png&quot; alt=&quot;image-showing-the-lancedb-table-with-the-data&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;setting-up-the-geospatial-reference&quot;&gt;Setting up the Geospatial Reference&lt;/h3&gt;
+
+&lt;p&gt;Now that our vector database is ready, the next step is to convert user queries into our specific query format. Essentially, what we will do here is to carefully extract key details from each user query to form a structured dictionary. This structured data will then be reformatted to match the pattern of our query strings. To achieve this, I’ll just use a LLM to decipher the user queries and identify the crucial entities we need.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import os
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+api_key = os.getenv(&quot;OPENAI_API_KEY&quot;)
+
+# Initialize the OpenAI client
+client = OpenAI(api_key=api_key)
+
+query_string = &quot;Hi, I am looking for a casual dining restaurant where Indian or Italian food is served near the HSR Bangalore&quot;
+
+# Helper prompt to extract structured data from ip_prompt
+total_prompt = f&quot;&quot;&quot;Query String: {query_string}\n\n\
+Now from the query string above extract these following entities pinpoints:
+1. Food type : Extract the food type 
+2. Avg ratings : Extract the average ratings
+3. Address : Extract the current exact location, don&apos;t consider the fillers like &quot;near&quot; or &quot;nearby&quot;.
+
+NOTE : For the Current location, try to understand the pin point location in the query string. Do not give any extra information. If you make the mistakes, bad things
+will happen.
+
+Finally return a python dictionary using those points as keys and don&apos;t write the markdown of python. If value of a key is not mentioned, then set it as None.
+&quot;&quot;&quot;
+
+# Make a request to OpenAI&apos;s API
+completion = client.chat.completions.create(
+    model=&quot;gpt-4o&quot;,  # Use the appropriate model
+    store=True,
+    messages=[
+        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: total_prompt}
+    ]
+)
+
+# Extract the generated text
+content = completion.choices[0].message.content
+print(content)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;{
+  &quot;Food type&quot;: &quot;Indian or Italian&quot;,
+  &quot;Avg ratings&quot;: None,
+  &quot;Address&quot;: &quot;HSR Bangalore&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now, all we need to do is process this output.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import ast
+
+# Convert the string content to a dictionary
+try:
+    response_dict = ast.literal_eval(content)
+except (ValueError, SyntaxError) as e:
+    print(&quot;Error parsing the response:&quot;, e)
+    response_dict = {}
+
+
+filter_cols = [&apos;Food type&apos;, &apos;Avg ratings&apos;, &apos;Address&apos;]
+query_string_parts = [f&quot;{col}/{response_dict.get(col)}&quot; for col in filter_cols if response_dict.get(col)]
+
+query_string = &quot;#&quot;.join(query_string_parts)
+print((query_string))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Well, now the user query looks like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;Food type/Indian or Italian#Address/HSR Bangalore
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Well, this user query is now formatted exactly like our &lt;code&gt;query_strings&lt;/code&gt;. We can go ahead and search through the vector database to find the top restaurants that best match this query.&lt;/p&gt;
+
+&lt;h3 id=&quot;searching-like-a-pro&quot;&gt;Searching like a pro.&lt;/h3&gt;
+
+&lt;p&gt;I’ll be using the Full Text Search (FTS) feature from LanceDB to run the search. You can read more about what’s happening behind the scenes &lt;a href=&quot;https://lancedb.github.io/lancedb/fts/#example&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;# Create the FTS index and search
+lancedb_table.create_fts_index(&quot;query_string&quot;, replace=True)
+results = lancedb_table.search(query_string).to_pandas()
+results.head()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/creating-a-restaurant-bot/search-results.png&quot; alt=&quot;image-showing-the-results&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;using-the-geospatial-data&quot;&gt;Using the Geospatial data&lt;/h3&gt;
+
+&lt;p&gt;So basically when someone searches for nearby restaurants, maybe they’re craving a specific type of cuisine or looking for highly-rated places, we first search up the places that fills there requirements. Now after identifying potential options, we use the &lt;a href=&quot;https://developers.google.com/maps/documentation/geocoding/overview&quot;&gt;Geospatial API&lt;/a&gt; to pinpoint their exact locations. The Google Maps API is perfect for this—it grabs the latitude and longitude so we know precisely where each restaurant is. With these coordinates, we can then easily figure out which places are closest to the user’s location, by just calculating the distance.&lt;/p&gt;
+
+&lt;p&gt;If you didn’t get that, Bear with me, this is going to be super cool.. So first thing we need to do is to setup our Geospatial function which takes a place and return the coordinates:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import requests
+import math
+
+def get_google_geocoding(address, api_key):
+    base_url = &quot;https://maps.googleapis.com/maps/api/geocode/json&quot;
+    params = {&quot;address&quot;: address, &quot;key&quot;: api_key}
+    response = requests.get(base_url, params=params)
+    
+    if response.status_code == 200:
+        result = response.json()
+        if result[&quot;status&quot;] == &quot;OK&quot;:
+            latitude = result[&quot;results&quot;][0][&quot;geometry&quot;][&quot;location&quot;][&quot;lat&quot;]
+            longitude = result[&quot;results&quot;][0][&quot;geometry&quot;][&quot;location&quot;][&quot;lng&quot;]
+            return (latitude, longitude)
+        else:
+            print(f&quot;Google API: No results found for address: {address}&quot;)
+            return None
+    else:
+        print(f&quot;Google API: Request failed for address: {address}&quot;)
+        return None
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For the distance calculation, there’s this thing called the &lt;code&gt;Haversine formula&lt;/code&gt;. It uses the coordinates of two points and basically draws an imaginary straight line between them across the earth to measure how far they are from each other. There’s a bit of math involved in how this formula works, but we can skip that part for now. Here’s what the formula looks like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;def haversine(coord1, coord2):
+    R = 6371.0  # Radius of the Earth in kilometers
+    lat1, lon1 = map(math.radians, coord1)
+    lat2, lon2 = map(math.radians, coord2)
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    distance = R * c
+    return distance
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Well, everything seems solid now, the only thing left is the current location. Here’s what we can do: if a user asks about restaurants near a specific area like “nearby HSR layout,” we can easily pull the current location from the preprocessing we did earlier. If not, for now, we can just input the current location manually. Then, we’ll check which restaurants from our vector database match our query and see how far they are based on the current location.&lt;/p&gt;
+
+&lt;p&gt;Well let’s see what we get:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;def process_top_restaurants(data, current_location, api_key, top_n=5):
+    current_coords = get_google_geocoding(current_location, api_key)
+    if not current_coords:
+        return
+
+    for index, row in data.head(top_n).iterrows():
+        complete_address = f&quot;{row[&apos;Restaurant&apos;]}, {row[&apos;City&apos;]}&quot;
+        restaurant_coords = get_google_geocoding(complete_address, api_key)
+        if restaurant_coords:
+            distance = haversine(current_coords, restaurant_coords)
+            print(f&quot;Restaurant Name: {row[&apos;Restaurant&apos;]}&quot;)
+            print(f&quot;Distance: {distance:.2f} km&quot;)
+            print(f&quot;Area: {row[&apos;Area&apos;]}&quot;)
+            print(f&quot;Price: {row[&apos;Price&apos;]}&quot;)
+            print(f&quot;Coordinates: {restaurant_coords}&quot;)
+            print(f&quot;Cuisines Type: {row[&apos;Food_type&apos;]}&quot;)
+            print(&quot;-&quot; * 40)
+
+# Example usage
+api_key = os.getenv(&apos;GOOGLE_MAPS_API&apos;)
+current_location = &apos;HSR Layout, Bangalore&apos;
+process_top_restaurants(results, current_location, api_key, top_n=5)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;Restaurant Name: Brooks And Bonds Brewery
+Distance: 3.36 km
+Area: Koramangala
+Price: 200.0
+Coordinates: (12.9341801, 77.62334249999999)
+Cuisines Type: Indian
+----------------------------------------
+Restaurant Name: Cafe Azzure
+Distance: 8.06 km
+Area: Ashok Nagar
+Price: 1000.0
+Coordinates: (12.975012, 77.6076558)
+Cuisines Type: American,Italian
+----------------------------------------
+Restaurant Name: Tottos Pizza
+Distance: 7.92 km
+Area: Central Bangalore
+Price: 500.0
+Coordinates: (12.9731935, 77.607012)
+Cuisines Type: Continental,Italian
+----------------------------------------
+Restaurant Name: Holy Doh!
+Distance: 4.15 km
+Area: Central Bangalore
+Price: 600.0
+Coordinates: (12.9346188, 77.6139914)
+Cuisines Type: Pizzas,Italian
+----------------------------------------
+Restaurant Name: Bakery By Foodhall
+Distance: 7.31 km
+Area: Ulsoor
+Price: 300.0
+Coordinates: (12.9734944, 77.62038629999999)
+Cuisines Type: Bakery,Italian,Desserts
+----------------------------------------
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here we go.. This is cool :)&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Understanding RAG fusion</title>
+   <link href="http://localhost:4000/2024/12/25/rag-fusion-understanding"/>
+   <updated>2024-12-25T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2024/12/25/rag-fusion-understanding</id>
+   <content type="html">&lt;p&gt;If you don’t have any clue on what RAG is, please go through this &lt;a href=&quot;https://vipul-maheshwari.github.io/2024/02/14/rag-application-with-langchain&quot;&gt;one&lt;/a&gt; to get a brief on what this is all about.&lt;/p&gt;
+
+&lt;p&gt;So when the RAG model ends, RAG Fusion picks up by adding more layers that improve the RAG retrieval phase, particularly by adding more sophisticated mechanisms for interpretation and integration of the retrieval output. RAG Fusion tries to combat some of the weaknesses inherent also to RAG, including better response to ambiguous queries and returning more relevant, accurate information by improving the retrieval-to-generation loop.&lt;/p&gt;
+
+&lt;h2 id=&quot;what-was-missed-in-rag&quot;&gt;What was missed in RAG?&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Constraints with Current Search Technologies: RAG is limited by the same things limiting our retrieval-based lexical and vector search technologies.&lt;/li&gt;
+  &lt;li&gt;Human Search Inefficiencies: Humans are not great at writing what they want into search systems, such as typos, vague queries, or limited vocabulary, which often lead to missing the vast reservoir of information that lies beyond the obvious top search results. While RAG assists, it hasn’t entirely solved this problem.&lt;/li&gt;
+  &lt;li&gt;Over-Simplification of Search: Our prevalent search paradigm linearly maps queries to answers, lacking the depth to understand the multi-dimensional nature of human queries. This linear model often fails to capture the nuances and contexts of more complex user inquiries, resulting in less relevant results.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;how-the-improvement-really-happens&quot;&gt;How the improvement really happens?&lt;/h2&gt;
+
+&lt;p&gt;So basically when we talk about the traditional RAG, it works by ranking documents in the order of relevance to the query based on vector similarity distances, usually using cosine similarity.&lt;/p&gt;
+
+&lt;p&gt;RAG Fusion on the other hands addresses the challenges of document retrieval using&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Query Transformation: Generates multiple new queries from different angels based on the original query and&lt;/li&gt;
+  &lt;li&gt;Reciprocal Rank Fusion(RRF): Reranking the document relevance based on Reciprocal Rank Fusion(RRF)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;That being said, when RAG Fusion receives the original query, it sends the original query to the large language model(LLM) to generate a number of new search queries based on the original query from different perspectives.&lt;/p&gt;
+
+&lt;p&gt;So what really happens is&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Query Duplication with a Twist: Translate a user’s query into similar, yet distinct queries via an LLM.&lt;/li&gt;
+  &lt;li&gt;Vector Search Unleashed: Perform vector searches for the original and its newly generated query siblings.&lt;/li&gt;
+  &lt;li&gt;Intelligent Reranking: Aggregate and refine all the results using reciprocal rank fusion.&lt;/li&gt;
+  &lt;li&gt;Final Step:  Pair the cherry-picked results with the new queries, guiding the large language model to a crafted output that considers all the queries and the reranked list of results.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Now For all the documents retrieved from the vector database for each query, like a list of lists.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Determine the rank of each document within its respective ranked list.&lt;/li&gt;
+  &lt;li&gt;For each document, compute the reciprocal of its rank (e.g., rank 1 → 1/1 = 1; rank 3 → 1/3).&lt;/li&gt;
+  &lt;li&gt;Sum the reciprocal ranks of each retrieved document across all generated queries.&lt;/li&gt;
+  &lt;li&gt;Order the documents based on their total aggregated scores to determine their final ranking.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;And then now the top-ranked retrieved documents will be then sent to the LLM along with all the queries to generate a response.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
    <title>Python Package to convert image datasets to lance type</title>
    <link href="http://localhost:4000/2024/12/04/lance-converter-package"/>
    <updated>2024-12-04T00:00:00+05:30</updated>
    <id>http://localhost:4000/2024/12/04/lance-converter-package</id>
-   <content type="html">&lt;p&gt;A few months ago, I wrote two articles on how the Lance format can supercharge your machine learning workflows. In the &lt;a href=&quot;https://vipul-maheshwari.github.io/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough&quot;&gt;first&lt;/a&gt;, I showed how Lance’s columnar storage can make handling large image datasets much more efficient for the ML workflows. Then, I followed up with a &lt;a href=&quot;https://vipul-maheshwari.github.io/2024/04/09/convert-any-image-dataset-to-lance&quot;&gt;guide&lt;/a&gt; on converting datasets like cinic and mini-imagenet into Lance format using a custom Python script in Google Colab. While that worked well, it was a bit manual.&lt;/p&gt;
+   <content type="html">&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/cli-for-lance-converter/lancify-title-image.png?raw=true&quot; alt=&quot;cli-lancify-title-image&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Today, I’m excited to share a much easier solution: the lance-image-converter Python package. With just a few lines of code, you can now convert any image dataset to the Lance format, making the process quicker and more accessible for everyone.&lt;/p&gt;
+&lt;p&gt;A few months ago, I wrote two articles on how the Lance format can supercharge your machine learning workflows. In the &lt;a href=&quot;https://vipul-maheshwari.github.io/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough&quot;&gt;first&lt;/a&gt;, I showed how Lance’s columnar storage can make handling large image datasets much more efficient for the ML workflows. Then, I followed up with a &lt;a href=&quot;https://vipul-maheshwari.github.io/2024/04/09/convert-any-image-dataset-to-lance&quot;&gt;guide&lt;/a&gt; on converting datasets like &lt;a href=&quot;https://www.kaggle.com/datasets/vipulmaheshwarii/cinic-10-lance-dataset?ref=blog.lancedb.com&quot;&gt;cinic&lt;/a&gt; and &lt;a href=&quot;https://www.kaggle.com/datasets/vipulmaheshwarii/mini-imagenet-lance-dataset?ref=blog.lancedb.com&quot;&gt;mini-imagenet&lt;/a&gt; into Lance format using a custom Python script in &lt;a href=&quot;https://colab.research.google.com/drive/12RjdHmp6m9_Lx7YMRiat4_fYWZ2g63gx?usp=sharing&amp;amp;ref=blog.lancedb.com&quot;&gt;Google Colab&lt;/a&gt;. While that worked well, it was a bit manual.&lt;/p&gt;
 
-&lt;h3 id=&quot;what-is-lance-image-converter&quot;&gt;What is &lt;code&gt;lance-image-converter&lt;/code&gt;?&lt;/h3&gt;
+&lt;p&gt;Well, Some of my friends are lazy as &lt;code&gt;fuxcks&lt;/code&gt; but excited enough to run the colab and use the Lance formatted datatype for some of their experiments. Being a good friend, I’m excited to share a much easier solution: the &lt;code&gt;lancify&lt;/code&gt; Python package.&lt;/p&gt;
 
-&lt;p&gt;The &lt;code&gt;lance-image-converter&lt;/code&gt; package is a Python utility designed to make the conversion of any image dataset into the efficient, columnar Lance format quick and easy. Whether you’re working with small or large image datasets, this package allows you to transform them into Lance datasets without the need for complex scripts or Google Colab notebooks.&lt;/p&gt;
-
-&lt;p&gt;In this updated blog, I will walk you through how to use the &lt;code&gt;lance-image-converter&lt;/code&gt; package to convert image datasets and how it improves upon the previous method.&lt;/p&gt;
+&lt;p&gt;I mean it’s literally just running a one command, and boom — your image datasets are in lance format, ready to go. And, just between us, it makes my life a lot easier too.&lt;/p&gt;
 
 &lt;h3 id=&quot;installing-the-package&quot;&gt;Installing the Package&lt;/h3&gt;
 
-&lt;p&gt;Before diving into the conversion process, let’s start by installing the &lt;code&gt;lance-image-converter&lt;/code&gt; package. You can easily install it via pip:&lt;/p&gt;
+&lt;p&gt;Before diving into the conversion process, let’s start by installing the &lt;code&gt;lancify&lt;/code&gt; package. You can easily install it via pip:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;pip install lance-image-converter
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;pip install lancify
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&quot;converting-your-image-dataset-to-lance&quot;&gt;Converting Your Image Dataset to Lance&lt;/h3&gt;
 
-&lt;p&gt;Once you’ve installed the package, converting any image dataset to the Lance format is as simple as running the following Python code. The &lt;code&gt;lance-image-converter&lt;/code&gt; package abstracts away the complexity of the previous approach, providing a simple interface to convert image datasets:&lt;/p&gt;
+&lt;p&gt;Once you’ve installed the package, converting any image dataset to the Lance format is as simple as running the following Python code. The &lt;code&gt;lancify&lt;/code&gt; package abstracts away the complexity of running the colab notebooks manually;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from lance_image_converter import convert_dataset
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from lancify.converter import convert_dataset
 
-# Specify the path to your image dataset folder
-image_dataset_path = &apos;path_to_your_image_dataset&apos;
+# Define the path to your image dataset
+image_dataset_path = &apos;cards-classification&apos;
+resize_dimensions = (256, 256)  # Example resize dimensions
+splits = [&quot;train&quot;, &quot;test&quot;, &quot;valid&quot;]
 
-# Convert the dataset to Lance format
-convert_dataset(image_dataset_path, output_dir=&apos;path_to_output_lance_files&apos;)
+convert_dataset(
+    dataset_path=image_dataset_path,
+    batch_size=10,  # You can adjust the batch size as needed
+    resize=resize_dimensions,  # Pass resize dimensions if you want to resize images
+    splits=splits
+)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For this demonstration, I have used this &lt;a href=&quot;https://www.kaggle.com/datasets/gpiosenka/cards-image-datasetclassification&quot;&gt;dataset&lt;/a&gt;, which provides flexibility in terms of image resizing and dataset splits. The image resizing is optional; by default, the images are processed with their original dimensions. However, if needed, you can specify a target size, such as 256x256, by passing the desired dimensions. If you prefer to keep the original size, simply pass None for the resize parameter. Regarding dataset splits, if the dataset includes predefined divisions like training, testing, and validation sets, you can pass a list specifying the relevant splits.&lt;/p&gt;
+
+&lt;p&gt;For &lt;a href=&quot;https://www.kaggle.com/datasets/jehanbhathena/weather-dataset&quot;&gt;datasets&lt;/a&gt; that do not have predefined splits, the images are organized by classification labels. In such cases, you only need to provide the dataset path, and a single lance file will be generated, containing all the images with their corresponding labels. This makes sure that the various kinds of image datasets are handled properly whether they include splits or not.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from lancify.converter import convert_dataset
+
+image_dataset_path = &apos;weather-classification-data&apos;
+
+convert_dataset(
+    dataset_path=image_dataset_path,
+    batch_size=10,  # You can adjust the batch size as needed
+)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;The &lt;code&gt;convert_dataset&lt;/code&gt; function automatically handles the following:&lt;/p&gt;
 &lt;ol&gt;
   &lt;li&gt;&lt;strong&gt;Reading the image data&lt;/strong&gt; – It reads image files and their metadata (filename, category, data split).&lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;Converting to Lance&lt;/strong&gt; – The images are converted into the Lance format with proper schema.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Saving the Lance files&lt;/strong&gt; – Lance files are saved for each dataset split (train, test, validation).&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Saving the Lance files&lt;/strong&gt; – Lance files are saved for each dataset split (train, test, validation) if there are splits in the dataset, if not then a single lance file is saved with the combined data with an adequate schema to segregate the data with the respective labels.&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;This method is far more concise than manually iterating over directories, creating schemas, and writing to Lance files as we did in the previous version using raw Python and PyArrow.&lt;/p&gt;
+&lt;p&gt;This method is far more concise than manually iterating over directories, creating schemas, and writing to lance files as we did in the previous version using raw colab.&lt;/p&gt;
+
+&lt;h3 id=&quot;cli-sdk&quot;&gt;CLI SDK&lt;/h3&gt;
+
+&lt;p&gt;In addition to using the &lt;code&gt;lancify&lt;/code&gt; package programmatically through the imported function, you can also leverage the CLI SDK to convert your image datasets. The SDK offers a CLI for the &lt;code&gt;lancify&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;To use the CLI, all you need to do is install the package with &lt;code&gt;pip install lancify&lt;/code&gt; and then run the &lt;code&gt;lancify&lt;/code&gt; command in your terminal and follow the args.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/cli-for-lance-converter/cli-lancify.png?raw=true&quot; alt=&quot;image-cli&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;whats-happened-behind-the-scenes&quot;&gt;What’s Happened Behind the Scenes?&lt;/h3&gt;
 
-&lt;p&gt;To give you a better understanding, here’s a brief overview of what happens when you use &lt;code&gt;lance-image-converter&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;To give you a better understanding, here’s a brief overview of what happens when you use &lt;code&gt;lancify&lt;/code&gt;:&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;&lt;strong&gt;Image Data&lt;/strong&gt;: The package reads images from your dataset directory and converts them into a binary format.&lt;/li&gt;
@@ -67,92 +527,35 @@ convert_dataset(image_dataset_path, output_dir=&apos;path_to_output_lance_files&
   &lt;li&gt;&lt;strong&gt;Lance Dataset Creation&lt;/strong&gt;: These &lt;code&gt;RecordBatch&lt;/code&gt; objects are then written to Lance datasets, which are optimized for performance and storage.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;This process mirrors the manual steps we previously took but in a much more user-friendly manner, significantly reducing the boilerplate code and improving maintainability.&lt;/p&gt;
-
-&lt;h3 id=&quot;advantages-of-using-lance-image-converter&quot;&gt;Advantages of Using &lt;code&gt;lance-image-converter&lt;/code&gt;&lt;/h3&gt;
-
-&lt;p&gt;With the new package, you can expect several key benefits over the manual script method:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;&lt;strong&gt;Simplicity&lt;/strong&gt;: No need to write custom processing functions or deal with complex loops; the package handles all of it for you.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Flexibility&lt;/strong&gt;: It supports any image dataset, from well-known benchmarks like &lt;code&gt;cinic&lt;/code&gt; and &lt;code&gt;mini-imagenet&lt;/code&gt; to your own custom datasets.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Performance&lt;/strong&gt;: By leveraging the Lance format, datasets are stored in a highly compressed, columnar format that makes loading and accessing data lightning-fast.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Integration&lt;/strong&gt;: The converted Lance datasets can easily be integrated with tools like Pandas and machine learning frameworks, allowing you to focus on model training instead of data wrangling.&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;This process mirrors the manual steps we previously took but in a much more user-friendly manner, significantly reducing the boilerplate code that was necessary before when you have to manually handle the &lt;a href=&quot;https://colab.research.google.com/drive/12RjdHmp6m9_Lx7YMRiat4_fYWZ2g63gx?usp=sharing#scrollTo=93qlCg6TpcW-&quot;&gt;colab&lt;/a&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;loading-your-dataset-into-pandas&quot;&gt;Loading Your Dataset into Pandas&lt;/h3&gt;
 
-&lt;p&gt;Once your image dataset has been converted into the Lance format, you can seamlessly load it into Pandas DataFrames for further analysis or training. Here’s how to do it:&lt;/p&gt;
+&lt;p&gt;Once your image dataset has been converted into the lance format, you can seamlessly load it into pandas data frames for doing all kind of stuff. Here’s how to do it for the &lt;code&gt;card-classification&lt;/code&gt; training lance file..&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import lance
 import pandas as pd
 
 # Load Lance dataset
-ds = lance.dataset(&apos;path_to_output_lance_files&apos;)
+ds = lance.dataset(&apos;cards-classification/cards-classification_train.lance&apos;)
+table = ds.to_table()
 
-# Convert Lance dataset to Pandas DataFrame
-df = ds.to_pandas()
-
-# Display the first few rows of the DataFrame
+# Convert Lance table to Pandas dataframe
+df = table.to_pandas()
 print(df.head())
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;This makes it incredibly easy to integrate the Lance format into your existing data pipelines, providing a consistent interface for working with large image datasets.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/cli-for-lance-converter/lance-training.png?raw=true&quot; alt=&quot;lance-training&quot; /&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;a-quick-comparison-manual-script-vs-lance-image-converter&quot;&gt;A Quick Comparison: Manual Script vs. &lt;code&gt;lance-image-converter&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;This is a simple and efficient way to convert your image datasets to the lance format using the &lt;code&gt;lancify&lt;/code&gt; package, and it integrates smoothly into your deep learning projects.&lt;/p&gt;
 
-&lt;p&gt;Here’s a comparison between the old manual method and the new package approach:&lt;/p&gt;
+&lt;p&gt;Switching to the Lance format makes your data pipelines faster and more efficient, especially when dealing with large image datasets. All you need to do is install the package and run the conversion script on your datasets—no hassle.&lt;/p&gt;
 
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th&gt;Aspect&lt;/th&gt;
-      &lt;th&gt;Manual Method&lt;/th&gt;
-      &lt;th&gt;&lt;code&gt;lance-image-converter&lt;/code&gt; Package&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;&lt;strong&gt;Ease of Use&lt;/strong&gt;&lt;/td&gt;
-      &lt;td&gt;Moderate&lt;/td&gt;
-      &lt;td&gt;Very Easy&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;&lt;strong&gt;Customizability&lt;/strong&gt;&lt;/td&gt;
-      &lt;td&gt;High&lt;/td&gt;
-      &lt;td&gt;Moderate&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;&lt;strong&gt;Setup Complexity&lt;/strong&gt;&lt;/td&gt;
-      &lt;td&gt;High&lt;/td&gt;
-      &lt;td&gt;Minimal&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;&lt;strong&gt;Code Length&lt;/strong&gt;&lt;/td&gt;
-      &lt;td&gt;Long&lt;/td&gt;
-      &lt;td&gt;Short&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;&lt;strong&gt;Error Handling&lt;/strong&gt;&lt;/td&gt;
-      &lt;td&gt;Custom&lt;/td&gt;
-      &lt;td&gt;Built-in&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/cli-for-lance-converter/child-meme-lancify.png?raw=true&quot; alt=&quot;meme-maker&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;As you can see, while the manual method provides more flexibility for fine-tuned control, the &lt;code&gt;lance-image-converter&lt;/code&gt; package offers a more streamlined and accessible solution.&lt;/p&gt;
+&lt;p&gt;Just this small change can really speed up your machine learning workflows—data loading and processing become much quicker, which means your models train faster.  If you need a reference, this is a &lt;a href=&quot;https://vipul-maheshwari.github.io/2024/06/26/train-a-cnn-with-lancedataset&quot;&gt;quickie&lt;/a&gt; on how to use the lance formatted image datasets for training you deep learning models. And if you’re looking for more ideas, there are plenty of other &lt;a href=&quot;https://github.com/lancedb/lance-deeplearning-recipes&quot;&gt;deep learning recipes&lt;/a&gt; built on lance.&lt;/p&gt;
 
-&lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
-
-&lt;p&gt;With the release of the &lt;code&gt;lance-image-converter&lt;/code&gt; package, converting your image datasets to the efficient and scalable Lance format has never been easier. It provides the same performance benefits as before—such as faster data loading and reduced storage footprint—while simplifying the workflow significantly.&lt;/p&gt;
-
-&lt;p&gt;Give it a try by installing the package and running the conversion script on your image datasets. This small change can drastically improve your machine learning pipelines, making data loading and processing faster and more efficient.&lt;/p&gt;
-
-&lt;p&gt;Feel free to explore the &lt;code&gt;lance-image-converter&lt;/code&gt; &lt;a href=&quot;https://github.com/vipul-maheshwari/lance-image-converter&quot;&gt;documentation&lt;/a&gt; for more details and examples.&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;This revised blog retains the educational nature of the original while focusing on how the new Python package simplifies the process of converting datasets to the Lance format. The transition is explained clearly, and it encourages readers to move from the previous method to the new one with minimal friction.&lt;/p&gt;
+&lt;p&gt;Trust me, it’s worth it! 🤗&lt;/p&gt;
 </content>
  </entry>
  
