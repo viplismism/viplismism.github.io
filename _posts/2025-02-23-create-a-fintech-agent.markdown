@@ -7,6 +7,8 @@ version: Released
 release: 23-02-2025
 ---
 
+![agent-meme](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/fintech-ai-agent/agent-meme.png?raw=true)
+
 AI agents are popping up everywhere, and they’re only going to become more common in the next few years. Think of them as a bunch of little digital assistants—agents—that keep an eye on things, make decisions, and get stuff done. It makes me wonder: how are we going to manage all these agents down the road? How do we trust them to handle decisions for us and let them run on their own?
 
 These days, many frameworks are out there to help you with AI agents quickly. Honestly, it feels like a new “low-code” tool shows up every other day, promising to make building agents a breeze. They’re all over the place—simple drag-and-drop setups or text boxes where you plug in a few prompts and some data, and just like that, your agent’s ready to go.
@@ -21,7 +23,7 @@ Every AI agent has three main pieces at its core: the Model, the Tools, and the 
 
 In this post, I’m going to mix things up a little. Instead of leaning on a framework, I’ll walk you through building a fintech agent from scratch using Python. This one’s going to help with decisions about loans and insurance.
 
-![architecture-overview]()
+![architecture-overview](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/fintech-ai-agent/fintech-ai-agent.excalidraw.png?raw=true)
 
 ## What's the deal here?
 
