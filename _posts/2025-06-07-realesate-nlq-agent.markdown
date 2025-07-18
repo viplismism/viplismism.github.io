@@ -15,7 +15,7 @@ Taking into that account, I created an agentic Natural Language Querying (NLQ) s
 
 Here's how I combined vector search with AI agents to create a real estate assistant that actually gets it. If you want to follow along, refer to this [colab](https://colab.research.google.com/drive/1UNOtum5ngDSm6Jj1dp6qpFe5mStqdgGb?usp=sharing)
 
-![title_image](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/real-estate-nlq/title_image.png?raw=true)
+![title_image](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/real-estate-nlq-agent/title_image.png?raw=true)
 
 ## The Problem with Current Real Estate Search
 
