@@ -15,7 +15,7 @@ Taking into that account, I created an agentic Natural Language Querying (NLQ) s
 
 Here's how I combined vector search with AI agents to create a real estate assistant that actually gets it. If you want to follow along, refer to this [colab](https://colab.research.google.com/drive/1UNOtum5ngDSm6Jj1dp6qpFe5mStqdgGb?usp=sharing)
 
-![title_image](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/real-estate-nlq/title_real_estate.png?raw=true)
+![title_image](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/real-estate-nlq/title_image.png?raw=true)
 
 ## The Problem with Current Real Estate Search
 
@@ -48,7 +48,7 @@ Well there are couple of the different components that I glued together which pr
 
 You can use any LLM or any embedding model of your choice based on the requirements.
 
-![nlq_only_architecture](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/real-estate-nlq/nlq_only_architecture.png?raw=true)
+![nlq_only_architecture](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/real-estate-nlq-agent/nlq_only_architecture.png?raw=true)
 
 ## Data Requirements
 
@@ -170,7 +170,7 @@ So when you blend NLQ (which listens and interprets) with agents (which think an
 
 Ok, Here’s where it starts to get fun. Rather than building a one-size-fits-all (and honestly, kind of dumb) search tool, I designed an agentic system made up of five specialised tools—each one kicks in based on what the user is actually trying to do.
 
-![agentic_only_architecture](attachment:41c7bf1b-ad2a-4bc6-b0a8-1b96b459d571:Screenshot_2025-06-23_at_5.11.03_PM.png)
+![agentic_only_architecture](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/real-estate-nlq-agent/agentic_only_architecture.png?raw=true)
 
 ```python
 class RealEstateAgent:
@@ -733,7 +733,7 @@ Kitchener 371  Ontario      110 FERGUS Avenue Unit# 1 $790,000            3     
 
 Here is the concluded look of how the whole system looks under the hood..
 
-![combined_nlq_agentic](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/real-estate-nlq/combined_nlq_agentic.png?raw=true)
+![combined_nlq_agentic](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/real-estate-nlq-agent/combined_nlq_agentic.png?raw=true)
 
 Well before ending this one, there are couple of points I want your attention. So doing this end to end , we took care of a few core architectural choices that shaped how this system really works.
 
