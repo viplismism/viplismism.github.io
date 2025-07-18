@@ -7,8 +7,6 @@ version: Released
 release: 07-06-2025
 ---
 
-# Building an Agentic NLQ System for Real Estate Search
-
 Real estate search is straight-up broken. I mean we all know the drill right, It’s just too much  dropdowns, rigid filters, and somehow we still end up scrolling through properties that miss the mark completely. Want a "family-friendly home near good schools"? Good luck translating that into checkboxes and price sliders. I mean imagine there is a system which can just translate these queries to something meaningful reference and give us better results.
 
 Taking into that account, I created an agentic Natural Language Querying (NLQ) system that actually understands what people want. Just tell it "Find me a 3-bedroom home in Toronto under $600,000 with 2 bedrooms and 3 bathrooms" and it figures out the rest. I mean this is one of the coolest thing right..
