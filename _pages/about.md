@@ -11,4 +11,6 @@ Moving on, I had the opportunity to intern with an incredible AI company as a co
 
 Soon after this internship, I joined an AI company specializing in the creation of multilingual AI bots using deep learning algorithms as a NLP Deep Learning Intern. My role involved resolving numerous multilingual Natural Language Understanding (NLU) and Named Entity Recognition (NER) challenges for over 15 clients. I implemented NER entity extraction using rule-based regex and pattern dictionaries to enhance intent coverage. Additionally, I Improved and refactored the Python Scripts for NER data creation and the multilingual NLU code base for the production level NLP applications. Along with it, I conducted extensive test on knowledge distillation where I exhibit the use of Transfer learning to decrease the latency of the production models and the usage of Large Language Models (LLMs) in large-scale conversational AI.
 
-Since then, I've gained extensive experience working with various companies in multiple capacities, including roles as a Machine Learning Engineer, Consultant, and a Freelance contractor. If you're looking to collaborate on a project related to AI or ML, feel free to reach out—I'm just a message away!
+Since then, I've gained extensive experience working with various companies in multiple capacities, including roles as a Machine Learning Engineer, Consultant, and a Freelance contractor. If you're looking to collaborate on a project related to AI or ML, feel free to reach out—I'm just a message away! 
+
+see you on the other side..
