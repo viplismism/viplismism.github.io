@@ -4,7 +4,7 @@
  <title>Deox Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2025-02-25T14:31:22+05:30</updated>
+ <updated>2025-08-16T02:45:05+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -13,55 +13,1590 @@
 
  
  <entry>
+   <title>Create a custom retriever</title>
+   <link href="http://localhost:4000/2025/07/02/custom-retriever"/>
+   <updated>2025-07-02T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2025/07/02/custom-retriever</id>
+   <content type="html">&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/custom-retriever/custom_retriever.png?raw=true&quot; alt=&quot;title_image&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As retrieval-augmented generation (RAG) systems continue to evolve, the need for &lt;strong&gt;custom, domain-specific retrievers&lt;/strong&gt; is becoming more and more obvious. Sure, traditional vector databases are great for basic similarity search—but the moment you throw in more complex, context-heavy queries, they start to fall short. Especially when you’re working with real-world data that needs richer filtering or semantic understanding.&lt;/p&gt;
+
+&lt;p&gt;In this post, we’ll walk through how to build a &lt;strong&gt;custom retriever&lt;/strong&gt; by combining &lt;strong&gt;Superlinked&lt;/strong&gt;—a high-performance vector compute engine—with &lt;strong&gt;LlamaIndex&lt;/strong&gt;’s flexible retrieval framework. Think of this as a hands-on guide: we’ll show you how to wire things up end-to-end using a &lt;strong&gt;Steam game recommendation system&lt;/strong&gt; as the example. We’ll tap into semantic similarity, multi-field indexing, and advanced query logic to make sure recommendations aren’t just relevant—they actually make sense.&lt;/p&gt;
+
+&lt;h2 id=&quot;why-custom-retrievers-matter&quot;&gt;Why Custom Retrievers Matter&lt;/h2&gt;
+
+&lt;p&gt;Before we dive into the implementation, let’s talk about why building your own retriever is often the better choice in real-world RAG setups.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;Tuned for Your Domain&lt;/strong&gt; – Generic retrievers are fine for general use, but they tend to miss the subtle stuff. Think about jargon, shorthand, or domain-specific phrasing—those don’t usually get picked up unless your retriever knows what to look for. That’s where custom ones shine: you can hardwire in that context.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Works Beyond Just Text&lt;/strong&gt; – Most real-world data isn’t just plain text. You’ll often have metadata, tags, maybe even embeddings from images or audio. For example, in a game recommendation system, we don’t just care about the game description—we also want to factor in genres, tags, user ratings, and more. Think about this logic: someone searching for a “strategy co-op game with sci-fi elements” won’t get far with text-only matching.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Custom Filtering and Ranking Logic&lt;/strong&gt; – Sometimes you want to apply your own rules to how things are scored or filtered. Maybe you want to prioritize newer content, or penalize results that don’t meet certain quality thresholds. I mean, having that kind of control is like giving your retriever an actual brain—it can reason through relevance instead of just relying on vector distances.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Performance Gains&lt;/strong&gt; – Let’s be real: general-purpose solutions are built to work “okay” for everyone, not great for you. If you know your data and your access patterns, you can fine-tune your retriever to run faster, rank better, and reduce unnecessary noise in the results.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;implementation-breakdown&quot;&gt;Implementation Breakdown&lt;/h2&gt;
+
+&lt;h3 id=&quot;part-1-core-dependencies-and-imports&quot;&gt;Part 1: Core Dependencies and Imports&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import pandas as pd
+from typing import List
+from llama_index.core.retrievers import BaseRetriever
+from llama_index.core.schema import NodeWithScore, QueryBundle, TextNode
+from llama_index.core.query_engine import RetrieverQueryEngine
+from llama_index.core.response_synthesizers import get_response_synthesizer
+from llama_index.core import Settings
+from llama_index.llms.openai import OpenAI
+import superlinked.framework as sl
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The import structure reveals our hybrid approach:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;LlamaIndex Core&lt;/strong&gt;: Provides the retrieval abstraction layer&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Superlinked Framework&lt;/strong&gt;: Handles vector computation and semantic search&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Pandas&lt;/strong&gt;: Manages data preprocessing and manipulation&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;part-2-understanding-llamaindex-custom-retrievers&quot;&gt;Part 2: Understanding LlamaIndex Custom Retrievers&lt;/h3&gt;
+
+&lt;p&gt;Before diving into our Superlinked implementation, it’s crucial to understand how LlamaIndex’s custom retriever architecture works and why it’s so powerful for building domain-specific RAG applications.&lt;/p&gt;
+
+&lt;h3 id=&quot;baseretriever-abstraction&quot;&gt;BaseRetriever Abstraction&lt;/h3&gt;
+
+&lt;p&gt;LlamaIndex provides an abstract &lt;code&gt;BaseRetriever&lt;/code&gt; class that serves as the foundation for all retrieval operations. The beauty of this design lies in its simplicity—any custom retriever only needs to implement one core method:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from abc import abstractmethod
+from llama_index.core.retrievers import BaseRetriever
+from llama_index.core.schema import NodeWithScore, QueryBundle
+
+class BaseRetriever:
+    @abstractmethod
+    def _retrieve(self, query_bundle: QueryBundle) -&amp;gt; List[NodeWithScore]:
+        &quot;&quot;&quot;Retrieve nodes given query.&quot;&quot;&quot;
+        pass
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The moat here is the presence of the Retrieval Protocol from the LlamaIndex. As this “retrieval protocol” makes it easy to plug in different backends or strategies without having to touch the rest of your system. Let’s break it down on what’s exactly is going on :&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Input: &lt;code&gt;QueryBundle&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;This is the query object passed into your retriever. At minimum, it contains the user’s raw query string (e.g., “sci-fi strategy games”). But it can also include extra metadata—like filters, embeddings, or user preferences. Basically, anything that might help shape a more relevant response.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Output: &lt;code&gt;List[NodeWithScore]&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;The retriever returns a list of nodes—these are your chunks of content, documents, or data entries—each paired with a relevance score. The higher the score, the more relevant the node is to the query. This list is what gets passed downstream to the LLM or other post-processing steps. As in our case, we are plugging on the&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Processing: Backend-Agnostic&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;Here’s the cool part: how you get from query to result is totally up to you. You can use a vector database, a traditional search engine, a REST API, or even something handcrafted for your specific use case. This decouples logic and gives you full control over the retrieval stack.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;but-why-this-matters&quot;&gt;But Why This Matters?&lt;/h3&gt;
+
+&lt;p&gt;This abstraction isn’t just clean—it’s &lt;em&gt;powerful&lt;/em&gt;. It means you can:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Combine multiple strategies&lt;/strong&gt; – Use dense vector search &lt;em&gt;and&lt;/em&gt; keyword filtering together if needed.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Run A/B tests easily&lt;/strong&gt; – Compare different retrievers to see what gives better results for your users.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Plug into any agent or tool&lt;/strong&gt; – Whether you’re building a chatbot, a search UI, or a full-blown agent system, this retriever interface slots in easily.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Think of the retrieval protocol as the API contract between your “retrieval brain” and everything else. Once you follow it, you’re free to innovate however you want behind the scenes.&lt;/p&gt;
+
+&lt;h3 id=&quot;plugging-superlinked-into-llamaindex&quot;&gt;Plugging Superlinked into LlamaIndex&lt;/h3&gt;
+
+&lt;p&gt;Now let’s see how we bridge Superlinked’s advanced vector computation capabilities with LlamaIndex’s retrieval abstraction:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class SuperlinkedSteamGamesRetriever(BaseRetriever):
+    &quot;&quot;&quot;A custom LlamaIndex retriever using Superlinked for Steam games data.&quot;&quot;&quot;
+    
+    def __init__(self, csv_file: str, top_k: int = 10):
+        self.top_k = top_k
+        self.df = pd.read_csv(csv_file)
+        
+        # Critical: Text field combination for semantic richness
+        self.df[&apos;combined_text&apos;] = (
+            self.df[&apos;name&apos;].astype(str) + &quot; &quot; +
+            self.df[&apos;desc_snippet&apos;].astype(str) + &quot; &quot; +
+            self.df[&apos;genre&apos;].astype(str) + &quot; &quot; +
+            self.df[&apos;game_details&apos;].astype(str) + &quot; &quot; +
+            self.df[&apos;game_description&apos;].astype(str)
+        )
+        
+        self._setup_superlinked()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Integration Architecture Deep Dive:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/custom-retriever/architecture.png?raw=true&quot; alt=&quot;architecture.png&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;part-3-superlinked-schema-definition-and-setup&quot;&gt;Part 3: Superlinked Schema Definition and Setup&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;def _setup_superlinked(self):
+    &quot;&quot;&quot;Set up Superlinked schema, space, index, and executor.&quot;&quot;&quot;
+
+    # Schema Definition - The Foundation of Type Safety
+    class GameSchema(sl.Schema):
+        game_number: sl.IdField
+        name: sl.String
+        desc_snippet: sl.String
+        game_details: sl.String
+        languages: sl.String
+        genre: sl.String
+        game_description: sl.String
+        original_price: sl.Float
+        discount_price: sl.Float
+        combined_text: sl.String  # Our semantic search target
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In Superlinked, the schema isn’t just about defining data types— it’s more like a formal definition between our data and the underlying vector compute engine. This schema determines how our data gets parsed, indexed, and queried—so getting it right is crucial.&lt;/p&gt;
+
+&lt;p&gt;In our &lt;code&gt;SuperlinkedSteamGamesRetriever&lt;/code&gt;, the schema is defined like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class GameSchema(sl.Schema):
+    game_number: sl.IdField
+    name: sl.String
+    desc_snippet: sl.String
+    game_details: sl.String
+    languages: sl.String
+    genre: sl.String
+    game_description: sl.String
+    original_price: sl.Float
+    discount_price: sl.Float
+    combined_text: sl.String  # Key field for semantic search
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let’s break down what each of these elements actually &lt;em&gt;does&lt;/em&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;&lt;code&gt;sl.IdField&lt;/code&gt; (→ &lt;code&gt;game_number&lt;/code&gt;)&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;Think of this as our primary key. It gives each game a unique identity and allows Superlinked to index and retrieve items efficiently, I mean basically it’s about how we are telling the Superlinked to segregate the unique identify of the games, and btw it’s especially important when you’re dealing with thousands of records.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;&lt;code&gt;sl.String&lt;/code&gt; and &lt;code&gt;sl.Float&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;Now these aren’t just type hints—they enable Superlinked to optimize operations differently depending on the field. For instance, &lt;code&gt;sl.String&lt;/code&gt; fields can be embedded and compared semantically, while &lt;code&gt;sl.Float&lt;/code&gt; fields can support numeric filtering or sorting.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;&lt;code&gt;combined_text&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;This is the &lt;strong&gt;semantic anchor&lt;/strong&gt; of our retriever. It’s a synthetic field where we concatenate the game name, description, genre, and other relevant attributes into a single block of text. This lets us build a single &lt;strong&gt;text similarity space&lt;/strong&gt; using sentence-transformer embeddings:&lt;/p&gt;
+
+    &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;  self.text_space = sl.TextSimilaritySpace(
+      text=self.game.combined_text,
+      model=&quot;sentence-transformers/all-mpnet-base-v2&quot;
+  )
+    
+&lt;/code&gt;&lt;/pre&gt;
+
+    &lt;p&gt;Why do this? Because users don’t just search by genre or name—they describe what they’re &lt;em&gt;looking for&lt;/em&gt;. By embedding all the important signals into &lt;code&gt;combined_text&lt;/code&gt;, we can better match fuzzy, natural-language queries with the most relevant games.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This schema definition is what allows Superlinked to &lt;strong&gt;parse our dataset, build the index, and execute semantic queries&lt;/strong&gt;—all while retaining full control over how data is structured and ranked.&lt;/p&gt;
+
+&lt;h3 id=&quot;part-4-vector-space-configuration&quot;&gt;Part 4: Vector Space Configuration&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;    # Create text similarity space using sentence transformers
+    self.text_space = sl.TextSimilaritySpace(
+        text=self.game.combined_text,
+        model=&quot;sentence-transformers/all-mpnet-base-v2&quot;
+    )
+
+    # Create index
+    self.index = sl.Index([self.text_space])
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To power the semantic search over our Steam games dataset, we made two intentional design choices that balance performance, simplicity, and flexibility.&lt;/p&gt;
+
+&lt;p&gt;First, for the embedding model, we selected &lt;code&gt;all-mpnet-base-v2&lt;/code&gt; from the Sentence Transformers library. This model produces 768-dimensional embeddings that strike a solid middle ground: they’re expressive enough to capture rich semantic meaning, yet lightweight enough to be fast in production. I mean it’s a reliable general-purpose model, known to perform well across diverse text types — which matters a lot when your data ranges from short genre tags to long-form game descriptions. In our case, we needed a model that wouldn’t choke on either end of that spectrum, and &lt;code&gt;all-mpnet-base-v2&lt;/code&gt; handled it cleanly.&lt;/p&gt;
+
+&lt;p&gt;Next, although Superlinked supports multi-space indexing — where you can combine multiple fields or even modalities (like text + images) — we deliberately kept things simple with a single &lt;code&gt;TextSimilaritySpace&lt;/code&gt;.  I would have included the &lt;code&gt;RecencySpace&lt;/code&gt; in here too but we don’t have the information on the release date for the games. But just to put this out here, if we have the release date information, we could plug in the RecencySpace here, and we can even sort the games with the TextSimilaritySpace along with the Recency of the games. Cool..&lt;/p&gt;
+
+&lt;p&gt;Now for the current &lt;code&gt;TextSimilaritySpace&lt;/code&gt; details, this was built on a custom field we created by concatenating the name, genre, description, and other textual fields for each game. The idea was straightforward: keep the query logic minimal, and let the model’s semantic power do the heavy lifting.&lt;/p&gt;
+
+&lt;h3 id=&quot;part-5-data-pipeline-and-executor-setup&quot;&gt;Part 5: Data Pipeline and Executor Setup&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;    # Map DataFrame columns to schema - Critical for data integrity
+    parser = sl.DataFrameParser(
+        self.game,
+        mapping={
+            self.game.game_number: &quot;game_number&quot;,
+            self.game.name: &quot;name&quot;,
+            self.game.desc_snippet: &quot;desc_snippet&quot;,
+            self.game.game_details: &quot;game_details&quot;,
+            self.game.languages: &quot;languages&quot;,
+            self.game.genre: &quot;genre&quot;,
+            self.game.game_description: &quot;game_description&quot;,
+            self.game.original_price: &quot;original_price&quot;,
+            self.game.discount_price: &quot;discount_price&quot;,
+            self.game.combined_text: &quot;combined_text&quot;
+        }
+    )
+
+    # Set up in-memory execution environment
+    source = sl.InMemorySource(self.game, parser=parser)
+    self.executor = sl.InMemoryExecutor(sources=[source], indices=[self.index])
+    self.app = self.executor.run()
+
+    # Load and process data
+    source.put([self.df])
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;At the heart of our retrieval system is a streamlined pipeline built for both clarity and speed. We start with the &lt;code&gt;DataFrameParser&lt;/code&gt;, which serves as our ETL layer. It ensures that each field in the dataset is correctly typed and consistently mapped to our schema — essentially acting as the contract between our raw CSV data and the Superlinked indexing layer.&lt;/p&gt;
+
+&lt;p&gt;Once the data is structured, we feed it into an &lt;code&gt;InMemorySource&lt;/code&gt;, which is ideal for datasets that comfortably fit in memory . This approach keeps everything lightning-fast without introducing storage overhead or network latency. Finally, the queries are handled by an &lt;code&gt;InMemoryExecutor&lt;/code&gt;, which is optimised for sub-millisecond latency. This is what makes Superlinked suitable for real-time applications like interactive recommendation systems, where speed directly impacts user experience.&lt;/p&gt;
+
+&lt;h3 id=&quot;part-6-the-retrieval-engine&quot;&gt;Part 6: The Retrieval Engine&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;def _retrieve(self, query_bundle: QueryBundle) -&amp;gt; List[NodeWithScore]:
+    &quot;&quot;&quot;Core retrieval logic with semantic similarity scoring.&quot;&quot;&quot;
+
+    query_text = query_bundle.query_str
+
+    # Construct Superlinked query with explicit field selection
+    query = (
+        sl.Query(self.index)
+        .find(self.game)
+        .similar(self.text_space, query_text)
+        .select([
+            self.game.game_number,
+            self.game.name,
+            self.game.desc_snippet,
+            self.game.game_details,
+            self.game.languages,
+            self.game.genre,
+            self.game.game_description,
+            self.game.original_price,
+            self.game.discount_price
+        ])
+        .limit(self.top_k)
+    )
+
+    # Execute and convert to pandas for processing
+    result = self.app.query(query)
+    df_result = sl.PandasConverter.to_pandas(result)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;One of the things that makes Superlinked genuinely enjoyable to work with is its fluent-style query builder. If you’ve used libraries like SQLAlchemy or Django ORM, the pattern will feel familiar — each method in the chain adds clarity instead of clutter. In our case, the query starts by selecting the relevant index and defining the similarity search using the &lt;code&gt;.similar()&lt;/code&gt; method, which computes cosine similarity in the embedding space. This is what allows us to retrieve semantically close games based on the user’s natural language query.&lt;/p&gt;
+
+&lt;p&gt;Another thoughtful design decision we made was to &lt;strong&gt;explicitly select the fields&lt;/strong&gt; we care about in the result set — rather than doing something like &lt;code&gt;SELECT *&lt;/code&gt;. This might sound minor, but it keeps the data lean, reduces processing overhead, and ensures we’re not passing around unnecessary payload during post-processing. Think of it as precision over bulk — especially important when you’re moving data between components in a latency-sensitive pipeline.&lt;/p&gt;
+
+&lt;h3 id=&quot;part-7-result-processing-and-node-creation&quot;&gt;Part 7: Result Processing and Node Creation&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;    # Convert to LlamaIndex NodeWithScore format
+    nodes_with_scores = []
+    for i, row in df_result.iterrows():
+        text = f&quot;{row[&apos;name&apos;]}: {row[&apos;desc_snippet&apos;]}&quot;
+        metadata = {
+            &quot;game_number&quot;: row[&quot;id&quot;],
+            &quot;name&quot;: row[&quot;name&quot;],
+            &quot;desc_snippet&quot;: row[&quot;desc_snippet&quot;],
+            &quot;game_details&quot;: row[&quot;game_details&quot;],
+            &quot;languages&quot;: row[&quot;languages&quot;],
+            &quot;genre&quot;: row[&quot;genre&quot;],
+            &quot;game_description&quot;: row[&quot;game_description&quot;],
+            &quot;original_price&quot;: row[&quot;original_price&quot;],
+            &quot;discount_price&quot;: row[&quot;discount_price&quot;]
+        }
+
+        # Simple ranking score based on result position
+        score = 1.0 - (i / self.top_k)
+        node = TextNode(text=text, metadata=metadata)
+        nodes_with_scores.append(NodeWithScore(node=node, score=score))
+
+    return nodes_with_scores
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now once we receive the results from Superlinked, we transform them into a format that plays well with LlamaIndex. First, we construct a &lt;strong&gt;human-readable text&lt;/strong&gt; string by combining the game’s name with its short description — this becomes the content of each node, making it easier for the language model to reason about. It’s a small touch, but it really improves how relevant and understandable the retrieved data is when passed to the LLM.&lt;/p&gt;
+
+&lt;p&gt;Next, we make sure that &lt;strong&gt;all original fields&lt;/strong&gt; from the dataset — including things like genre, pricing, and game details — are retained in the metadata. This is crucial because downstream processes might want to filter, display, or rank results based on this information. We don’t want to lose any useful context once we start working with the retrieved nodes.&lt;/p&gt;
+
+&lt;p&gt;Finally, we apply a lightweight &lt;strong&gt;score normalisation&lt;/strong&gt; strategy. Instead of relying on raw similarity scores, we assign scores based on the position of the result in the ranked list. This keeps things simple and consistent — the top result always has the highest score, and the rest follow in descending order. It’s not fancy, but it gives us a stable and interpretable scoring system that works well across different queries.&lt;/p&gt;
+
+&lt;h2 id=&quot;show-time-executing-the-pipeline&quot;&gt;Show Time: Executing the pipeline&lt;/h2&gt;
+
+&lt;p&gt;Now that all components are in place, it’s time to bring our Retrieval-Augmented Generation (RAG) system to life. Below is the end-to-end integration of Superlinked and LlamaIndex in action.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;# Initialize the RAG pipeline
+Settings.llm = OpenAI(api_key=&quot;your-api-key-here&quot;)
+retriever = SuperlinkedSteamGamesRetriever(&quot;sampled_games.csv&quot;, top_k=5)
+response_synthesizer = get_response_synthesizer()
+
+query_engine = RetrieverQueryEngine(
+    retriever=retriever,
+    response_synthesizer=response_synthesizer
+)
+
+# Execute a query
+query = &quot;I want to find a magic game with spells?&quot;
+response = query_engine.query(query)
+print(response)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This setup combines our custom semantic retriever with a response synthesizer backed by an LLM. The query is seamlessly passed through the retrieval pipeline and returned with a meaningful response.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Real Estate Natural Language Querying Agent</title>
+   <link href="http://localhost:4000/2025/06/07/realesate-nlq-agent"/>
+   <updated>2025-06-07T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2025/06/07/realesate-nlq-agent</id>
+   <content type="html">&lt;p&gt;Real estate search is straight-up broken. I mean we all know the drill right, It’s just too much  dropdowns, rigid filters, and somehow we still end up scrolling through properties that miss the mark completely. Want a “family-friendly home near good schools”? Good luck translating that into checkboxes and price sliders. I mean imagine there is a system which can just translate these queries to something meaningful reference and give us better results.&lt;/p&gt;
+
+&lt;p&gt;Taking into that account, I created an agentic Natural Language Querying (NLQ) system that actually understands what people want. Just tell it “Find me a 3-bedroom home in Toronto under $600,000 with 2 bedrooms and 3 bathrooms” and it figures out the rest. I mean this is one of the coolest thing right..&lt;/p&gt;
+
+&lt;p&gt;Here’s how I combined vector search with AI agents to create a real estate assistant that actually gets it. If you want to follow along, refer to this &lt;a href=&quot;https://colab.research.google.com/drive/1UNOtum5ngDSm6Jj1dp6qpFe5mStqdgGb?usp=sharing&quot;&gt;colab&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/real-estate-nlq-agent/title_image.png?raw=true&quot; alt=&quot;title_image&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;the-problem-with-current-real-estate-search&quot;&gt;The Problem with Current Real Estate Search&lt;/h2&gt;
+
+&lt;p&gt;Every real estate platform treats search like you’re querying a database. It’s all structured filters and rigid categories. Need a family home at a place? Here’s your homework:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Pick a price range from a dropdown&lt;/li&gt;
+  &lt;li&gt;Select bedrooms and bathrooms&lt;/li&gt;
+  &lt;li&gt;Choose your city from a list&lt;/li&gt;
+  &lt;li&gt;Cross your fingers that “good schools” somehow correlates with your selected neighborhood&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This approach fails because real estate decisions are nuanced as hell. It’s super hard to translate the relevant requirements to the dropdowns and rigid filters. When someone says “affordable family home,” they could mean totally different things based on their income, family size, and what they consider “affordable.” I mean we need something where we can just put out the queries and get the relevant results. That’s where NLQ comes into play.&lt;/p&gt;
+
+&lt;h2 id=&quot;whats-natural-language-querying-all-about&quot;&gt;What’s Natural Language Querying All About?&lt;/h2&gt;
+
+&lt;p&gt;NLQ flips the script. Instead of forcing users to translate their thoughts into database queries, it lets them just… talk normally.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Old way&lt;/strong&gt;: &lt;code&gt;Price: $400K-$600K, Bedrooms: 3+, Location: Toronto&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;New way&lt;/strong&gt;: &lt;code&gt;&quot;Find me a 3-bedroom home in Toronto under $600,000&quot;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;The system handles the translation from human language to structured queries while actually understanding context and intent.&lt;/p&gt;
+
+&lt;h2 id=&quot;what-it-took-to-made-it&quot;&gt;What it took to made it..&lt;/h2&gt;
+
+&lt;p&gt;Well there are couple of the different components that I glued together which provides NLQ capabilities, semantic search, and contextual reasoning.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Superlinked&lt;/strong&gt;: Well this is the most important aspect of making this happen, I mean this is the one which provides the core vector search and NLQ interfaces for retrieving relevant results based on user queries.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;LLM&lt;/strong&gt;: Well for this project, I used OpenAI GPT-4 which powers both the intent classification and generative outputs such as recommendations, insight narratives, and query reformulations.&lt;/li&gt;
+  &lt;li&gt;For the embedding generation I used &lt;code&gt;sentence-transformers/all-mpnet-base-v2&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;You can use any LLM or any embedding model of your choice based on the requirements.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/real-estate-nlq-agent/nlq_only_architecture.png?raw=true&quot; alt=&quot;nlq_only_architecture&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;data-requirements&quot;&gt;Data Requirements&lt;/h2&gt;
+
+&lt;p&gt;To demonstrate how the NLQ system and agentic flow work in practice, I used a dataset that reflects what you’d typically find in real-world property listings. This includes property-level attributes like price, number of bedrooms and bathrooms, and address, along with geographic fields such as city and province.&lt;/p&gt;
+
+&lt;p&gt;To support more context-aware reasoning, the data also includes demographic details like population size and median household income—useful for queries that imply lifestyle or investment considerations.&lt;/p&gt;
+
+&lt;h2 id=&quot;how-i-built-this-thing&quot;&gt;How I Built This Thing&lt;/h2&gt;
+
+&lt;h3 id=&quot;step-1-vector-spaces-for-property-magic&quot;&gt;Step 1: Vector Spaces for Property Magic&lt;/h3&gt;
+
+&lt;p&gt;I created specialised vector spaces for different property characteristics. Think of these as smart ways to understand fuzzy concepts like “near downtown” or “family-friendly.”&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;# Text similarity space for addresses
+address_space = sl.TextSimilaritySpace(
+    text=real_estate.address,
+    model=&quot;sentence-transformers/all-mpnet-base-v2&quot;
+)
+
+# Numerical similarity spaces
+price_space = sl.NumberSpace(
+    number=real_estate.price,
+    min_value=0,
+    max_value=int(max_price),
+    mode=sl.Mode.MINIMUM
+)
+
+beds_space = sl.NumberSpace(
+    number=real_estate.number_beds,
+    min_value=0,
+    max_value=int(max_beds),
+    mode=sl.Mode.MINIMUM
+)
+
+baths_space = sl.NumberSpace(
+    number=real_estate.number_baths,
+    min_value=0,
+    max_value=int(max_baths),
+    mode=sl.Mode.MINIMUM
+)
+
+population_space = sl.NumberSpace(
+    number=real_estate.population,
+    min_value=0,
+    max_value=int(max_population),
+    mode=sl.Mode.MINIMUM
+)
+
+income_space = sl.NumberSpace(
+    number=real_estate.median_family_income,
+    min_value=0,
+    max_value=int(max_median_family_income),
+    mode=sl.Mode.MINIMUM
+)
+
+# Categorical similarity spaces
+city_space = sl.CategoricalSimilaritySpace(
+    category_input=real_estate.city,
+    categories=unique_city_categories
+)
+
+province_space = sl.CategoricalSimilaritySpace(
+    category_input=real_estate.province,
+    categories=unique_province_categories,
+    negative_filter=-1.0,
+    uncategorized_as_category=False
+)
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Why vector spaces? They enable fuzzy matching, so when someone searches “near downtown” the system intelligently finds relevant addresses without needing exact geolocation data. Numerical spaces compare property details like price, bedrooms, bathrooms, population, and income, prioritising user preferences. Categorical spaces ensure precise matching for cities and provinces, filtering out irrelevant locations. It’s all about semantic understanding and flexible, accurate comparisons.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-2-weighted-query-construction&quot;&gt;Step 2: Weighted Query Construction&lt;/h3&gt;
+
+&lt;p&gt;Weighted queries prioritize what matters most in searches. As weights defines how much importance that parameter have when we fetch the relevant results. Higher weights, like for price, ensure results match user priorities, like sticking to a budget.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;query = sl.Query(index, weights={
+    address_space: sl.Param(&quot;address_weight&quot;, default=1.0),
+    price_space: sl.Param(&quot;price_weight&quot;, default=100.0),
+    city_space: sl.Param(&quot;city_weight&quot;, default=1.0),
+    beds_space: sl.Param(&quot;beds_weight&quot;, default=1.0),
+    baths_space: sl.Param(&quot;baths_weight&quot;, default=1.0),
+    population_space: sl.Param(&quot;population_weight&quot;, default=0.2),
+    income_space: sl.Param(&quot;income_weight&quot;, default=1.0),
+})
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Notice price gets 100x weight? That’s because budget is usually the make-or-break factor. No point showing someone a $2M mansion when they said “affordable.” Crazy laugh here…&lt;/p&gt;
+
+&lt;h3 id=&quot;why-agents--nlq-for-real-estate-search&quot;&gt;Why Agents + NLQ for Real Estate Search?&lt;/h3&gt;
+
+&lt;p&gt;Before we get into the tools and how they simplify everything, let’s take a quick look at why pairing agents with Natural Language Querying (NLQ) leads to such a powerful search experience.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;NLQ helps machines speak our language.&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;When someone says, “affordable family homes under $250,000,” NLQ knows how to break that down into structured search parameters and get the relevant results for us.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;But on its own, NLQ hits a ceiling.&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;Sure, it’s great at filtering by the criteria as I mention, but it tends to fall short when:&lt;/p&gt;
+
+    &lt;ul&gt;
+      &lt;li&gt;The results are too few or too literal, without understanding the intent behind the query.&lt;/li&gt;
+      &lt;li&gt;You’re looking for personalised suggestions that go beyond the filters. I mean just think when you have let’s say 10 different properties which are completing your criteria but you still need some kind of personalised recommendations.&lt;/li&gt;
+      &lt;li&gt;You want to compare multiple results in context.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;That’s where agents step in.&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;Agents bring reasoning to the table. They can:&lt;/p&gt;
+
+    &lt;ul&gt;
+      &lt;li&gt;Recognise when a search is too narrow and offer smarter alternatives.&lt;/li&gt;
+      &lt;li&gt;Read between the lines and pick up on what the user might actually want. So instead of just throwing the results, we can utilize these agents to make more of those findings.&lt;/li&gt;
+      &lt;li&gt;Handle more complex workflows—like comparing options or building narratives from raw data.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;So when you blend NLQ (which listens and interprets) with agents (which think and act), you get something far more intelligent: a system that doesn’t just understand your request—it also knows how to respond meaningfully. That’s the sweet spot.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-3-the-agentic-layer---where-the-magic-happens&quot;&gt;Step 3: The Agentic Layer - Where the Magic Happens&lt;/h3&gt;
+
+&lt;p&gt;Ok, Here’s where it starts to get fun. Rather than building a one-size-fits-all (and honestly, kind of dumb) search tool, I designed an agentic system made up of five specialised tools—each one kicks in based on what the user is actually trying to do.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/real-estate-nlq-agent/agentic_only_architecture.png?raw=true&quot; alt=&quot;agentic_only_architecture&quot; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class RealEstateAgent:
+    def __init__(self, df, app, master_query, openai_client):
+        self.tools = [
+            PropertyRetrievalTool(),      # Basic &quot;show me homes&quot; requests
+            PropertyRecommendationTool(), # &quot;What&apos;s good for me?&quot; queries
+            QueryRefinementTool(),        # When searches come up empty
+            NarrativeInsightTool(),       # Market analysis stuff
+            MultiStepQueryTool()          # &quot;Compare Toronto vs Vancouver&quot;
+        ]
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Each tool has a specific job. Let me break them down all of them one step at a time..&lt;/p&gt;
+
+&lt;h3 id=&quot;propertyretrievaltool&quot;&gt;PropertyRetrievalTool&lt;/h3&gt;
+
+&lt;p&gt;This one’s is used for the straightforward lookups. So if we type a query something like, &lt;em&gt;“3-bedroom homes in Oshawa under $600K.”&lt;/em&gt; This tool parses that to our Superlinked Search engine, runs it through and—bam—we get relevant listings back. It’s quick, clean, and no fuss.&lt;/p&gt;
+
+&lt;p&gt;Behind the scenes, what it really do is it wraps the user query, hands it to the NLQ-powered engine, and formats the results for display. If nothing shows up, it gracefully pass the actions to another tool called &lt;code&gt;QueryRefinementTool&lt;/code&gt; which takes care of the situation. More on this a bit later..&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class PropertyRetrievalTool(Tool):
+    def name(self) -&amp;gt; str:
+        return &quot;PropertyRetrievalTool&quot;
+
+    def description(self) -&amp;gt; str:
+        return &quot;Retrieves properties based on natural language queries, leveraging NLQ intelligence for ranking&quot;
+
+    def use(self, query: str, df: pd.DataFrame, app: Any, master_query: Any, openai_client: Any) -&amp;gt; str:
+        try:
+            results = app.query(master_query, natural_query=query, limit=10)
+            df_results = results_to_dataframe(results, df)
+            if len(df_results) == 0:
+                # If there are no results found, pass it to the QueryRefinementTool to get the better response
+                refine_tool = QueryRefinementTool()
+                return refine_tool.use(query, df, app, master_query, openai_client)
+            return f&quot;Search Results for &apos;{query}&apos;:\\n\\n{format_property_display(df_results, query, detailed=True)}&quot;
+        except Exception as e:
+            return f&quot;Error in property retrieval: {str(e)}&quot;
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;propertyrecommendationtool&quot;&gt;PropertyRecommendationTool&lt;/h3&gt;
+
+&lt;p&gt;This tool isn’t just matching filters—it’s more like a reasoning. When someone enters a query, it tries to understand their &lt;em&gt;intent&lt;/em&gt; and &lt;em&gt;preferences&lt;/em&gt;. For example, it might see that “affordable housing for a growing family” suggests a budget, space needs, and a preference for family-friendly areas.&lt;/p&gt;
+
+&lt;p&gt;It:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Uses GPT-4 to extract a lightweight user profile from the query.&lt;/li&gt;
+  &lt;li&gt;Fetches relevant results with NLQ.&lt;/li&gt;
+  &lt;li&gt;Then it generates top 3 recommendations &lt;em&gt;with pros and cons&lt;/em&gt;, using both the data and inferred preferences.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;It’s like having a real estate advisor who reads between the lines.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class PropertyRecommendationTool(Tool):
+    def name(self) -&amp;gt; str:
+        return &quot;PropertyRecommendationTool&quot;
+
+    def description(self) -&amp;gt; str:
+        return &quot;Provides personalized property recommendations based on inferred user preferences&quot;
+
+    def use(self, query: str, df: pd.DataFrame, app: Any, master_query: Any, openai_client: Any) -&amp;gt; str:
+        # Infer user profile from query
+        profile_prompt = f&quot;&quot;&quot;
+        Extract user preferences from this query, such as budget, family size, commute preferences, or lifestyle (e.g., urban, family-friendly).
+        Query: &quot;{query}&quot;
+        Return a JSON object with inferred preferences (e.g., budget). If none, return .
+        &quot;&quot;&quot;
+        try:
+            profile_response = openai_client.chat.completions.create(
+                model=&quot;gpt-4&quot;,
+                messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: profile_prompt}],
+                temperature=0.3,
+                max_tokens=100
+            )
+            user_profile = eval(profile_response.choices[0].message.content.strip()) or {}
+        except Exception as e:
+            user_profile = {}
+            print(f&quot;Error inferring user profile: {str(e)}&quot;)
+
+        # Fetch properties using NLQ
+        results = app.query(master_query, natural_query=query, limit=15)
+        df_results = results_to_dataframe(results, df)
+        if len(df_results) == 0:
+            return &quot;No properties found to recommend.&quot;
+
+        # Prepare property data (top properties from NLQ ranking)
+        properties_summary = [
+            {
+                &apos;address&apos;: row[&apos;address&apos;],
+                &apos;city&apos;: row[&apos;city&apos;],
+                &apos;province&apos;: row[&apos;province&apos;],
+                &apos;price&apos;: int(row[&apos;price&apos;]),
+                &apos;beds&apos;: int(row[&apos;number_beds&apos;]),
+                &apos;baths&apos;: int(row[&apos;number_baths&apos;]),
+                &apos;population&apos;: int(row[&apos;population&apos;]),
+                &apos;median_income&apos;: int(row[&apos;median_family_income&apos;]),
+                &apos;relevance&apos;: round(row[&apos;relevance_score&apos;], 3)
+            }
+            for _, row in df_results.head(10).iterrows()
+        ]
+
+        # Generate recommendations
+        prompt = f&quot;&quot;&quot;
+        You are a real estate advisor. Provide recommendations based on:
+        Query: &quot;{query}&quot;
+        Inferred Profile: {user_profile}
+        Properties (ranked by NLQ relevance): {properties_summary}
+
+        The properties are already ranked by our intelligent NLQ system considering all factors including price relevance.
+        Provide:
+        1. Top 3 recommendations with reasons (include address) - respect the NLQ ranking
+        2. Pros and cons for each
+        3. Additional considerations (e.g., neighborhood, lifestyle fit)
+        &quot;&quot;&quot;
+        try:
+            response = openai_client.chat.completions.create(
+                model=&quot;gpt-4&quot;,
+                messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+                temperature=0.7,
+                max_tokens=800
+            )
+            recommendations = response.choices[0].message.content.strip()
+
+            # Use top properties from NLQ ranking (no additional sorting)
+            formatted_properties = format_property_display(df_results.head(5), query, detailed=True)
+            return f&quot;Recommendations for &apos;{query}&apos;:\\n\\n{recommendations}\\n\\nProperty Listings (NLQ Ranked):\\n{formatted_properties}&quot;
+        except Exception as e:
+            return f&quot;Error generating recommendations: {str(e)}&quot;
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;queryrefinementtool&quot;&gt;QueryRefinementTool&lt;/h3&gt;
+
+&lt;p&gt;Sometimes people are too specific and get little (or nothing) back. That’s where this tool steps in. If a query returns too few results, it suggests a smart alternative—maybe relaxing price, broadening the location, or tweaking filters.&lt;/p&gt;
+
+&lt;p&gt;It then reruns the new query and returns the refined results. It’s especially useful when users aren’t sure how to phrase their search in the most productive way. That’s where this comes into play..&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class QueryRefinementTool(Tool):
+    def name(self) -&amp;gt; str:
+        return &quot;QueryRefinementTool&quot;
+
+    def description(self) -&amp;gt; str:
+        return &quot;Refines queries when results are sparse or irrelevant&quot;
+
+    def use(self, query: str, df: pd.DataFrame, app: Any, master_query: Any, openai_client: Any) -&amp;gt; str:
+        # Try initial query
+        results = app.query(master_query, natural_query=query, limit=10)
+        df_results = results_to_dataframe(results, df)
+
+        if len(df_results) &amp;gt;= 3:
+            return f&quot;Search Results for &apos;{query}&apos;:\\n\\n{format_property_display(df_results, query, detailed=True)}&quot;
+
+        # Refine query if fewer than 3 results
+        refine_prompt = f&quot;&quot;&quot;
+        The query &quot;{query}&quot; returned {len(df_results)} results. Suggest an alternative query to get more relevant results.
+        Consider relaxing filters (e.g., price, location) or expanding scope (e.g., nearby cities).
+        Return a single alternative query as a string.
+        &quot;&quot;&quot;
+        try:
+            response = openai_client.chat.completions.create(
+                model=&quot;gpt-4&quot;,
+                messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: refine_prompt}],
+                temperature=0.3,
+                max_tokens=50
+            )
+            new_query = response.choices[0].message.content.strip()
+
+            # Try refined query
+            results = app.query(master_query, natural_query=new_query, limit=10)
+            df_new_results = results_to_dataframe(results, df)
+
+            if len(df_new_results) == 0:
+                return f&quot;No properties found for &apos;{query}&apos;. Suggested query &apos;{new_query}&apos; also returned no results.&quot;
+
+            return f&quot;&quot;&quot;
+Original Query: &apos;{query}&apos; returned {len(df_results)} results.
+Suggested Query: &apos;{new_query}&apos;
+Results for &apos;{new_query}&apos; (NLQ Ranked):
+{format_property_display(df_new_results, new_query, detailed=True)}
+            &quot;&quot;&quot;
+        except Exception as e:
+            return f&quot;Error refining query: {str(e)}&quot;
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;narrativeinsighttool&quot;&gt;NarrativeInsightTool&lt;/h3&gt;
+
+&lt;p&gt;This tool’s for the data-savvy users—the investors, the analysts, the curious &lt;a href=&quot;http://minds.it/&quot;&gt;minds.It&lt;/a&gt; takes a query and returns a story: average prices, price ranges, bedroom counts, top cities, median incomes, Then it wraps all that data into a readable narrative: market trends, investment potential, and key takeaways based on the context.&lt;/p&gt;
+
+&lt;p&gt;You get both the numbers and the story behind them. So instead of just seeing the relevant results in the tabular format, this tool gives the results a more readable format.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class NarrativeInsightTool(Tool):
+    def name(self) -&amp;gt; str:
+        return &quot;NarrativeInsightTool&quot;
+
+    def description(self) -&amp;gt; str:
+        return &quot;Provides narrative insights for complex queries (e.g., investment potential)&quot;
+
+    def use(self, query: str, df: pd.DataFrame, app: Any, master_query: Any, openai_client: Any) -&amp;gt; str:
+        results = app.query(master_query, natural_query=query, limit=10)
+        df_results = results_to_dataframe(results, df)
+        if len(df_results) == 0:
+            return &quot;No properties found for analysis.&quot;
+
+        stats = {
+            &apos;avg_price&apos;: int(df_results[&apos;price&apos;].mean()),
+            &apos;median_price&apos;: int(df_results[&apos;price&apos;].median()),
+            &apos;price_range&apos;: (int(df_results[&apos;price&apos;].min()), int(df_results[&apos;price&apos;].max())),
+            &apos;avg_beds&apos;: round(df_results[&apos;number_beds&apos;].mean(), 1),
+            &apos;avg_baths&apos;: round(df_results[&apos;number_baths&apos;].mean(), 1),
+            &apos;cities&apos;: df_results[&apos;city&apos;].value_counts().head(3).to_dict(),
+            &apos;avg_income&apos;: int(df_results[&apos;median_family_income&apos;].mean())
+        }
+
+        prompt = f&quot;&quot;&quot;
+        Provide a narrative analysis for the query: &quot;{query}&quot;
+        Data: {stats}
+        Properties (NLQ ranked by relevance): {[{k: v for k, v in row.items() if k in [&apos;address&apos;, &apos;city&apos;, &apos;price&apos;, &apos;number_beds&apos;, &apos;number_baths&apos;, &apos;relevance_score&apos;]} for _, row in df_results.head(5).iterrows()]}
+
+        Note: Properties are already intelligently ranked by our NLQ system considering price and other factors.
+        Include:
+        1. Market overview
+        2. Investment potential (if relevant)
+        3. Key considerations (e.g., location, price trends)
+        &quot;&quot;&quot;
+        try:
+            response = openai_client.chat.completions.create(
+                model=&quot;gpt-4&quot;,
+                messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+                temperature=0.7,
+                max_tokens=600
+            )
+            insights = response.choices[0].message.content.strip()
+            formatted_properties = format_property_display(df_results, query, detailed=True)
+            return f&quot;Insights for &apos;{query}&apos;:\\n\\n{insights}\\n\\nProperty Listings (NLQ Ranked):\\n{formatted_properties}&quot;
+        except Exception as e:
+            return f&quot;Error generating insights: {str(e)}&quot;
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;multistepquerytool&quot;&gt;MultiStepQueryTool&lt;/h3&gt;
+
+&lt;p&gt;This one’s built for the power users—the folks asking things like, &lt;em&gt;“Compare properties in Toronto vs. family homes in Ontario under $300K.”&lt;/em&gt; That’s not a simple query; it’s actually two or more requests bundled into one.&lt;/p&gt;
+
+&lt;p&gt;Instead of throwing its hands up, this tool does it :&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;It just break down the question into the manageable parts, something like more doable.&lt;/li&gt;
+  &lt;li&gt;Now it runs those sub-query in the independent fashion using the correct retrieval logic.&lt;/li&gt;
+  &lt;li&gt;Then comes the comparison where it just compares them side by side&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;It’s what makes the whole system feel flexible—like it &lt;em&gt;understands&lt;/em&gt; layered intent instead of forcing users to rephrase things over and over.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class MultiStepQueryTool(Tool):
+    def name(self) -&amp;gt; str:
+        return &quot;MultiStepQueryTool&quot;
+
+    def description(self) -&amp;gt; str:
+        return &quot;Handles queries requiring multiple NLQ calls (e.g., comparisons)&quot;
+
+    def use(self, query: str, df: pd.DataFrame, app: Any, master_query: Any, openai_client: Any) -&amp;gt; str:
+        # Detect if query involves comparison
+        compare_pattern = re.compile(r&apos;\\b(compare|versus|vs\\.?)\\b&apos;, re.IGNORECASE)
+        if not compare_pattern.search(query):
+            return &quot;Query does not require comparison.&quot;
+
+        # Extract sub-queries
+        prompt = f&quot;&quot;&quot;
+        Split the query into sub-queries for comparison.
+        Query: &quot;{query}&quot;
+        Return a JSON list of sub-queries (e.g., [&quot;3 bedroom homes in Toronto&quot;, &quot;3 bedroom homes in Kitchener&quot;]).
+        &quot;&quot;&quot;
+        try:
+            response = openai_client.chat.completions.create(
+                model=&quot;gpt-4&quot;,
+                messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+                temperature=0.3,
+                max_tokens=100
+            )
+            sub_queries = eval(response.choices[0].message.content.strip())
+            if not isinstance(sub_queries, list) or len(sub_queries) &amp;lt; 2:
+                return &quot;Unable to split query for comparison.&quot;
+
+            # Run sub-queries (NLQ handles intelligent ranking)
+            results_dict = {}
+            for sub_query in sub_queries[:2]:  # Limit to 2 for simplicity
+                results = app.query(master_query, natural_query=sub_query, limit=5)
+                df_sub_results = results_to_dataframe(results, df)
+                results_dict[sub_query] = df_sub_results
+
+            # Generate comparison
+            data_str = &quot;&quot;
+            for sub_query, df_sub_results in results_dict.items():
+                data_str += f&quot;\\n{sub_query} (NLQ ranked):\\n&quot;
+                for _, row in df_sub_results.head(3).iterrows():
+                    data_str += f&quot;  - Address: {row[&apos;address&apos;]}, City: {row[&apos;city&apos;]}, Price: ${row[&apos;price&apos;]:,.0f}, Beds: {row[&apos;number_beds&apos;]}, Baths: {row[&apos;number_baths&apos;]}, Relevance: {row[&apos;relevance_score&apos;]:.3f}\\n&quot;
+
+            compare_prompt = f&quot;&quot;&quot;
+            Compare properties from these sub-queries (each ranked by NLQ intelligence):
+            {list(results_dict.keys())}
+            Data:
+            {data_str}
+
+            Note: Each property list is already ranked by our NLQ system considering all factors including price relevance.
+            Provide:
+            1. Side-by-side comparison (price, beds, baths, NLQ relevance)
+            2. Key differences (e.g., location, value, market positioning)
+            3. Recommendations for different buyer types
+            &quot;&quot;&quot;
+            response = openai_client.chat.completions.create(
+                model=&quot;gpt-4&quot;,
+                messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: compare_prompt}],
+                temperature=0.7,
+                max_tokens=800
+            )
+            comparison = response.choices[0].message.content.strip()
+
+            # Format results
+            output = [f&quot;Comparison for &apos;{query}&apos;:\\n\\n{comparison}&quot;]
+            for sub_query, df_sub_results in results_dict.items():
+                if not df_sub_results.empty:
+                    output.append(f&quot;\\nResults for &apos;{sub_query}&apos; (NLQ Ranked):\\n{format_property_display(df_sub_results, sub_query, detailed=True)}&quot;)
+
+            return &quot;\\n&quot;.join(output)
+        except Exception as e:
+            return f&quot;Error processing comparison: {str(e)}&quot;
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;step-4-intent-classification--figuring-out-what-the-user-really-wants&quot;&gt;Step 4: Intent Classification – Figuring Out What the User Really Wants&lt;/h3&gt;
+
+&lt;p&gt;At this point, the system needs to make a smart decision on which tool we should invoke? &lt;em&gt;Which tool is the best fit for this query?&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;To do that, it relies on GPT-4 to act like a traffic director. I mean more like a router which takes the query and classifies the intent behind it. Based on the outcome, it routes the query to the right tool:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;def classify_query(self, query: str) -&amp;gt; str:
+        valid_categories = {&apos;retrieval&apos;, &apos;recommendation&apos;, &apos;refinement&apos;, &apos;insight&apos;, &apos;multistep&apos;}
+        prompt = f&quot;&quot;&quot;
+Classify the query into one category based on its intent, returning only the category name (&apos;retrieval&apos; if unsure):
+- retrieval: Search for properties by criteria (e.g., location, price, bedrooms).
+- recommendation: Personalized property suggestions for user needs.
+- refinement: Strict criteria likely yielding few results, needing adjustment.
+- insight: Analysis, investment advice, or market trends.
+- multistep: Comparison or multiple criteria across locations.
+Query: &quot;{query}&quot;
+        &quot;&quot;&quot;
+        try:
+            response = self.openai_client.chat.completions.create(
+                model=&quot;gpt-4&quot;,
+                messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+                temperature=0.3,
+                max_tokens=20
+            )
+            classification = response.choices[0].message.content.strip().lower()
+            return classification if classification in valid_categories else &apos;retrieval&apos;
+        except Exception as e:
+            print(f&quot;Classification error: {str(e)}&quot;)
+            return &apos;retrieval&apos;
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To understand how the system operates in practice, let’s walk through a few real-world queries and how they are handled end-to-end.&lt;/p&gt;
+
+&lt;h3 id=&quot;example-1-basic-search&quot;&gt;Example 1: Basic Search&lt;/h3&gt;
+
+&lt;p&gt;Consider the query: “3 bedroom homes in Oshawa under $600,000.” The system classifies this as a retrieval task. It extracts structured parameters—location (Oshawa), number of bedrooms (3+), and price ceiling ($600,000)—and executes a vector-based search using these constraints.&lt;/p&gt;
+
+&lt;p&gt;The results are then ranked and returned based on semantic relevance and price alignment. Eassy pisssy..&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-markdown&quot;&gt;Processing query: 3 bedroom homes in Oshawa under $600,000
+Query classified as: retrieval
+Search Results for &apos;3 bedroom homes in Oshawa under $600,000&apos;:
+
+  city  id province              address    price  number_beds  number_baths relevance_score
+Oshawa 171  Ontario #70 -53 TAUNTON RD E $520,000            3             3           0.418
+Oshawa 603  Ontario      145 BANTING AVE $499,900            6             5           0.417
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;example-2-personalised-recommendations&quot;&gt;Example 2: Personalised Recommendations&lt;/h3&gt;
+
+&lt;p&gt;In this case, the query is: &lt;em&gt;“I live in Toronto, show me the most expensive option that would be good for me.”&lt;/em&gt; The system classifies this under the recommendation category. It infers that the user is located in Toronto and likely has a preference for high-end listings. Now if this thing goes to the NLQ directly, the NLQ might not be able to make a ton of sense as we haven’t putted out too much of the filtration here, that’s where the agentic tooling helps.&lt;/p&gt;
+
+&lt;p&gt;So now the query pass through the router, then the router directs that to the relevant tool which is &lt;code&gt;RecommendationTool&lt;/code&gt; in this case, and then that tool extracts additional implicit preferences (e.g., lifestyle, city familiarity, price range), fetches the top relevant properties using the user profile, and then generates recommendations with a short rationale, including pros and cons for each option.&lt;/p&gt;
+
+&lt;p&gt;THIS IS TOO MUCH HANDY MANNN&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-markdown&quot;&gt;
+Processing query: I want to know which will be a good option for me if I live in Toronto, most expensive one
+Query classified as: recommendation
+Recommendations for &apos;I want to know which will be a good option for me if I live in Toronto, most expensive one&apos;:
+
+1. Top 3 Recommendations:
+
+   1.1. Property: #LPH19 -2095 LAKE SHORE BLVD W
+   Reasons: This property is the most expensive on the list, priced at $4,336,900. It has 3 bedrooms and 4 bathrooms, which might be suitable if you&apos;re looking for a spacious property. It is also situated in a city with a high median income, which indicates a prosperous neighborhood.
+
+   1.2. Property: 209 BELLWOODS AVE
+   Reasons: This property is priced at $2,500,000. It has 4 bedrooms and 4 bathrooms, providing ample space. It&apos;s the second most expensive property on the list, which might be desirable if you&apos;re looking for a high-end property.
+
+   1.3. Property: 43 WALMSLEY BLVD
+   Reasons: This property is priced at $1,998,000. It has 3 bedrooms and 1 bathroom, which might be a good fit if you have a smaller family or prefer fewer bathrooms to maintain.
+
+2. Pros and Cons:
+
+   2.1. #LPH19 -2095 LAKE SHORE BLVD W
+   Pros: It&apos;s the most expensive property available, indicating luxury and high-standard living. It has 3 bedrooms and 4 bathrooms, offering comfort and convenience.
+   Cons: The high price might be beyond the budget of some people.
+
+   2.2. 209 BELLWOODS AVE
+   Pros: The property has 4 bedrooms and 4 bathrooms, offering ample space for a family. The price is also relatively high, suggesting a quality property.
+   Cons: May be expensive for some buyers.
+
+   2.3. 43 WALMSLEY BLVD
+   Pros: The property is reasonably priced for its offerings. It has 3 bedrooms, which can be suitable for a family.
+   Cons: The property has only 1 bathroom, which might not be enough if you have a larger family or frequently have guests.
+
+3. Additional Considerations:
+
+   3.1. Neighborhood: All properties are situated in Toronto, a vibrant city with a high median income. You might want to consider the specific neighborhood&apos;s safety, amenities, and community when making your decision.
+
+   3.2. Lifestyle fit: Consider your lifestyle needs. If you frequently host guests, a property with more bedrooms and bathrooms might be preferred. Similarly, if you enjoy luxury living, the most expensive property might be more appealing.
+
+   3.3. Future Resale Value: If you&apos;re considering the property as an investment, you might want to consider the potential resale value. Higher-end properties might have a better resale value.
+
+Property Listings (NLQ Ranked):
+   city  id province                        address      price  number_beds  number_baths relevance_score
+Toronto   9  Ontario #LPH19 -2095 LAKE SHORE BLVD W $4,336,900            3             4          -0.624
+Toronto 489  Ontario              209 BELLWOODS AVE $2,500,000            4             4          -0.677
+Toronto 190  Ontario               43 WALMSLEY BLVD $1,998,000            3             1          -0.687
+Toronto 195  Ontario                411 CONCORD AVE $1,859,000            3             3          -0.690
+Toronto 357  Ontario              212 EDENBRIDGE DR $1,800,000            4             3          -0.690
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;example-3-query-refinement&quot;&gt;Example 3: Query Refinement&lt;/h3&gt;
+
+&lt;p&gt;The query “3 bedroom homes in Oshawa under $300,000” is classified as a retrieval request, but the result set is empty due to overly strict constraints. Instead of returning nothing, the system triggers a refinement process.&lt;/p&gt;
+
+&lt;p&gt;It automatically adjusts the query—suggesting a more realistic
+variant like “3 bedroom homes in Oshawa under $400,000”—and displays both the original and refined results. This helps the user quickly iterate without needing to rephrase their search.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-markdown&quot;&gt;Processing query: 3 bedroom homes in Oshawa under $300,000
+Query classified as: retrieval
+
+Original Query: &apos;3 bedroom homes in Oshawa under $300,000&apos; returned 0 results.
+Suggested Query: &apos;&quot;3 bedroom homes in Durham Region under $400,000&quot;&apos;
+Results for &apos;&quot;3 bedroom homes in Durham Region under $400,000&quot;&apos; (NLQ Ranked):
+       city  id                  province                 address    price  number_beds  number_baths relevance_score
+    Calgary 263                   Alberta   84 Whitehaven Road NE $329,000            3             2           0.793
+ St. John&apos;s 544 Newfoundland and Labrador     28 Chapman Crescent $199,900            3             1           0.790
+ St. John&apos;s 148 Newfoundland and Labrador 193 Cumberland Crescent $190,000            3             2           0.789
+ St. John&apos;s  30 Newfoundland and Labrador       162 Bennetts Road $369,900            3             2           0.788
+ St. John&apos;s 658 Newfoundland and Labrador 127 Commonwealth Avenue $295,000            3             2           0.788
+Thunder Bay 723                   Ontario          71 Hull Avenue $329,900            3             1           0.787
+     Regina 315              Saskatchewan    2914 Avonhurst DRIVE $265,000            3             2           0.787
+     Regina 683              Saskatchewan          35 Hind STREET $159,900            3             1           0.786
+     Regina 547              Saskatchewan  4609 Green Rock ROAD E $395,000            3             3           0.784
+ Lethbridge 596                   Alberta          12 Lynx Road N $388,000            3             3           0.783
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;example-4-market-insight-generation&quot;&gt;Example 4: Market Insight Generation&lt;/h3&gt;
+
+&lt;p&gt;When a user asks: “What’s a good investment in Toronto?” the system identifies this as an insight-oriented query. It analyses the dataset to produce a narrative summary, including average prices, market trends, top-performing neighbourhoods, and potential investment signals.&lt;/p&gt;
+
+&lt;p&gt;The output combines raw statistics with interpreted insights to guide decision-making.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-markdown&quot;&gt;Processing query: What&apos;s a good investment in Toronto?
+Query classified as: insight
+Insights for &apos;What&apos;s a good investment in Toronto?&apos;:
+
+Market Overview:
+The Toronto property market is characterized by an average property price of $577,158, with a median price slightly higher at $589,000. The price range for properties in the market spans from $415,000 to $695,000. The average property consists of approximately 1.6 bedrooms and 1.1 bathrooms.
+
+Investment Potential:
+Given the average income in Toronto is $97,000, the property prices indicate a relatively high cost of living. This presents an opportunity for investors as there is a substantial market for both property purchasing and rental if buying to let. The properties in Toronto have been ranked by our NLQ system based on price and other factors, giving a relevance score. This score indicates the property&apos;s potential for return on investment considering these factors.
+
+Key Considerations:
+The top-ranked property by our NLQ system is located at &apos;#1808 -1 KING ST W&apos; with a price of $415,000. This property has 1 bedroom and 1 bathroom and it is the most affordable among the top-ranked properties. Other good investment options include properties located at &apos;#201 -115 RICHMOND ST E&apos;, &apos;#1608 -101 ERSKINE AVE&apos;, &apos;#906 -1190 DUNDAS ST E&apos;, and &apos;#2009 -24 WELLESLEY ST W&apos; with prices ranging from $479,000 to $599,000.
+
+It is important for potential investors to consider the location of the property, as properties in certain neighborhoods may offer higher potential returns due to demand and price trends. It is also crucial to consider the number of bedrooms and bathrooms, as these factors can affect both the rental income potential and the resale value.
+
+Property Listings (NLQ Ranked):
+   city  id province                  address    price  number_beds  number_baths relevance_score
+Toronto  25  Ontario       #1808 -1 KING ST W $415,000            1             1           0.418
+Toronto 914  Ontario  #201 -115 RICHMOND ST E $479,000            1             1           0.418
+Toronto  91  Ontario   #1608 -101 ERSKINE AVE $539,900            1             1           0.418
+Toronto 699  Ontario   #906 -1190 DUNDAS ST E $579,000            1             1           0.418
+Toronto 592  Ontario #2009 -24 WELLESLEY ST W $599,000            2             1           0.418
+Toronto 695  Ontario       #1606 -36 ZORRA ST $519,888            2             1           0.418
+Toronto 492  Ontario #907 -185 ROEHAMPTON AVE $609,900            2             1           0.418
+Toronto 164  Ontario     #325 -361 FRONT ST W $659,900            2             1           0.417
+Toronto 649  Ontario     #213 -525 WILSON AVE $675,000            2             2           0.417
+Toronto 706  Ontario      #2112 -101 PETER ST $695,000            2             1           0.417
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;example-5-comparative-search&quot;&gt;Example 5: Comparative Search&lt;/h3&gt;
+
+&lt;p&gt;In the query: “Compare 3 bedroom homes in Toronto and Kitchener,” the system recognizes the need for multi-step reasoning. It decomposes the query into two independent sub-queries—one for Toronto, one for Kitchener—runs each using the retrieval tool, and then formats the results into a side-by-side comparison.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-markdown&quot;&gt;Processing query: Compare 3 bedroom homes in Toronto and Kitchener
+Query classified as: multistep
+Comparison for &apos;Compare 3 bedroom homes in Toronto and Kitchener&apos;:
+
+1. Side-by-side comparison:
+
+   - 3 bedroom homes in Toronto:
+     - Prices: $929,000, $848,000, $1,149,999
+     - Beds: 3 for all
+     - Baths: 2 for all
+     - NLQ Relevance: 0.417, 0.417, 0.415
+
+   - 3 bedroom homes in Kitchener:
+     - Prices: $589,000, $649,900, $624,900
+     - Beds: 3 for all
+     - Baths: 1, 2, 2
+     - NLQ Relevance: 0.419 for all
+
+2. Key Differences:
+   - Location: The key difference between these two sets of properties is their location, with one set located in Toronto and the other in Kitchener.
+   - Value: The properties in Toronto are significantly more expensive than those in Kitchener, reflecting the higher real estate prices in Toronto.
+   - Market Positioning: The properties in Toronto might be positioned towards buyers looking for homes in a bustling, cosmopolitan city, while the homes in Kitchener might attract those looking for a more relaxed, suburban lifestyle.
+
+3. Recommendations for Different Buyer Types:
+   - Buyers with a higher budget and a preference for city living might find the properties in Toronto more attractive. These properties offer the convenience of city living, with easy access to amenities and are ideal for those who work in the city.
+   - On the other hand, buyers looking for more affordable options, or those who prefer a quieter, suburban lifestyle might prefer the properties in Kitchener. These homes offer great value for money and could also be ideal for families with children, given the lower cost of living.
+   - For investors, both cities could offer good opportunities depending on their strategy. Toronto&apos;s high property prices could lead to high rental income, while Kitchener&apos;s lower prices could result in higher yield.
+
+Results for &apos;3 bedroom homes in Toronto&apos; (NLQ Ranked):
+   city  id province              address      price  number_beds  number_baths relevance_score
+Toronto 508  Ontario    166 HIAWATHA RD W   $929,000            3             2           0.417
+Toronto 869  Ontario         299 OSLER ST   $848,000            3             2           0.417
+Toronto  54  Ontario         35 FOURTH ST $1,149,999            3             2           0.415
+Toronto 813  Ontario 1042* ST CLARENS AVE $1,139,000            3             2           0.415
+Toronto 659  Ontario    108 ARMSTRONG AVE $1,189,000            3             2           0.415
+
+Results for &apos;3 bedroom homes in Kitchener&apos; (NLQ Ranked):
+     city  id province                        address    price  number_beds  number_baths relevance_score
+Kitchener 471  Ontario           204 SCHLUETER Street $589,000            3             1           0.419
+Kitchener 918  Ontario 355 FISHER MILLS Road Unit# 75 $649,900            3             2           0.419
+Kitchener 156  Ontario         24 TIMBERLANE Crescent $624,900            3             2           0.419
+Kitchener 906  Ontario     400 WILSON Avenue Unit# 49 $599,000            3             3           0.419
+Kitchener 371  Ontario      110 FERGUS Avenue Unit# 1 $790,000            3             2           0.418
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here is the concluded look of how the whole system looks under the hood..&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/real-estate-nlq-agent/combined_nlq_agentic.png?raw=true&quot; alt=&quot;combined_nlq_agentic&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Well before ending this one, there are couple of points I want your attention. So doing this end to end , we took care of a few core architectural choices that shaped how this system really works.&lt;/p&gt;
+
+&lt;p&gt;The most important one here is that I intentionally gave more weight to the Price rather than other filters when we were creating the query, as It acts as a hard constraint, while other attributes like location or amenities adjust the relevance within that boundary. I mean the Price is the most important factor I guess when we are looking out for the real estate.&lt;/p&gt;
+
+&lt;p&gt;And as I said earlier, our NLQ engine doesn’t depends on the structured filters, instead it understand the natural language directly.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>An agent to read research papers better</title>
+   <link href="http://localhost:4000/2025/03/10/creating-a-superlinked-research-agent"/>
+   <updated>2025-03-10T00:00:00+05:30</updated>
+   <id>http://localhost:4000/2025/03/10/creating-a-superlinked-research-agent</id>
+   <content type="html">&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/superlinked-research-agent/agent-meme.png?raw=true&quot; alt=&quot;agent-meme&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I’ve always wanted an AI assistant that could make it easier to go through a collection of research papers, answer my questions, summarize the content, and give me the important points. In short, I wanted a research helper that would make the whole process simpler. That’s when I decided to create it.&lt;/p&gt;
+
+&lt;h3 id=&quot;whats-the-plan&quot;&gt;What’s the Plan?&lt;/h3&gt;
+
+&lt;p&gt;I wanted to build an agentic system that could do three main things:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Find Papers: Search for research papers by topic (e.g., “quantum computing”) and rank them by relevance and recency.&lt;/li&gt;
+  &lt;li&gt;Summarize: Crunch those papers into bite-sized insights fast when I asked it to do so.&lt;/li&gt;
+  &lt;li&gt;Answer Questions: Pull answers from the specific papers which I tell it to do and based on that it answer those questions&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;In all of it, Superlinked is the backbone here, As it improves the vector search relevance by encoding metadata together with your unstructured data into vectors. This powers a vector database that understands both the text’s meaning and the time factor. I mean when we will stitch the schema design later on, we will be using &lt;code&gt;RecencySpace&lt;/code&gt; which will literally help us to add the relevancy of the papers during the retrieval (ps: without using any rerankers) that means during the retrieval, if the two papers have the same kind of relevancy, it will prioritize paper which is more recent. More on this later.&lt;/p&gt;
+
+&lt;p&gt;For the LLM reasoning, I plan to use OpenAI’s models. However, you can easily replace it with any LLM of your choice. And last but not least,  I made a Kernel Agent to handle the queries. Too much talking, let’s go now.. If you want to follow along with me, use this &lt;a href=&quot;https://colab.research.google.com/drive/1381qGPsTdMr6Wvod0ZfDwyQmE-O8DxAm?usp=sharing&quot;&gt;colab&lt;/a&gt; for the reference.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-1--setting-up-the-toolbox&quot;&gt;Step 1 : Setting up the toolbox&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;pip3 install openai pandas superlinked==19.21.1 sentence-transformers transformers 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To make things easier and more modular, I created an Abstract Tool class. This will simplify the process of building and adding tools&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import pandas as pd
+import superlinked.framework as sl
+from datetime import timedelta
+from openai import OpenAI
+import os
+from abc import ABC, abstractmethod
+from tqdm import tqdm
+
+# Abstract Tool Class for clean modularity
+class Tool(ABC):
+    @abstractmethod
+    def name(self) -&amp;gt; str:
+        pass
+
+    @abstractmethod
+    def description(self) -&amp;gt; str:
+        pass
+
+    @abstractmethod
+    def use(self, *args, **kwargs):
+        pass
+
+# OpenAI setup
+api_key = os.environ.get(&quot;OPENAI_API_KEY&quot;, &quot;your-key-here&quot;)
+if not api_key:
+    raise ValueError(&quot;Set your OPENAI_API_KEY!&quot;)
+client = OpenAI(api_key=api_key)
+model = &quot;gpt-3.5-turbo&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;step-2--data-needs&quot;&gt;Step 2 : Data needs&lt;/h3&gt;
+
+&lt;p&gt;What does the data look like? For this experiment, I used a dataset consisting of 10,000 AI research papers from &lt;a href=&quot;https://www.kaggle.com/datasets/yasirabdaali/arxivorg-ai-research-papers-dataset&quot;&gt;Kaggle&lt;/a&gt;. To make it easy, simply run the cell below, and it will automatically download the dataset to your working directory. You can also replace this with your own data sources, whether they are research papers or other academic content. If you decide to do so, all you need to do is adjust the schema design slightly and update the column names.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import pandas as pd
+
+!wget --no-check-certificate &apos;https://drive.google.com/uc?export=download&amp;amp;id=1FCR3TW5yLjGhEmm-Uclw0_5PWVEaLk1j&apos; -O arxiv_ai_data.csv
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For now, I’m going to work with just 1,000 papers—mainly to speed things up for the demo. SHHHHHH :)&lt;/p&gt;
+
+&lt;p&gt;There’s one more thing: I’ll convert the published data from string timestamps (like ‘1993-08-01 00:00:00+00:00’) into pandas datetime objects. This conversion is necessary because it allows us to perform date/time operations.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;df = pd.read_csv(&apos;arxiv_ai.csv&apos;).head(1000)
+
+# Convert to datetime but keep it as datetime (more readable and usable)
+df[&apos;published&apos;] = pd.to_datetime(df[&apos;published&apos;])
+
+# Ensure summary is a string
+df[&apos;summary&apos;] = df[&apos;summary&apos;].astype(str)
+
+# Add &apos;text&apos; column for similarity search
+df[&apos;text&apos;] = df[&apos;title&apos;] + &quot; &quot; + df[&apos;summary&apos;]
+
+# Debug: Confirm columns in original DataFrame
+print(&quot;Debug: Columns in original DataFrame:&quot;, df.columns.tolist())
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;Debug: Columns in original DataFrame: [&apos;authors&apos;, &apos;categories&apos;, &apos;comment&apos;, &apos;doi&apos;, &apos;entry_id&apos;, &apos;journal_ref&apos; &apos;pdf_url&apos;, &apos;primary_category&apos;, &apos;published&apos;, &apos;summary&apos;, &apos;title&apos;, &apos;updated&apos;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let me briefly explain the columns and what they contain, as this will be helpful later on:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;code&gt;published&lt;/code&gt;: The date the paper was published.&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;summary&lt;/code&gt;: The abstract of the paper.&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;entry_id&lt;/code&gt;: The arXiv entry ID for the paper.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;For our experiment, the only columns we need are &lt;code&gt;entry_id&lt;/code&gt;, &lt;code&gt;published&lt;/code&gt;, &lt;code&gt;title&lt;/code&gt;, and &lt;code&gt;summary&lt;/code&gt;. To make things more effective, we can combine the title and the summary of each paper to create a comprehensive text, which will be the core of our work. So &lt;code&gt;text&lt;/code&gt; column will contains the &lt;code&gt;title&lt;/code&gt; and the &lt;code&gt;summary&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Just a bit on the Superlinked’s in-memory indexer. So basically I think it’s a game-changer for our small dataset of 1,000 papers. I mean it stores data in the computer’s memory, which means queries are lightning-fast—no waiting for disk access. This is perfect for real-time applications and prototyping, like our proof-of-concept.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-3--defining-the-superlinked-schema&quot;&gt;Step 3 : Defining the Superlinked Schema&lt;/h3&gt;
+
+&lt;p&gt;To move ahead, we will need a schema to map our data. I set up &lt;code&gt;PaperSchema&lt;/code&gt; with key fields:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class PaperSchema(sl.Schema):
+    text: sl.String
+    published: sl.Timestamp
+    entry_id: sl.IdField
+    title: sl.String
+    summary: sl.String
+
+paper = PaperSchema()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now, the most important part of the process is creating the spaces. There are two spaces we need to create for our schema. The first one is &lt;code&gt;TextSimilaritySpace&lt;/code&gt;. This space plays a crucial role in organizing and searching through the research papers. Essentially, it converts the text data we provide into vectors, making it much easier to search through them. The TextSimilaritySpace is specifically designed to efficiently encode longer text sequences using specialized models, enabling effective similarity comparisons between different pieces of text&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;text_space = sl.TextSimilaritySpace(
+    text=sl.chunk(paper.text, chunk_size=200, chunk_overlap=50),
+    model=&quot;sentence-transformers/all-mpnet-base-v2&quot;
+)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;On the other hand, &lt;code&gt;RecencySpace&lt;/code&gt; focuses on the importance of time in the context of research papers. It encodes timestamps, prioritizing the recency of the papers. This ensures that more recent papers are given greater weight in the similarity calculations, allowing for a balance between the relevance of the content and the publication time of the papers.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;recency_space = sl.RecencySpace(
+    timestamp=paper.published,
+    period_time_list=[
+        sl.PeriodTime(timedelta(days=365)),  # 1 year
+        sl.PeriodTime(timedelta(days=2*365)),  # 2 years
+        sl.PeriodTime(timedelta(days=3*365)),  # 3 years
+    ],
+    negative_filter=-0.25  # Penalize ancient papers
+)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Think of RecencySpace as a time-based filter, similar to sorting your emails by date or viewing Instagram posts with the newest ones first. It helps answer the question, ‘How fresh is this paper?’&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Smaller timedeltas (like 365 days) allow for more granular, yearly time-based rankings.&lt;/li&gt;
+  &lt;li&gt;Larger timedeltas (like 1095 days) create broader time periods.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The &lt;code&gt;negative_filter&lt;/code&gt; penalizes very old papers. To explain it more clearly, consider the following example where two papers have identical content relevance, but their rankings will depend on their publication dates.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-markdown&quot;&gt;Paper A: Published in 1996 
+Paper B: Published in 1993
+
+Scoring example:
+- Text similarity score: Both papers get 0.8
+- Recency score:
+  - Paper A: Receives the full recency boost (1.0)
+  - Paper B: Gets penalized (-0.25 due to negative_filter)
+
+Final combined scores:
+- Paper A: Higher final rank
+- Paper B: Lower final rank
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;These spaces are key to making the dataset more accessible and effective. They allow for both content-based and time-based searches, and really helpful in understanding the relevance and recency of research papers. This provides a powerful way to organize and search through the dataset based on both the content and the publication time.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-4--building-the-index&quot;&gt;Step 4 : Building the index&lt;/h3&gt;
+
+&lt;p&gt;Next, I fused the spaces into an index, A.K.A the search engine’s core:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;paper_index = sl.Index([text_space, recency_space])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then, I mapped the DataFrame to the schema and loaded it in batches (10 papers at a time) into in-memory store:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;parser = sl.DataFrameParser(
+    paper,
+    mapping={
+        paper.entry_id: &quot;entry_id&quot;,
+        paper.published: &quot;published&quot;,
+        paper.text: &quot;text&quot;,
+        paper.title: &quot;title&quot;,
+        paper.summary: &quot;summary&quot;,
+    }
+)
+
+source = sl.InMemorySource(paper, parser=parser)
+executor = sl.InMemoryExecutor(sources=[source], indices=[paper_index])
+app = executor.run()
+
+batch_size = 10
+data_batches = [df[i:i + batch_size] for i in range(0, len(df), batch_size)]
+for batch in tqdm(data_batches, desc=&quot;Loading Data&quot;):
+    source.put([batch])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The in-memory executor is why Superlinked shines here—1,000 papers fit snugly in RAM, and queries fly without disk I/O bottlenecks.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-5--crafting-the-query&quot;&gt;Step 5 : Crafting the query&lt;/h3&gt;
+
+&lt;p&gt;Next, we move on to query creation. This is where we set up a template for crafting queries. To manage this, we need a query template that can balance both relevance and recency. Here’s what it looks like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;knowledgebase_query = (
+    sl.Query(
+        paper_index,
+        weights={
+            text_space: sl.Param(&quot;relevance_weight&quot;),
+            recency_space: sl.Param(&quot;recency_weight&quot;),
+        }
+    )
+    .find(paper)
+    .similar(text_space, sl.Param(&quot;search_query&quot;))
+    .select(paper.entry_id, paper.published, paper.text, paper.title, paper.summary)
+    .limit(sl.Param(&quot;limit&quot;))
+)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This lets me puts on how much I care about content (relevance_weight) versus freshness (recency_weight) — a killer combo for our agentic needs.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-6--building-tools&quot;&gt;Step 6 : Building tools&lt;/h3&gt;
+
+&lt;p&gt;Now comes the tooling part, here we go lads.&lt;/p&gt;
+
+&lt;p&gt;Ok , So We’ll be creating three tools for our agent to choose from. These tools will help find papers, summarize them if needed, and answer relevant questions.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;code&gt;Retrieval Tool&lt;/code&gt; : This tool is crafted by hooking into Superlinked’s index, letting it pull the top 5 papers based on a query. It balances relevance (1.0 weight) and recency (0.5 weight) to nail the “find papers” goal.  I mean what we wanted is to find the papers which are relevant to the query. So if the query is something like, “What are the Quantum computers papers are published in b/w 1993 and 1994” , then the retrieval tool will retrieve those papers, will bring out the summary of those papers one by one, and will return the result.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class RetrievalTool(Tool):
+    def __init__(self, df, app, knowledgebase_query, client, model):
+        self.df = df
+        self.app = app
+        self.knowledgebase_query = knowledgebase_query
+        self.client = client
+        self.model = model
+
+    def name(self) -&amp;gt; str:
+        return &quot;RetrievalTool&quot;
+
+    def description(self) -&amp;gt; str:
+        return &quot;Fetches papers with Superlinked’s vector search—built by wiring up the Superlinked index to query for topic matches and recent papers.&quot;
+
+    def use(self, query: str) -&amp;gt; pd.DataFrame:
+        result = self.app.query(
+            self.knowledgebase_query,
+            relevance_weight=1.0,
+            recency_weight=0.5,
+            search_query=query,
+            limit=5
+        )
+        df_result = sl.PandasConverter.to_pandas(result)
+        df_result[&apos;summary&apos;] = df_result[&apos;summary&apos;].astype(str)
+        return df_result
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Next up is the &lt;code&gt;Summarization Tool&lt;/code&gt;. This tool is designed for cases where we need a concise summary of a paper. To use it, we’ll provide the &lt;code&gt;paper_id&lt;/code&gt;, which is the ID of the paper we want summarized. Keep in mind that if you don’t provide the &lt;code&gt;paper_id&lt;/code&gt;, the tool won’t work, as it requires these IDs to look up the corresponding papers in the dataset.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class SummarizationTool(Tool):
+    def __init__(self, df, client, model):
+        self.df = df
+        self.client = client
+        self.model = model
+
+    def name(self) -&amp;gt; str:
+        return &quot;SummarizationTool&quot;
+
+    def description(self) -&amp;gt; str:
+        return &quot;Summarizes papers using GPT-3.5-turbo—put together with OpenAI’s API to crunch paper summaries by ID into quick insights.&quot;
+
+    def use(self, query: str, paper_ids: list) -&amp;gt; str:
+        papers = self.df[self.df[&apos;entry_id&apos;].isin(paper_ids)]
+        if papers.empty:
+            return &quot;No papers found.&quot;
+        summaries = &quot;\n\n&quot;.join(papers[&apos;summary&apos;].tolist())
+        prompt = f&quot;Summarize these:\n\n{summaries}\n\nKeep it tight.&quot;
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+            temperature=0.7,
+            max_tokens=500
+        )
+        return response.choices[0].message.content.strip()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Finally, we have the &lt;code&gt;QuestionAnsweringTool&lt;/code&gt;. This tool chains the &lt;code&gt;RetrievalTool&lt;/code&gt; to fetch the relevant papers and then uses them to answer the questions. If no relevant papers are found to answer the questions, it will provide an answer based on general knowledge&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class QuestionAnsweringTool(Tool):
+    def __init__(self, retrieval_tool, client, model):
+        self.retrieval_tool = retrieval_tool
+        self.client = client
+        self.model = model
+
+    def name(self) -&amp;gt; str:
+        return &quot;QuestionAnsweringTool&quot;
+
+    def description(self) -&amp;gt; str:
+        return &quot;Answers questions about research topics using retrieved paper summaries or general knowledge if no specific context is available.&quot;
+
+    def use(self, query: str) -&amp;gt; str:
+        df_result = self.retrieval_tool.use(query)
+        if &apos;summary&apos; not in df_result.columns:
+            # Tag as a general question if summary is missing
+            prompt = f&quot;&quot;&quot;
+            You are a knowledgeable research assistant. This is a general question tagged as [GENERAL]. Answer based on your broad knowledge, not limited to specific paper summaries. If you don&apos;t know the answer, provide a brief explanation of why.
+
+            User&apos;s question: {query}
+            &quot;&quot;&quot;
+        else:
+            # Use paper summaries for specific context
+            contexts = df_result[&apos;summary&apos;].tolist()
+            context_str = &quot;\n\n&quot;.join(contexts)
+            prompt = f&quot;&quot;&quot;
+            You are a research assistant. Use the following paper summaries to answer the user&apos;s question. If you don&apos;t know the answer based on the summaries, say &apos;I don&apos;t know.&apos;
+
+            Paper summaries:
+            {context_str}
+
+            User&apos;s question: {query}
+            &quot;&quot;&quot;
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+            temperature=0.7,
+            max_tokens=500
+        )
+        return response.choices[0].message.content.strip()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;step-7---building-the-kernel-agent&quot;&gt;Step 7 :  Building the Kernel Agent&lt;/h3&gt;
+
+&lt;p&gt;Next, we have the Kernel Agent. Whenever I build an agent-based system, I always include the Kernel Agent—it acts like the ‘boss.’ It really makes everything run smoothly. The Kernel Agent is the centerpiece of the system. If you have multiple agents working in parallel, it acts as a router, directing queries based on the intent. In a single-agent system like this one, you simply use the Kernel Agent with the relevant tools.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class KernelAgent:
+    def __init__(self, retrieval_tool: RetrievalTool, summarization_tool: SummarizationTool, question_answering_tool: QuestionAnsweringTool, client, model):
+        self.retrieval_tool = retrieval_tool
+        self.summarization_tool = summarization_tool
+        self.question_answering_tool = question_answering_tool
+        self.client = client
+        self.model = model
+
+    def classify_query(self, query: str) -&amp;gt; str:
+        prompt = f&quot;&quot;&quot;
+        Classify the following user prompt into one of the three categories:
+        - retrieval: The user wants to find a list of papers based on some criteria (e.g., &apos;Find papers on AI ethics from 2020&apos;).
+        - summarization: The user wants to summarize a list of papers (e.g., &apos;Summarize papers with entry_id 123, 456, 789&apos;).
+        - question_answering: The user wants to ask a question about research topics and get an answer (e.g., &apos;What is the latest development in AI ethics?&apos;).
+
+        User prompt: {query}
+
+        Respond with only the category name (retrieval, summarization, question_answering).
+        If unsure, respond with &apos;unknown&apos;.
+        &quot;&quot;&quot;
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+            temperature=0.7,
+            max_tokens=10
+        )
+        classification = response.choices[0].message.content.strip().lower()
+        print(f&quot;Query type: {classification}&quot;)
+        return classification
+
+    def process_query(self, query: str, params: Optional[Dict] = None) -&amp;gt; str:
+        query_type = self.classify_query(query)
+        if query_type == &apos;retrieval&apos;:
+            df_result = self.retrieval_tool.use(query)
+            response = &quot;Here are the top papers:\n&quot;
+            for i, row in df_result.iterrows():
+                # Ensure summary is a string and handle empty cases
+                summary = str(row[&apos;summary&apos;]) if pd.notna(row[&apos;summary&apos;]) else &quot;&quot;
+                response += f&quot;{i+1}. {row[&apos;title&apos;]} \nSummary: {summary[:200]}...\n\n&quot;
+            return response
+        elif query_type == &apos;summarization&apos;:
+            if not params or &apos;paper_ids&apos; not in params:
+                return &quot;Error: Summarization query requires a &apos;paper_ids&apos; parameter with a list of entry_ids.&quot;
+            return self.summarization_tool.use(query, params[&apos;paper_ids&apos;])
+        elif query_type == &apos;question_answering&apos;:
+            return self.question_answering_tool.use(query)
+        else:
+            return &quot;Error: Unable to classify query as &apos;retrieval&apos;, &apos;summarization&apos;, or &apos;question_answering&apos;.&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;By this point, everything is set up for our Research Agent System. All you need to do is initialize the Kernel Agent with the tools, and voilà—our Research Agent system is ready to roll.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;retrieval_tool = RetrievalTool(df, app, knowledgebase_query, client, model)
+summarization_tool = SummarizationTool(df, client, model)
+question_answering_tool = QuestionAnsweringTool(retrieval_tool, client, model)
+
+# Initialize KernelAgent
+kernel_agent = KernelAgent(retrieval_tool, summarization_tool, question_answering_tool, client, model)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now let’s test the system..&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;# Test query
+print(kernel_agent.process_query(&quot;Find papers on quantum computing in last 10 years&quot;))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When you run this, the &lt;code&gt;RetrievalTool&lt;/code&gt; will be activated. It will fetch the relevant papers based on both relevance and recency, and return the relevant columns. If the returned result includes the summary column (indicating the papers were retrieved from the dataset), it will use those summaries and return them to us.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;Query type: retrieval
+Here are the top papers:
+1. Quantum Computing and Phase Transitions in Combinatorial Search 
+Summary: We introduce an algorithm for combinatorial search on quantum computers that
+is capable of significantly concentrating amplitude into solutions for some NP
+search problems, on average. This is done by...
+
+2. The Road to Quantum Artificial Intelligence 
+Summary: This paper overviews the basic principles and recent advances in the emerging
+field of Quantum Computation (QC), highlighting its potential application to
+Artificial Intelligence (AI). The paper provi...
+
+3. Solving Highly Constrained Search Problems with Quantum Computers 
+Summary: A previously developed quantum search algorithm for solving 1-SAT problems in
+a single step is generalized to apply to a range of highly constrained k-SAT
+problems. We identify a bound on the number o...
+
+4. The model of quantum evolution 
+Summary: This paper has been withdrawn by the author due to extremely unscientific
+errors....
+
+5. Artificial and Biological Intelligence 
+Summary: This article considers evidence from physical and biological sciences to show
+machines are deficient compared to biological systems at incorporating
+intelligence. Machines fall short on two counts: fi...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let’s try one more query, this time, let’s do a summarization one..&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;print(kernel_agent.process_query(&quot;Summarize this paper&quot;, params={&quot;paper_ids&quot;: [&quot;http://arxiv.org/abs/cs/9311101v1&quot;]}))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;Query type: summarization
+This paper discusses the challenges of learning logic programs that contain the cut predicate (!). Traditional learning methods cannot handle clauses with cut because it has a procedural meaning. The proposed approach is to first generate a candidate base program that covers positive examples, and then make it consistent by inserting cut where needed. Learning programs with cut is difficult due to the need for intensional evaluation, and current induction techniques may need to be limited to purely declarative logic languages.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I mean it’s so cool.&lt;/p&gt;
+
+&lt;p&gt;Adios Amigos, until next time.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
    <title>Creating a Fintech AI agent without any framework</title>
    <link href="http://localhost:4000/2025/02/23/create-a-fintech-agent"/>
    <updated>2025-02-23T00:00:00+05:30</updated>
    <id>http://localhost:4000/2025/02/23/create-a-fintech-agent</id>
-   <content type="html">&lt;p&gt;AI agents are everywhere, and they’re only going to get more common in the next few years. To put it simply, imagine a bunch of small digital assistants—agents—that analyze what’s going on, make decisions, and get things done. This makes me wonder: how are we going to handle all these agents in the future? How do we trust them to make decisions for us and let them operate on their own?&lt;/p&gt;
+   <content type="html">&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/fintech-ai-agent/agent-meme.png?raw=true&quot; alt=&quot;agent-meme&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Right now, there are tons of frameworks that let you quickly build AI agents. Honestly, it feels like every other day a new “low-code” tool pops up, claiming to make building agents super easy. These tools are everywhere—simple drag-and-drop boards or text boxes where you just connect a few prompts and data, and boom, you have your agent.&lt;/p&gt;
+&lt;p&gt;AI agents are popping up everywhere, and they’re only going to become more common in the next few years. Think of them as a bunch of little digital assistants—agents—that keep an eye on things, make decisions, and get stuff done. It makes me wonder: how are we going to manage all these agents down the road? How do we trust them to handle decisions for us and let them run on their own?&lt;/p&gt;
 
-&lt;p&gt;At the heart of every AI agent, there are three key parts: the Model, the Tools, and the Reasoning Loop.&lt;/p&gt;
+&lt;p&gt;These days, many frameworks are out there to help you with AI agents quickly. Honestly, it feels like a new “low-code” tool shows up every other day, promising to make building agents a breeze. They’re all over the place—simple drag-and-drop setups or text boxes where you plug in a few prompts and some data, and just like that, your agent’s ready to go.&lt;/p&gt;
+
+&lt;p&gt;Every AI agent has three main pieces at its core: the Model, the Tools, and the Reasoning Loop.&lt;/p&gt;
 
 &lt;ol&gt;
   &lt;li&gt;
-    &lt;p&gt;The Model: This is the Large Language Model (LLM) that powers the agent. It’s the core of the agent’s intelligence, trained on tons of text data to understand language and follow complex instructions. This model gives the agent its ability to think and respond like a human.&lt;/p&gt;
+    &lt;p&gt;The Model: This is the Large Language Model (LLM) that drives the agent. It’s the brain behind it all, trained on piles of text to understand language and tackle tricky instructions. This is what lets the agent think and talk almost like a person.&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;The Tools: These are the specific functions that the AI agent uses to interact with its environment and carry out tasks. Whether it’s fetching data, calling APIs, or interacting with other software, tools are what make the agent capable of performing its job.&lt;/p&gt;
+    &lt;p&gt;The Tools: The agent uses specific skills to interact with the world and get things done. Whether it’s grabbing data, hitting up APIs, or working with other programs, the tools are what make the agent useful.&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;The Reasoning Loop: This is how the agent makes decisions. It’s a process that allows the agent to solve problems, figure out the best course of action, and get things done.&lt;/p&gt;
+    &lt;p&gt;The Reasoning Loop: This is how the agent figures things out. It’s the process it uses to solve problems, pick the best path forward, and wrap up tasks.&lt;/p&gt;
   &lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;In this post, I’m going to show you something a bit different. Instead of using a framework, I’ll walk you through building a fintech agent with Python. This agent will help with decision-making when it comes to loans and insurance.&lt;/p&gt;
+&lt;p&gt;In this post, I’m going to mix things up a little. Instead of leaning on a framework, I’ll walk you through building a fintech agent from scratch using Python. This one’s going to help with decisions about loans and insurance.&lt;/p&gt;
 
-&lt;h3 id=&quot;whats-the-deal&quot;&gt;What’s the deal?&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/fintech-ai-agent/fintech-ai-agent.excalidraw.png?raw=true&quot; alt=&quot;architecture-overview&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;So how this fintech agent works, Well, imagine you’re a FinTech company, now customers hit you up with questions like, “Can I borrow $10K for a new kitchen? I am 26 years old” or “I crashed my car—will you cover it?” Lol, I would literally close that insurance claim for sure.&lt;/p&gt;
+&lt;h2 id=&quot;whats-the-deal-here&quot;&gt;What’s the deal here?&lt;/h2&gt;
 
-&lt;p&gt;Ok the point is What we need is a system that’s fast, smart, and trustworthy in making the decisions on the loan queries as well the insurance claims. Now what I did is, instead of a single alone Agent with all the tools, we will have three agents, loan, insurance and the kernel ones.&lt;/p&gt;
+&lt;p&gt;So how does this fintech agent work? Well, picture yourself running a FinTech company. Customers come at you with stuff like, “Can I borrow $10K for a new kitchen? I’m 26 years old,” or “I crashed my car—will you cover it?” Haha, I’d probably shut that insurance claim down real quick.&lt;/p&gt;
+
+&lt;p&gt;The point is, that we need a system that’s fast, sharp, and reliable when it comes to deciding on loan requests and insurance claims. So, what I did is this: instead of one lone agent handling everything, I split it into three—Loan, Insurance, and a Kernel agent.&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;Loan Agent: Takes a query, figures out intent (e.g., “home improvement”), and predicts if they’re loan-worthy based on age, income, and amount with the help of a ML model.&lt;/li&gt;
-  &lt;li&gt;Insurance Side: Reads a claim, compares it to past ones, and decides if it’s payable—think semantic search over a claims database.&lt;/li&gt;
-  &lt;li&gt;Kernel: The brains tying it together, routing queries to the right agent.&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Loan Agent: Takes a query, figures out what they want (like “home improvement”), and uses an ML model to predict if they’re good for the loan based on age, income, and the amount.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Insurance Agent: Reads a claim, checks it against past cases, and decides if it’s worth paying out—kind of like a semantic search over a claims database.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Kernel Agent: The brains that tie it all together, sending queries to the right place.&lt;/p&gt;
+  &lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;Why raw Python? It’s flexible; I mean I am just presenting a POC and the companies can literally customize it to their data and needs, no black-box framework nonsense. The &lt;a href=&quot;https://www.kaggle.com/datasets/laotse/credit-risk-dataset&quot;&gt;Credit Risk Dataset&lt;/a&gt; and synthetic claims are just stand-ins; real firms would use their own loan histories and claim records.&lt;/p&gt;
+&lt;p&gt;Now the question always comes of why raw Python? Well, the most viable reason is flexibility. I’m just putting together a proof of concept here, and companies can easily tweak it to fit their own data and needs—no black-box framework nonsense. The Credit Risk Dataset and synthetic claims are just placeholders; real firms would swap in their own loan histories and claim records.&lt;/p&gt;
 
-&lt;p&gt;Here’s the big picture: we’ve got a Kernel Agent directing traffic, a Loan Agent predicting eligibility with ML, and an Insurance Agent checking claims against a vector database.&lt;/p&gt;
+&lt;h2 id=&quot;big-picture&quot;&gt;Big Picture&lt;/h2&gt;
 
-&lt;p&gt;I am using the Credit Risk Dataset as a demo for loans, in real;companies can use the CIBIL score like metric to check if the given person is eligible for the loans or not. But for the sake of this POC, I have utilized the dataset, trained a random forest and use it for the predictive analysis.&lt;/p&gt;
+&lt;p&gt;Ok so what we’ve got is a Kernel Agent directing traffic, a Loan Agent predicting eligibility with machine learning, and an Insurance Agent checking claims against a vector database.&lt;/p&gt;
 
-&lt;p&gt;For the insurance-agent, I have used a synthetic pipeline to generate a dataset which consists of the fake insurance queries, and the target is based on that conversation, if the insurance claim is done, the target is one, insurance—placeholders to show the ropes. Companies can plug in their own data instead.&lt;/p&gt;
+&lt;p&gt;I’m using the &lt;a href=&quot;https://www.kaggle.com/datasets/laotse/credit-risk-dataset?ref=blog.lancedb.com&quot;&gt;Credit Risk Dataset&lt;/a&gt; as a demo for loans. In reality, companies could use something like a CIBIL score to see if someone’s eligible. But for this POC, I grabbed that dataset, trained a random forest model, and used it for predictive analysis. For the insurance agent, I built a synthetic pipeline to whip up a dataset of fake insurance queries. The target’s simple: if the claim gets approved based on the conversation, it’s a one. These are just placeholders to show how it works; companies can plug in their own data instead. Saying that, let’s get started.&lt;/p&gt;
 
-&lt;p&gt;Well I would say you can tune the dataset you want as you require the data. Let’s break it down step by step, with code and the why behind it all.&lt;/p&gt;
+&lt;h2 id=&quot;step-1---setting-up-the-stage---libraries-and-setup&quot;&gt;Step 1 :  Setting up the stage - Libraries and Setup&lt;/h2&gt;
 
-&lt;h3 id=&quot;setting-the-stage-libraries-and-setup&quot;&gt;Setting the Stage: Libraries and Setup&lt;/h3&gt;
+&lt;p&gt;We start by grabbing our tools—libraries that handle data, models, and vectors.&lt;/p&gt;
 
-&lt;p&gt;We start by grabbing our tools—libraries that handle data, models, and vectors:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;pip install pandas joblib pyarrow sentence-transformers lancedb mistralai
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import pandas as pd
 import joblib
@@ -94,355 +1629,296 @@ if not api_key:
 
 model = &quot;mistral-large-latest&quot;
 client = Mistral(api_key=api_key)
-embedder = SentenceTransformer(&apos;all-MiniLM-L6-v2&apos;)
+hf_token = &quot;hf_xxxxxxx&quot;
+embedder = SentenceTransformer(&apos;all-MiniLM-L6-v2&apos;, token=hf_token)
 
 # Connect to LanceDB
 db = lancedb.connect(&apos;./lancedb_data&apos;)
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;For the quick demonstration, I am going to use &lt;code&gt;mistral-large-latest&lt;/code&gt; model from the Mistral for LLM tasks and the intent classification in the Loan queries. The &lt;code&gt;Tool&lt;/code&gt; class is our way to keep the agents modular - every tool gets a clear job.&lt;/p&gt;
+&lt;p&gt;For the quick demonstration, I am going to use &lt;code&gt;mistral-large-latest&lt;/code&gt; a model from the Mistral for LLM tasks and the intent classification in the Loan queries. The &lt;code&gt;Tool&lt;/code&gt; class is our way to keep the agents modular - every tool gets a clear job.&lt;/p&gt;
 
-&lt;h2 id=&quot;loan-agent-predicting-with-ml&quot;&gt;Loan Agent: Predicting with ML&lt;/h2&gt;
+&lt;h2 id=&quot;step-2--loan-agent---predictive-analysis-with-ml&quot;&gt;Step 2 : Loan Agent - Predictive analysis with ML&lt;/h2&gt;
 
-&lt;p&gt;The Loan Agent decides who gets a loan. We’re using the Credit Risk Dataset as a demo—it’s got age, income, loan amounts, and intents, perfect for a proof-of-concept.&lt;/p&gt;
+&lt;p&gt;As soon as a query comes in, the Loan Agent uses its ML tool to spin up the predictions. I am using the &lt;a href=&quot;https://www.kaggle.com/datasets/laotse/credit-risk-dataset?ref=blog.lancedb.com&quot;&gt;Credit Risk Dataset&lt;/a&gt; here.&lt;/p&gt;
 
-&lt;p&gt;#&lt;/p&gt;
-</content>
- </entry>
- 
- <entry>
-   <title>Creating a Restaurant Recommendation System</title>
-   <link href="http://localhost:4000/2024/12/28/creating-a-restaurant-bot"/>
-   <updated>2024-12-28T00:00:00+05:30</updated>
-   <id>http://localhost:4000/2024/12/28/creating-a-restaurant-bot</id>
-   <content type="html">&lt;p&gt;In 2024, I did spend significant amount of time playing with RAG and Vector Databases. Typically, LanceDB was at the core and it was one amazing hell of a ride. As the year is ending, I tried to make a simple restaurant recommendation system but it’s going to be slightly different. The idea is to use this &lt;a href=&quot;https://www.kaggle.com/datasets/abhijitdahatonde/swiggy-restuarant-dataset&quot;&gt;Restaurant Dataset&lt;/a&gt; and to answer the queries like “Is there any cafe nearby which serves Punjabi food?” or “What are the top 5 restaurants in the city which serve Chinese food?”. The twist is, we need some form of geospatial data to mould the data points into a form that can be used for queries which are related to the distance.&lt;/p&gt;
+&lt;h3 id=&quot;loading-the-demo-data&quot;&gt;Loading the Demo Data&lt;/h3&gt;
 
-&lt;p&gt;So if you want to name this stuff, it can be called “Geospatial Recommendation System”. Sounds cool.. Ok let’s get started.&lt;/p&gt;
-
-&lt;h3 id=&quot;how-to-start&quot;&gt;How to start?&lt;/h3&gt;
-
-&lt;p&gt;Well, ok so the first thing is to sort out some relevant features that are required for the recommendation system. So generally, folks who are searching for any recommendation for a restaurant, they are generally looking out for things like restaurant’s name (obviously lol), location maybe, and what kind of food they serve, or other details like ratings or maybe how much time it takes for a restaurant to deliver the food or what’s the average order prices. So, we need to extract these features from the dataset.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import pandas as pd
-
-restaurant_data = pd.read_csv(&quot;data.csv&quot;)
-restaurant_data = restaurant_data[restaurant_data.columns[1:]]
-restaurant_data.dropna(inplace=True)
-restaurant_data.drop_duplicates(inplace=True)
-restaurant_data.head()
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;loan_data = pd.read_csv(&apos;./credit_risk_dataset.csv&apos;)
+loan_data.head()
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/creating-a-restaurant-bot/data-reference.png&quot; alt=&quot;image-showing-the-table-and-the-data&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;To keep things simple, we’re just going to focus on a few key details for now: the type of food a restaurant serves, how customers rate it on average, and where it’s located. By sticking to these basics, we can quickly give people great recommendations without making things too complicated.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;data_points_vectors = []
-
-for _, row in restaurant_data.iterrows():
-    filter_cols = [&apos;Food type&apos;, &apos;Avg ratings&apos;, &apos;Address&apos;]
-    data_point = &quot;#&quot;.join(f&quot;{col}/{row[col]}&quot; for col in filter_cols)
-    data_points_vectors.append(data_point)
-
-# Add the new column to the DataFrame
-restaurant_data[&quot;query_string&quot;] = data_points_vectors
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;   person_age  person_income  loan_amnt  loan_intent  loan_status
+0          22          59000      35000     PERSONAL            1
+1          21           9600       1000    EDUCATION            0
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;You can see that I’ve used &lt;code&gt;#&lt;/code&gt; to separate different sections and &lt;code&gt;/&lt;/code&gt; for splitting up the key-value pairs. Just a heads up, you can pick different separators and delimiters if you like, but since I’m using FTS (full text search) from LanceDB, a few are reserved for internal representations. If you need to, you can use a backslash as a prefix to support the reserved ones and still use them. This is how a single query string might look&lt;/p&gt;
+&lt;p&gt;Why Credit Risk Dataset? : It’s public, well-structured, and mimics real loan data with features like loan_status (0 = approved, 1 = rejected). For demo purposes, it’s spot-on. Companies would swap this for their own credit records—same columns, different rows, or maybe other relevant benchmarks that can be utilized for setting up the target in terms of the loan status.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;&apos;Food type/Biryani,Chinese,North Indian,South Indian#Avg ratings/4.4#Address/5Th Block&apos;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&quot;building-the-ml-model&quot;&gt;Building the ML model&lt;/h3&gt;
 
-&lt;p&gt;Ok, this looks good! Next, we need to turn our query string into a vector. You can choose any embedding model that fits your needs, but I’ll be using the paraphrase-MiniLM-L6-v2 model for now. Basically, all we have to do is encode our query strings into vectors and then load up the payload with the relevant information.&lt;/p&gt;
+&lt;p&gt;For the sake of the demonstration, I have used a Random Forest Classifier here. You can literally play around with different sets of these models, ensemble them, and get better in terms of accuracy and data processing.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from sentence_transformers import SentenceTransformer
-model = SentenceTransformer(&apos;paraphrase-MiniLM-L6-v2&apos;)
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.pipeline import Pipeline
+import joblib
 
-list_of_payloads = []
+features = [&apos;person_age&apos;, &apos;person_income&apos;, &apos;loan_amnt&apos;, &apos;loan_intent&apos;]
+target = &apos;loan_status&apos;
 
-for index, row in restaurant_data.iterrows():
-    encoded_vector = model.encode(row[&apos;query_string&apos;])
-    payload = {
-        &apos;Area&apos;: row[&apos;Area&apos;],
-        &apos;City&apos;: row[&apos;City&apos;],
-        &apos;Restaurant&apos;: row[&apos;Restaurant&apos;],
-        &apos;Price&apos;: row[&apos;Price&apos;],
-        &apos;Avg_ratings&apos;: row[&apos;Avg ratings&apos;],
-        &apos;Total_ratings&apos;: row[&apos;Total ratings&apos;],
-        &apos;Food_type&apos;: row[&apos;Food type&apos;],
-        &apos;Address&apos;: row[&apos;Address&apos;],
-        &apos;Delivery_time&apos;: row[&apos;Delivery time&apos;],
-        &apos;query_string&apos;: row[&apos;query_string&apos;],
-        &apos;vector&apos;: encoded_vector
-    }
+loan_data = loan_data.dropna(subset=features + [target])
 
-    list_of_payloads.append(payload)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;setting-up-the-vector-database&quot;&gt;Setting up the Vector Database&lt;/h3&gt;
-
-&lt;p&gt;So, we’ve got our &lt;code&gt;list_of_payloads&lt;/code&gt; that includes all the relevant data we’re going to store in our vector database. Let’s get LanceDB set up here:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import lancedb
-
-# Connect to the LanceDB instance
-uri = &quot;data&quot;
-db = lancedb.connect(uri)
-
-lancedb_table = db.create_table(&quot;restaurant-geocoding-app&quot;, data=list_of_payloads)
-lancedb_df = lancedb_table.to_pandas()
-lancedb_df.head()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/creating-a-restaurant-bot/lancedb-table-reference.png&quot; alt=&quot;image-showing-the-lancedb-table-with-the-data&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;setting-up-the-geospatial-reference&quot;&gt;Setting up the Geospatial Reference&lt;/h3&gt;
-
-&lt;p&gt;Now that our vector database is ready, the next step is to convert user queries into our specific query format. Essentially, what we will do here is to carefully extract key details from each user query to form a structured dictionary. This structured data will then be reformatted to match the pattern of our query strings. To achieve this, I’ll just use a LLM to decipher the user queries and identify the crucial entities we need.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import os
-from openai import OpenAI
-from dotenv import load_dotenv
-
-load_dotenv()
-
-api_key = os.getenv(&quot;OPENAI_API_KEY&quot;)
-
-# Initialize the OpenAI client
-client = OpenAI(api_key=api_key)
-
-query_string = &quot;Hi, I am looking for a casual dining restaurant where Indian or Italian food is served near the HSR Bangalore&quot;
-
-# Helper prompt to extract structured data from ip_prompt
-total_prompt = f&quot;&quot;&quot;Query String: {query_string}\n\n\
-Now from the query string above extract these following entities pinpoints:
-1. Food type : Extract the food type 
-2. Avg ratings : Extract the average ratings
-3. Address : Extract the current exact location, don&apos;t consider the fillers like &quot;near&quot; or &quot;nearby&quot;.
-
-NOTE : For the Current location, try to understand the pin point location in the query string. Do not give any extra information. If you make the mistakes, bad things
-will happen.
-
-Finally return a python dictionary using those points as keys and don&apos;t write the markdown of python. If value of a key is not mentioned, then set it as None.
-&quot;&quot;&quot;
-
-# Make a request to OpenAI&apos;s API
-completion = client.chat.completions.create(
-    model=&quot;gpt-4o&quot;,  # Use the appropriate model
-    store=True,
-    messages=[
-        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: total_prompt}
-    ]
+preprocessor = ColumnTransformer(
+    transformers=[(&apos;cat&apos;, OneHotEncoder(handle_unknown=&apos;ignore&apos;), [&apos;loan_intent&apos;])],
+    remainder=&apos;passthrough&apos;
 )
 
-# Extract the generated text
-content = completion.choices[0].message.content
-print(content)
+X = loan_data[features]
+y = loan_data[target]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = Pipeline(steps=[
+    (&apos;preprocessor&apos;, preprocessor),
+    (&apos;classifier&apos;, RandomForestClassifier(random_state=42))
+])
+model.fit(X_train, y_train)
+
+accuracy = model.score(X_test, y_test)
+print(f&quot;Model accuracy: {accuracy:.2f}&quot;)  # 0.84
+joblib.dump(model, &apos;loan_approval_model.pkl&apos;)
 &lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;{
-  &quot;Food type&quot;: &quot;Indian or Italian&quot;,
-  &quot;Avg ratings&quot;: None,
-  &quot;Address&quot;: &quot;HSR Bangalore&quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Now, all we need to do is process this output.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import ast
-
-# Convert the string content to a dictionary
-try:
-    response_dict = ast.literal_eval(content)
-except (ValueError, SyntaxError) as e:
-    print(&quot;Error parsing the response:&quot;, e)
-    response_dict = {}
-
-
-filter_cols = [&apos;Food type&apos;, &apos;Avg ratings&apos;, &apos;Address&apos;]
-query_string_parts = [f&quot;{col}/{response_dict.get(col)}&quot; for col in filter_cols if response_dict.get(col)]
-
-query_string = &quot;#&quot;.join(query_string_parts)
-print((query_string))
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Well, now the user query looks like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;Food type/Indian or Italian#Address/HSR Bangalore
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Well, this user query is now formatted exactly like our &lt;code&gt;query_strings&lt;/code&gt;. We can go ahead and search through the vector database to find the top restaurants that best match this query.&lt;/p&gt;
-
-&lt;h3 id=&quot;searching-like-a-pro&quot;&gt;Searching like a pro.&lt;/h3&gt;
-
-&lt;p&gt;I’ll be using the Full Text Search (FTS) feature from LanceDB to run the search. You can read more about what’s happening behind the scenes &lt;a href=&quot;https://lancedb.github.io/lancedb/fts/#example&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;# Create the FTS index and search
-lancedb_table.create_fts_index(&quot;query_string&quot;, replace=True)
-results = lancedb_table.search(query_string).to_pandas()
-results.head()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&quot;../images/creating-a-restaurant-bot/search-results.png&quot; alt=&quot;image-showing-the-results&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;using-the-geospatial-data&quot;&gt;Using the Geospatial data&lt;/h3&gt;
-
-&lt;p&gt;So basically when someone searches for nearby restaurants, maybe they’re craving a specific type of cuisine or looking for highly-rated places, we first search up the places that fills there requirements. Now after identifying potential options, we use the &lt;a href=&quot;https://developers.google.com/maps/documentation/geocoding/overview&quot;&gt;Geospatial API&lt;/a&gt; to pinpoint their exact locations. The Google Maps API is perfect for this—it grabs the latitude and longitude so we know precisely where each restaurant is. With these coordinates, we can then easily figure out which places are closest to the user’s location, by just calculating the distance.&lt;/p&gt;
-
-&lt;p&gt;If you didn’t get that, Bear with me, this is going to be super cool.. So first thing we need to do is to setup our Geospatial function which takes a place and return the coordinates:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import requests
-import math
-
-def get_google_geocoding(address, api_key):
-    base_url = &quot;https://maps.googleapis.com/maps/api/geocode/json&quot;
-    params = {&quot;address&quot;: address, &quot;key&quot;: api_key}
-    response = requests.get(base_url, params=params)
-    
-    if response.status_code == 200:
-        result = response.json()
-        if result[&quot;status&quot;] == &quot;OK&quot;:
-            latitude = result[&quot;results&quot;][0][&quot;geometry&quot;][&quot;location&quot;][&quot;lat&quot;]
-            longitude = result[&quot;results&quot;][0][&quot;geometry&quot;][&quot;location&quot;][&quot;lng&quot;]
-            return (latitude, longitude)
-        else:
-            print(f&quot;Google API: No results found for address: {address}&quot;)
-            return None
-    else:
-        print(f&quot;Google API: Request failed for address: {address}&quot;)
-        return None
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;For the distance calculation, there’s this thing called the &lt;code&gt;Haversine formula&lt;/code&gt;. It uses the coordinates of two points and basically draws an imaginary straight line between them across the earth to measure how far they are from each other. There’s a bit of math involved in how this formula works, but we can skip that part for now. Here’s what the formula looks like:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;def haversine(coord1, coord2):
-    R = 6371.0  # Radius of the Earth in kilometers
-    lat1, lon1 = map(math.radians, coord1)
-    lat2, lon2 = map(math.radians, coord2)
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-    a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    distance = R * c
-    return distance
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Well, everything seems solid now, the only thing left is the current location. Here’s what we can do: if a user asks about restaurants near a specific area like “nearby HSR layout,” we can easily pull the current location from the preprocessing we did earlier. If not, for now, we can just input the current location manually. Then, we’ll check which restaurants from our vector database match our query and see how far they are based on the current location.&lt;/p&gt;
-
-&lt;p&gt;Well let’s see what we get:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;def process_top_restaurants(data, current_location, api_key, top_n=5):
-    current_coords = get_google_geocoding(current_location, api_key)
-    if not current_coords:
-        return
-
-    for index, row in data.head(top_n).iterrows():
-        complete_address = f&quot;{row[&apos;Restaurant&apos;]}, {row[&apos;City&apos;]}&quot;
-        restaurant_coords = get_google_geocoding(complete_address, api_key)
-        if restaurant_coords:
-            distance = haversine(current_coords, restaurant_coords)
-            print(f&quot;Restaurant Name: {row[&apos;Restaurant&apos;]}&quot;)
-            print(f&quot;Distance: {distance:.2f} km&quot;)
-            print(f&quot;Area: {row[&apos;Area&apos;]}&quot;)
-            print(f&quot;Price: {row[&apos;Price&apos;]}&quot;)
-            print(f&quot;Coordinates: {restaurant_coords}&quot;)
-            print(f&quot;Cuisines Type: {row[&apos;Food_type&apos;]}&quot;)
-            print(&quot;-&quot; * 40)
-
-# Example usage
-api_key = os.getenv(&apos;GOOGLE_MAPS_API&apos;)
-current_location = &apos;HSR Layout, Bangalore&apos;
-process_top_restaurants(results, current_location, api_key, top_n=5)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;Restaurant Name: Brooks And Bonds Brewery
-Distance: 3.36 km
-Area: Koramangala
-Price: 200.0
-Coordinates: (12.9341801, 77.62334249999999)
-Cuisines Type: Indian
-----------------------------------------
-Restaurant Name: Cafe Azzure
-Distance: 8.06 km
-Area: Ashok Nagar
-Price: 1000.0
-Coordinates: (12.975012, 77.6076558)
-Cuisines Type: American,Italian
-----------------------------------------
-Restaurant Name: Tottos Pizza
-Distance: 7.92 km
-Area: Central Bangalore
-Price: 500.0
-Coordinates: (12.9731935, 77.607012)
-Cuisines Type: Continental,Italian
-----------------------------------------
-Restaurant Name: Holy Doh!
-Distance: 4.15 km
-Area: Central Bangalore
-Price: 600.0
-Coordinates: (12.9346188, 77.6139914)
-Cuisines Type: Pizzas,Italian
-----------------------------------------
-Restaurant Name: Bakery By Foodhall
-Distance: 7.31 km
-Area: Ulsoor
-Price: 300.0
-Coordinates: (12.9734944, 77.62038629999999)
-Cuisines Type: Bakery,Italian,Desserts
-----------------------------------------
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Here we go.. This is cool :)&lt;/p&gt;
-</content>
- </entry>
- 
- <entry>
-   <title>Understanding RAG fusion</title>
-   <link href="http://localhost:4000/2024/12/25/rag-fusion-understanding"/>
-   <updated>2024-12-25T00:00:00+05:30</updated>
-   <id>http://localhost:4000/2024/12/25/rag-fusion-understanding</id>
-   <content type="html">&lt;p&gt;If you don’t have any clue on what RAG is, please go through this &lt;a href=&quot;https://vipul-maheshwari.github.io/2024/02/14/rag-application-with-langchain&quot;&gt;one&lt;/a&gt; to get a brief on what this is all about.&lt;/p&gt;
-
-&lt;p&gt;So when the RAG model ends, RAG Fusion picks up by adding more layers that improve the RAG retrieval phase, particularly by adding more sophisticated mechanisms for interpretation and integration of the retrieval output. RAG Fusion tries to combat some of the weaknesses inherent also to RAG, including better response to ambiguous queries and returning more relevant, accurate information by improving the retrieval-to-generation loop.&lt;/p&gt;
-
-&lt;h2 id=&quot;what-was-missed-in-rag&quot;&gt;What was missed in RAG?&lt;/h2&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Constraints with Current Search Technologies: RAG is limited by the same things limiting our retrieval-based lexical and vector search technologies.&lt;/li&gt;
-  &lt;li&gt;Human Search Inefficiencies: Humans are not great at writing what they want into search systems, such as typos, vague queries, or limited vocabulary, which often lead to missing the vast reservoir of information that lies beyond the obvious top search results. While RAG assists, it hasn’t entirely solved this problem.&lt;/li&gt;
-  &lt;li&gt;Over-Simplification of Search: Our prevalent search paradigm linearly maps queries to answers, lacking the depth to understand the multi-dimensional nature of human queries. This linear model often fails to capture the nuances and contexts of more complex user inquiries, resulting in less relevant results.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&quot;how-the-improvement-really-happens&quot;&gt;How the improvement really happens?&lt;/h2&gt;
-
-&lt;p&gt;So basically when we talk about the traditional RAG, it works by ranking documents in the order of relevance to the query based on vector similarity distances, usually using cosine similarity.&lt;/p&gt;
-
-&lt;p&gt;RAG Fusion on the other hands addresses the challenges of document retrieval using&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Query Transformation: Generates multiple new queries from different angels based on the original query and&lt;/li&gt;
-  &lt;li&gt;Reciprocal Rank Fusion(RRF): Reranking the document relevance based on Reciprocal Rank Fusion(RRF)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;That being said, when RAG Fusion receives the original query, it sends the original query to the large language model(LLM) to generate a number of new search queries based on the original query from different perspectives.&lt;/p&gt;
-
-&lt;p&gt;So what really happens is&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;Query Duplication with a Twist: Translate a user’s query into similar, yet distinct queries via an LLM.&lt;/li&gt;
-  &lt;li&gt;Vector Search Unleashed: Perform vector searches for the original and its newly generated query siblings.&lt;/li&gt;
-  &lt;li&gt;Intelligent Reranking: Aggregate and refine all the results using reciprocal rank fusion.&lt;/li&gt;
-  &lt;li&gt;Final Step:  Pair the cherry-picked results with the new queries, guiding the large language model to a crafted output that considers all the queries and the reranked list of results.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;Now For all the documents retrieved from the vector database for each query, like a list of lists.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Determine the rank of each document within its respective ranked list.&lt;/li&gt;
-  &lt;li&gt;For each document, compute the reciprocal of its rank (e.g., rank 1 → 1/1 = 1; rank 3 → 1/3).&lt;/li&gt;
-  &lt;li&gt;Sum the reciprocal ranks of each retrieved document across all generated queries.&lt;/li&gt;
-  &lt;li&gt;Order the documents based on their total aggregated scores to determine their final ranking.&lt;/li&gt;
+  &lt;li&gt;Why Random Forest? Well as we know, Random forest comes under the ensemble category, and it’s robust in nature, handles mixed data (numbers and categories) well, and gives us probabilities—not just yes/no. For loans, that’s gold; banks love knowing the odds though.&lt;/li&gt;
+  &lt;li&gt;How It Works: We preprocess loan_intent into numbers (e.g., “MEDICAL” becomes a categorical encoded number), split the data, train, and test. Got an 84% accuracy which is decent for a demo. Real data could boost or tweak that.&lt;/li&gt;
+  &lt;li&gt;Swap It Out: As I said earlier, companies can use their own loan data here—same features, their numbers. Train it fresh, and it’s tailored to them.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;And then now the top-ranked retrieved documents will be then sent to the LLM along with all the queries to generate a response.&lt;/p&gt;
+&lt;h3 id=&quot;completing-the-integration-for-the-loan-agent&quot;&gt;Completing the integration for the Loan Agent&lt;/h3&gt;
+
+&lt;p&gt;Now comes the agent itself:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class PredictiveMLTool:
+    def __init__(self):
+        self.model = joblib.load(&apos;loan_approval_model.pkl&apos;)
+    
+    def use(self, intent, age, income, loan_amount):
+        input_data = pd.DataFrame(
+            [[age, income, loan_amount, intent]],
+            columns=[&apos;person_age&apos;, &apos;person_income&apos;, &apos;loan_amnt&apos;, &apos;loan_intent&apos;]
+        )
+        prob_approved = self.model.predict_proba(input_data)[0][0]
+        print(f&quot;Probability for the loan approval is: {prob_approved}&quot;)
+        return &quot;Eligible&quot; if prob_approved &amp;gt; 0.5 else &quot;Not Eligible&quot;
+
+class LoanAgent:
+    def __init__(self):
+        self.tools = [PredictiveMLTool()]
+        self.llm = llm
+    
+    def process(self, query, params):
+        intent = self.extract_intent(query)
+        age = params.get(&apos;age&apos;)
+        income = params.get(&apos;income&apos;)
+        loan_amount = params.get(&apos;loan_amount&apos;)
+        return self.tools[0].use(intent, age, income, loan_amount)
+    
+    def extract_intent(self, query):
+        valid_intents = [&apos;DEBTCONSOLIDATION&apos;, &apos;EDUCATION&apos;, &apos;HOMEIMPROVEMENT&apos;, &apos;MEDICAL&apos;, &apos;PERSONAL&apos;, &apos;VENTURE&apos;]
+        prompt = f&quot;Given the query: &apos;{query}&apos;, classify the intent into one of: {&apos;, &apos;.join(valid_intents)}. Respond with only the intent in uppercase (e.g., &apos;HOMEIMPROVEMENT&apos;). If unsure, respond with &apos;PERSONAL&apos;.&quot;
+        response = self.llm(prompt)[0][&apos;generated_text&apos;].strip().upper()
+        return response if response in valid_intents else &apos;PERSONAL&apos;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Why ML Here? It’s predictive, which means it takes raw data and spits out a decision. LLM handles intent because it’s quick and decent for text, though companies might use something beefier or their own intent rules. I let the LLM decide what’s the intent here.- How It Fits: Query → Intent (e.g., “school fees” → EDUCATION) → ML prediction. It’s as simple as the tool’s the muscle, and the agent’s the coordinator.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If the companies need a different logic to get the target status in terms if the loan can be provided to an individual or not, as I said earlier, they can easily replace the predictive ml modeling with another set of benchmarks or maybe thresholding some different set of metrics to figure out if that person is made for the loan or not.&lt;/p&gt;
+
+&lt;p&gt;To make things more smoother, let’s introduce our Kernel Agent which will be used for redirecting the queries to the Loan and the Insurance agent based on the query type.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;class KernelAgent:
+    def __init__(self, loan_agent):
+        self.loan_agent = loan_agent
+    
+    def process_query(self, query, params):
+        return self.loan_agent.process(query, params)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Well, this is good, but let’s not forget we now need to work on our Insurance agent.&lt;/p&gt;
+
+&lt;h2 id=&quot;step-3--insurance-agent---vector-search-with-lancedb&quot;&gt;Step 3 : Insurance Agent - Vector Search with LanceDB&lt;/h2&gt;
+
+&lt;p&gt;Before diving in, I want to walk you through my thought process for creating the Insurance Agent. Picture this: you walk into an insurance company, sit down with someone, and start explaining why you need to file a claim—why it’s legit and why you deserve it. That conversation is key because it’s the starting point for deciding whether the claim gets processed or not.&lt;/p&gt;
+
+&lt;p&gt;I tried hunting down a dataset with those kinds of conversations and clear &lt;code&gt;yes&lt;/code&gt; or &lt;code&gt;no&lt;/code&gt; labels for claims, but I came up empty. So, to keep things moving, I built a simple synthetic dataset pipeline. It generates a fake dataset with text queries on one side and a target on the other—showing if the person filing the claim is eligible or not.&lt;/p&gt;
+
+&lt;p&gt;Now, let’s talk about where the VectorDB comes in. Here’s the plan: we’ll embed those insurance claim queries first. Then, when a new claim pops up, we’ll pull the k-most similar queries from the database, look at their average eligibility scores, and use that to decide if the new query deserves a legitimate claim or not. With that in mind, let’s start by generating some synthetic claims for the automotive industry. This is just a quick demo—companies can swap in real conversations instead, and you can tweak the pipeline a bit to handle actual data.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import random
+import csv
+from mistralai import Mistral
+
+api_key = &quot;xxxxxxxxxxxxxxx&quot;
+model = &quot;mistral-large-latest&quot;
+client = Mistral(api_key=api_key)
+
+base_prompt = &quot;Generate a detailed query for an auto insurance claim...&quot;
+def generate_query(denied=False):
+    prompt = base_prompt
+    if denied:
+        prompt += &quot; Include a reason the claim might be denied (e.g., drunk driving, uninsured vehicle).&quot;
+    response = client.chat.complete(model=model, messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}], max_tokens=200)
+    return response.choices[0].message.content.strip()
+
+def assign_target(query):
+    rejection_keywords = [&quot;drunk&quot;, &quot;influence&quot;, &quot;racing&quot;, &quot;uninsured&quot;]
+    return 0 if any(kw in query.lower() for kw in rejection_keywords) else 1
+
+dataset = []
+for i in range(100):
+    denied = random.random() &amp;lt; 0.4
+    query = generate_query(denied)
+    target = assign_target(query) if not denied else 0
+    dataset.append({&quot;query&quot;: query, &quot;target&quot;: target})
+
+with open(&quot;auto_insurance_claims.csv&quot;, &quot;w&quot;, newline=&quot;&quot;) as f:
+    writer = csv.DictWriter(f, fieldnames=[&quot;query&quot;, &quot;target&quot;])
+    writer.writeheader()
+    writer.writerows(dataset)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To make it a bit more realistic, I have included some of the rejection keywords like &lt;code&gt;drunk&lt;/code&gt;, &lt;code&gt;influence&lt;/code&gt; &lt;code&gt;racing&lt;/code&gt; and the &lt;code&gt;uninsured&lt;/code&gt; which is readily used to make the dataset better in terms of the realistic cases where the claims are not processed. Running this will generate a CSV with the relevant data.&lt;/p&gt;
+
+&lt;p&gt;Now comes the LanceDB setup..&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import pyarrow as pa
+
+df = pd.read_csv(&apos;auto_insurance_claims.csv&apos;)
+embeddings = embedder.encode(df[&apos;query&apos;].tolist())
+embeddings_list = [embedding.tolist() for embedding in embeddings]
+
+schema = pa.schema([
+    pa.field(&quot;embedding&quot;, pa.list_(pa.float32(), list_size=384)),
+    pa.field(&quot;target&quot;, pa.int32()),
+    pa.field(&quot;query&quot;, pa.string())
+])
+
+table = db.create_table(&quot;insurance_queries&quot;, schema=schema)
+df_lance = pd.DataFrame({&quot;embedding&quot;: embeddings_list, &quot;target&quot;: df[&apos;target&apos;], &quot;query&quot;: df[&apos;query&apos;]})
+table.add(df_lance)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As I said earlier, companies could load their real claim logs here instead. Now comes the main part, we are going to integrate the semantic tooling capability into our Insurance agent.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;# Insurance Agent Tools
+class SemanticSearchTool(Tool):
+    def __init__(self, table):
+        self.table = table
+        self.embedder = embedder
+
+    def name(self):
+        return &quot;Semantic Search Tool&quot;
+
+    def description(self):
+        return &quot;Performs semantic search in LanceDB to assess claim approval based on similar past claims.&quot;
+
+    def use(self, query, k=5):
+        new_embedding = self.embedder.encode([query])[0].tolist()
+        results = self.table.search(new_embedding).limit(k).to_pandas()
+        approval_rate = results[&apos;target&apos;].mean()
+        similar_queries = results[&apos;query&apos;].tolist()
+        decision = &quot;Approved&quot; if approval_rate &amp;gt; 0.5 else &quot;Not Approved&quot;
+        print(f&quot;Approval rate among similar claims: {approval_rate*100:.1f}%&quot;)
+        return {&quot;decision&quot;: decision, &quot;similar_queries&quot;: similar_queries}
+
+# Insurance Agent
+class InsuranceAgent:
+    def __init__(self, table):
+        self.tools = [SemanticSearchTool(table)]
+
+    def process(self, query):
+        return self.tools[0].use(query)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is it, let’s integrate our Insurance agent within our Kernel agent along with the Loan Agent.&lt;/p&gt;
+
+&lt;h2 id=&quot;step-4--completion-of-kernel-agent&quot;&gt;Step 4 : Completion of Kernel Agent&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;# Kernel Agent
+class KernelAgent:
+    def __init__(self, loan_agent, insurance_agent):
+        self.loan_agent = loan_agent
+        self.insurance_agent = insurance_agent
+        self.client = client
+        self.model = model
+
+    def classify_query(self, query):
+        prompt = f&quot;&quot;&quot;
+        Given the query: &apos;{query}&apos;, classify it as &apos;loan&apos; or &apos;insurance&apos;.
+        Respond with only &apos;loan&apos; or &apos;insurance&apos;.
+        If unsure, respond with &apos;unknown&apos;.
+        &quot;&quot;&quot;
+        response = self.client.chat.complete(
+            model=self.model,
+            messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+            temperature=0.7,
+            max_tokens=10
+        )
+        print(f&quot;Query type : {response.choices[0].message.content.strip().lower()}&quot;)
+        return response.choices[0].message.content.strip().lower()
+
+    def process_query(self, query, params=None):
+        query_type = self.classify_query(query)
+        if query_type == &apos;loan&apos;:
+            if not params:
+                return &quot;Error: Loan query requires parameters (age, income, loan_amount).&quot;
+            return self.loan_agent.process(query, params)
+        elif query_type == &apos;insurance&apos;:
+            return self.insurance_agent.process(query)
+        else:
+            return &quot;Error: Unable to classify query as &apos;loan&apos; or &apos;insurance&apos;.&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now all you need to do is toss in a query—could be anything about loans or insurance. It’ll hit the Kernel Agent first, and based on what the query’s about, it’ll get handed off to either the Loan Agent or the Insurance Agent. From there, they’ll handle the rest of the decisions.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;# Test Cases
+test_cases = [
+    {
+        &quot;query&quot;: &quot;I had a bad accident yesterday, but i think i was a bit drunk, need some insurance&quot;,
+        &quot;params&quot;: None
+    },
+]
+
+# Run Tests
+print(&quot;Testing Integrated System with Mistral:&quot;)
+print(&quot;-&quot; * 50)
+for case in test_cases:
+    query = case[&quot;query&quot;]
+    params = case.get(&quot;params&quot;)
+    result = kernel_agent.process_query(query, params)
+    print(f&quot;Query: &apos;{query}&apos;&quot;)
+    if params:
+        print(f&quot;Params: {params}&quot;)
+    if isinstance(result, dict):
+        print(f&quot;Decision: {result[&apos;decision&apos;]}&quot;)
+        print(&quot;Similar Queries:&quot;)
+        for q in result[&apos;similar_queries&apos;]:
+            print(f&quot;- {q}&quot;)
+    else:
+        print(f&quot;Result: {result}&quot;)
+    print(&quot;-&quot; * 50)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Think about the potential here: fintech companies can plug in their own tools and data to process loans and insurance claims. Picture how much manual work insurance folks put in, checking every little thing to figure out if a claim’s legit or not—or the same deal with loans, deciding if someone qualifies. This could cut out so much of that hassle.&lt;/p&gt;
+
+&lt;p&gt;Now if you made this far, dude, you are really into agents. To make your life more easier, here is the &lt;a href=&quot;https://colab.research.google.com/github/lancedb/vectordb-recipes/blob/main/examples/fintech-ai-agent/fintech-ai-agent.ipynb?ref=blog.lancedb.com&quot;&gt;colab&lt;/a&gt; to run the whole game.&lt;/p&gt;
+
+&lt;p&gt;See you in the next one.&lt;/p&gt;
 </content>
  </entry>
  

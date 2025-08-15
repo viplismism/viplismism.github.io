@@ -1,6 +1,5 @@
 ---
 layout: page
-title: Search
 ---
 
 <style>
@@ -11,8 +10,10 @@ title: Search
 	input[type=text] {
 		font-size: normal;
 	    outline: none;
-	    padding: 1rem;
-		background: rgb(236, 237, 238);
+	    padding: 0.5rem;
+		border-bottom: 1px solid #000;
+margin-left: 0;
+background: transparent;
 	    width: 100%;
 		-webkit-appearance: none;
 		font-family: inherit;
@@ -20,15 +21,28 @@ title: Search
 		border: none;
 	}
 	#results-container {
-		margin: .5rem 0;
+		margin: 0rem 0;
 	}
 </style>
 
+<script>
+document.getElementById('search-input').addEventListener('input', function() {
+    document.getElementById('search-line').style.display = this.value ? 'none' : 'block';
+});
+</script>
+
 <!-- Html Elements for Search -->
 <div id="search-container">
-<input type="text" id="search-input" placeholder="Search...">
+<input type="text" id="search-input" placeholder="">
 <ol id="results-container"></ol>
 </div>
+<hr style="margin-top: 1rem;" id="search-line">
+
+<style>
+#search-container:focus-within #search-line {
+    display: none;
+}
+</style>
 
 <!-- Script pointing to search-script.js -->
 <script src="/search.js" type="text/javascript"></script>

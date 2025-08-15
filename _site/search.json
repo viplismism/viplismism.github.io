@@ -2,34 +2,45 @@
   
     {
 
+      "title"    : "Create a custom retriever",
+      "description" : "This post is all about creating a custom retriever.",
+      "url"      : "/2025/07/02/custom-retriever",
+      "category" : "",
+      "tags"     : "Retriever, Superlinked",
+      "date"     : "2025-07-02 00:00:00 +0530"
+
+    } ,
+  
+    {
+
+      "title"    : "Real Estate Natural Language Querying Agent",
+      "description" : "This post is all about creating an agent which can help you to figure out what you really want in the Real Estate",
+      "url"      : "/2025/06/07/realesate-nlq-agent",
+      "category" : "",
+      "tags"     : "Agent, Superlinked",
+      "date"     : "2025-06-07 00:00:00 +0530"
+
+    } ,
+  
+    {
+
+      "title"    : "An agent to read research papers better",
+      "description" : "This post is all about creating a superlinked research paper agent which can help you out to do research better.",
+      "url"      : "/2025/03/10/creating-a-superlinked-research-agent",
+      "category" : "",
+      "tags"     : "Agent, Superlinked",
+      "date"     : "2025-03-10 00:00:00 +0530"
+
+    } ,
+  
+    {
+
       "title"    : "Creating a Fintech AI agent without any framework",
       "description" : "This post gives a detailed introduction on how agents work and how we can create one using the simple Python",
       "url"      : "/2025/02/23/create-a-fintech-agent",
       "category" : "",
       "tags"     : "AI Agents, Python Agent from Scratch",
       "date"     : "2025-02-23 00:00:00 +0530"
-
-    } ,
-  
-    {
-
-      "title"    : "Creating a Restaurant Recommendation System",
-      "description" : "This post gives an adequate understanding of how to use RAG to create a restaurant recommendation system.",
-      "url"      : "/2024/12/28/creating-a-restaurant-bot",
-      "category" : "",
-      "tags"     : "RAG, LanceDB, Recommendation System",
-      "date"     : "2024-12-28 00:00:00 +0530"
-
-    } ,
-  
-    {
-
-      "title"    : "Understanding RAG fusion",
-      "description" : "This post gives an adequate understanding of how the RAG fusion works.",
-      "url"      : "/2024/12/25/rag-fusion-understanding",
-      "category" : "",
-      "tags"     : "RAG, LanceDB, RAG Fusion, Improvement in RAG",
-      "date"     : "2024-12-25 00:00:00 +0530"
 
     } ,
   
