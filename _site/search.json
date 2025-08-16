@@ -145,7 +145,7 @@
   
     {
 
-      "title"    : "Create a Multimodal RAG application",
+      "title"    : "Create a Multimodal GTA-V RAG application",
       "description" : "Multimodal RAG applications using lanceDB",
       "url"      : "/2024/03/03/multimodal-rag-application",
       "category" : "",

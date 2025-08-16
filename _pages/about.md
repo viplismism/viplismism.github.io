@@ -35,14 +35,14 @@ On top of that, I made a [Lancify package](https://www.lancedb.com/blog/python-p
 
 To demonstrate real-world use cases, I built and documented several examples:
 
-- Multimodal RAG with GTA V dataset — combining text and images for retrieval and grounding with LanceDB.
-- Training CNNs with LanceDataset — showcasing end-to-end model training pipelines powered by Lance dataloaders.
-- Zero-shot image classification with CLIP + LanceDB — leveraging Lance for scalable multimodal search and classification tasks.
+- [Multimodal GTA V RAG](https://vipul-maheshwari.github.io/2024/03/03/multimodal-rag-application)— combining text and images for retrieval and grounding with LanceDB.
+- [Training CNNs with LanceDataset](https://vipul-maheshwari.github.io/2024/06/26/train-a-cnn-with-lancedataset) — showcasing end-to-end model training pipelines powered by Lance dataloaders.
+- [Zero-shot image classification with CLIP + LanceDB](https://vipul-maheshwari.github.io/2024/07/14/zero-shot-image-classification) — leveraging Lance for scalable multimodal search and classification tasks.
 
-And a few more along the same lines, always with the goal of showing how LanceDB can fit directly into deep learning workflows and not just as a standalone vector database.
+And a few more along the same lines, always with the goal of showing how LanceDB can fit directly into deep learning workflows and not just as a standalone vector database. Check more of these [here](https://vipul-maheshwari.github.io/)
 
-Additionally, here and there, I collaborated with consulting companies such as [Figr](https://figr.design/), Arrowhead, and Superlinked. At Figr, I worked on zero-shot and few-shot learning approaches to generate Figma components for text-to-Figma code, contributing to a custom library for Figma using generative AI techniques.
+Additionally, here and there, I collaborated with consulting companies such as [Figr](https://figr.design/) or [Superlinked](https://superlinked.com/). At Figr, I worked on zero-shot and few-shot learning approaches to generate Figma components for text-to-Figma code, contributing to a custom library for Figr.
 
-Currently, I am working with Juspay, where I am developing advanced AI systems focused on semantic search, information retrieval, and agent-based architectures. My work involves designing and implementing end-to-end Retrieval-Augmented Generation (RAG) pipelines, optimizing vector search for low-latency query processing, and building intelligent agent creation and calling frameworks. These efforts leverage state-of-the-art transformer models and knowledge graphs to enhance contextual understanding and scalability in production-grade AI applications.
+Currently, I am working with [Juspay](https://juspay.io/in) on the [Xyne team](https://xynehq.com/) where I am developing advanced AI systems focused on semantic search, information retrieval, and agent-based architectures. My work involves designing and implementing end-to-end Retrieval-Augmented Generation (RAG) pipelines, optimizing vector search for low-latency query processing, and building intelligent agentic frameworks. These efforts leverage state-of-the-art transformer models and knowledge graphs to enhance contextual understanding and scalability in production-grade AI applications.
 
-If you’re looking to collaborate on a project related to AI or ML, feel free to reach out—I’m just a message away! Connect with me on LinkedIn for more details.
+Well that's it.. I am still not sure what I like most. So if you’re looking to collaborate on a project related to AI or ML, feel free to reach out—I’m just a message away!

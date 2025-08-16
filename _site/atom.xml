@@ -4,7 +4,7 @@
  <title>Deox Labs</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2025-08-16T02:45:05+05:30</updated>
+ <updated>2025-08-16T15:07:38+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name></name>
@@ -4497,7 +4497,7 @@ if __name__ == &quot;__main__&quot;:
  </entry>
  
  <entry>
-   <title>Create a Multimodal RAG application</title>
+   <title>Create a Multimodal GTA-V RAG application</title>
    <link href="http://localhost:4000/2024/03/03/multimodal-rag-application"/>
    <updated>2024-03-03T00:00:00+05:30</updated>
    <id>http://localhost:4000/2024/03/03/multimodal-rag-application</id>
