@@ -5,9 +5,11 @@ title: About
 
 I’m Vipul Maheshwari from Bharat, and I did my B.Tech in Computer Science.
 
-My journey into the world of Artificial Intelligence and Deep Learning began in my second year when a senior student of mine was working on a classified project for the Indian Army. I volunteered in that project and I was tasked with object localization and creating a manual test set using bounding boxes. The project was a huge success, and it immediately grabbed my attention. I was amazed at how a blend of linear algebra, computational resources, and a dash of Python could work wonders.
+My journey into the world of Artificial Intelligence and Deep Learning began in my second year when a senior of mine was working on a [classified project for the Indian Army](https://link.springer.com/article/10.1007/s11042-021-11242-y). I volunteered in that project and I was tasked with object localization and creating a manual test set using bounding boxes. PS : see acknowledgement and you will find my name :) 
 
-Following that project, I embarked on a research apprenticeship with one of my professors. Our research focused on creating unified model predictors for neurological diseases. We delved into neuroimaging data related to Impulse Control Disorder (ICD) and developed an LSTM synthesizer capable of predicting the deterioration levels of patients. This research grabbed the attention of reviewers at ICICV, and we bagged the Best Paper Award.
+The project was a huge success, and it immediately grabbed my attention. I was amazed at how a blend of linear algebra, computational resources, and a dash of Python could work wonders.
+
+Following that project, I embarked on a research apprenticeship. Our research focused on creating unified model predictors for neurological diseases. We delved into neuroimaging data related to Impulse Control Disorder (ICD) and developed an [LSTM synthesizer capable of predicting](https://link.springer.com/chapter/10.1007/978-981-99-2602-2_12) the deterioration levels of patients. This research grabbed the attention of reviewers at ICICV, and we [bagged the Best Paper Award](https://drive.google.com/file/d/1-Ee-EZXcHNe5wS4xbzSrP74SQUzs-o-m/view).
 
 Moving on, I had the opportunity to intern with [aiensured](https://www.aiensured.com/) as a computer vision intern. During this internship, I utilized YOLO, image slicing, and segmentation algorithms to build impressive machine learning datasets and pipelines for a wide range of tasks.
 
@@ -15,7 +17,7 @@ Soon after this internship, I joined [Saarthi.ai](https://www.saarthi.ai/) speci
 
 Now comes the time when I started to move to some big leagues.
 
-My time with [Endeavor Labs](https://www.endeavorlabs.co/), a New York-based research and consultancy outfit, kicked off in an unexpected way. I posted a casual intro about my goals and what I was hoping to dive into on the MongoDB #general channel, and somehow that caught Nathan’s eye—though I can’t quite recall the exact message, but that lead to me working here.
+My time with [Endeavor Labs](https://www.endeavorlabs.co/), a New York-based research and consultancy outfit, kicked off in an unexpected way. I posted a casual intro about my goals and what I was hoping to dive into on the MindsDB #general channel, and somehow that caught Nathan’s eye—though I can’t quite recall the exact message, but that lead to me working here.
 
 At Endeavor, I jumped into a supervised machine learning project, tackling multiclass classification to boost operational efficiency. I leaned on to the 
 [CatBoost](https://catboost.ai/docs/en/concepts/loss-functions-multiclassification) for build solid models, tweaking it with gradient optimization and some clever feature tweaks to keep overfitting aside. It was a hands-on effort that really sharpened the predictive edge and helped clients make smarter, data-backed calls. I mean the feature engineering was the big part here. The data was messy as **fcuk** but that project was a huge success..
