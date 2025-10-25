@@ -3,7 +3,9 @@ layout: page
 title: About
 ---
 
-I’m Vipul Maheshwari from Bharat, and I did my B.Tech in Computer Science.
+If you're coming from [Jyosa Labs](https://www.jyosalabs.xyz/), you already know what I do—but if not, here's the quick version: I'm the founder of Jyosa Labs, a research lab where I'm building systems and experiments at the intersection of AI, deep learning, and production infrastructure. This website serves as my blog and resource hub, documenting work, experiments, and learnings along the way.
+
+I'm Vipul Maheshwari from Bharat, and I did my B.Tech in Computer Science.
 
 My journey into the world of Artificial Intelligence and Deep Learning began in my second year when a senior of mine was working on a [classified project for the Indian Army](https://link.springer.com/article/10.1007/s11042-021-11242-y). I volunteered in that project and I was tasked with object localization and creating a manual test set using bounding boxes. PS : see acknowledgement and you will find my name :) 
 
@@ -44,8 +46,8 @@ To demonstrate real-world use cases, I built and documented several examples:
 
 And a few more along the same lines, always with the goal of showing how LanceDB can fit directly into deep learning workflows and not just as a standalone vector database. Check more of these [here](https://vipul-maheshwari.github.io/)
 
-Additionally, here and there, I collaborated with consulting companies such as [Figr](https://figr.design/) or [Superlinked](https://superlinked.com/). At Figr, I worked on zero-shot and few-shot learning approaches to generate Figma components for text-to-Figma code, contributing to a custom library for Figr.
+Additionally, I've collaborated with several companies on specialized AI projects. At [Figr](https://figr.design/), I worked on zero-shot and few-shot learning approaches to generate Figma components for text-to-Figma code, contributing to a custom library. With [Superlinked](https://superlinked.com/), I built production-grade retrieval systems including: a Steam game recommender using Superlinked's vector compute with LlamaIndex for multi-field semantic indexing; a real estate NLQ agent with weighted vector spaces (100x price weighting) for fuzzy matching on complex queries; a research paper agent leveraging TextSimilaritySpace and RecencySpace for balanced retrieval; and a fintech agent integrating RandomForestClassifier for loan predictions with LanceDB-powered semantic insurance claim validation. These projects involved creating custom rerankers, designing specialized agents, and optimizing vector search pipelines for production use cases.
 
-Currently, I am working with [Juspay](https://juspay.io/in) on the [Xyne team](https://xynehq.com/) where I am developing advanced AI systems focused on semantic search, information retrieval, and agent-based architectures. My work involves designing and implementing end-to-end Retrieval-Augmented Generation (RAG) pipelines, optimizing vector search for low-latency query processing, and building intelligent agentic frameworks. These efforts leverage state-of-the-art transformer models and knowledge graphs to enhance contextual understanding and scalability in production-grade AI applications.
+Currently, I am working with [Juspay](https://juspay.io/in) on the [Xyne team](https://xynehq.com/) where I'm focused on fine-tuning and continued pre-training (CPT) for coder models. Next up is reinforcement learning for reasoning tasks and agentic capabilities. Previously on this team, I developed advanced AI systems focused on semantic search, information retrieval, and agent-based architectures—designing and implementing end-to-end Retrieval-Augmented Generation (RAG) pipelines, optimizing vector search for low-latency query processing, and building intelligent agentic frameworks leveraging state-of-the-art transformer models and knowledge graphs.
 
 Well that's it.. I am still not sure what I like most. So if you’re looking to collaborate on a project related to AI or ML, feel free to reach out—I’m just a message away!

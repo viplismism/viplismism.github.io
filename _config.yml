@@ -1,17 +1,17 @@
-site: Deox Labs
+site: Vipul Maheshwari
 url: https://vipul-maheshwari.github.io/
-title: Deox Labs
+title: Vipul Maheshwari
 description: Everything related to AI
 twitter:
-  username: fuxssss
+  username: broskidotai
   card: summary
-  creator: #yourusername
+  creator: broskidotai
 author:
-  twitter: #yourusername
-  name: #yourusername
+  twitter: broskidotai
+  name: Vipul Maheshwari
   avatar:
-  email: #youremail
-  url: #yoururl
+  email:
+  url: https://vipul-maheshwari.github.io/
 permalink: pretty
 
 baseurl: ""
