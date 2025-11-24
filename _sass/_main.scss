@@ -273,7 +273,15 @@ main {
 
     .nav-menu a:hover,
     .nav-menu a:active,
-    .nav-menu a:focus,
+    .nav-menu a:focus {
+        background: none !important;
+        background-color: transparent !important;
+        outline: none !important;
+        box-shadow: none !important;
+        border-bottom: 2px solid #333 !important;
+        text-decoration: none !important;
+    }
+
     .nav-menu a.active,
     .nav-menu a:visited,
     .nav-menu a:link {
