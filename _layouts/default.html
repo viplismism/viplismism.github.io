@@ -20,9 +20,18 @@ layout: compress
 
         if (mobileMenuToggle && navMenu) {
           // Toggle menu when hamburger is clicked
-          mobileMenuToggle.addEventListener('click', function() {
+          mobileMenuToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             mobileMenuToggle.classList.toggle('active');
             navMenu.classList.toggle('active');
+
+            // Prevent body scroll when menu is open
+            if (navMenu.classList.contains('active')) {
+              document.body.style.overflow = 'hidden';
+            } else {
+              document.body.style.overflow = '';
+            }
           });
 
           // Close menu when a link is clicked
@@ -30,14 +39,25 @@ layout: compress
             if (e.target.tagName === 'A') {
               mobileMenuToggle.classList.remove('active');
               navMenu.classList.remove('active');
+              document.body.style.overflow = '';
             }
           });
 
-          // Close menu when clicking outside
-          document.addEventListener('click', function(e) {
-            if (!navMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+          // Close menu when clicking outside (on the overlay)
+          navMenu.addEventListener('click', function(e) {
+            if (e.target === navMenu) {
               mobileMenuToggle.classList.remove('active');
               navMenu.classList.remove('active');
+              document.body.style.overflow = '';
+            }
+          });
+
+          // Close menu on escape key
+          document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+              mobileMenuToggle.classList.remove('active');
+              navMenu.classList.remove('active');
+              document.body.style.overflow = '';
             }
           });
         }
