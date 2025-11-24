@@ -183,13 +183,14 @@ main {
     box-shadow: none !important;
     cursor: pointer;
     flex-direction: column;
-    padding: 8px !important;
+    padding: 10px !important;
     position: fixed;
-    top: 15px;
-    right: 15px;
+    top: 50px;
+    right: 20px;
     z-index: 1001;
     width: auto !important;
     height: auto !important;
+    touch-action: manipulation;
 }
 
 .hamburger-line {

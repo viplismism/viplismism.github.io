@@ -15,16 +15,21 @@ layout: compress
     <!-- Mobile hamburger menu JavaScript -->
     <script>
       function toggleMobileMenu() {
+        console.log('Toggle clicked!');
         const hamburger = document.querySelector('.mobile-menu-toggle');
         const menu = document.querySelector('.nav-menu');
 
         if (hamburger && menu) {
           hamburger.classList.toggle('active');
           menu.classList.toggle('active');
+          console.log('Menu toggled, active:', menu.classList.contains('active'));
+        } else {
+          console.log('Elements not found:', hamburger, menu);
         }
       }
 
       function closeMobileMenu() {
+        console.log('Closing menu');
         const hamburger = document.querySelector('.mobile-menu-toggle');
         const menu = document.querySelector('.nav-menu');
 
@@ -33,20 +38,6 @@ layout: compress
           menu.classList.remove('active');
         }
       }
-
-      document.addEventListener('DOMContentLoaded', function() {
-        // Hamburger click handler
-        const hamburger = document.querySelector('.mobile-menu-toggle');
-        if (hamburger) {
-          hamburger.addEventListener('click', toggleMobileMenu);
-        }
-
-        // Close menu when clicking links
-        const menuLinks = document.querySelectorAll('.nav-menu a');
-        menuLinks.forEach(link => {
-          link.addEventListener('click', closeMobileMenu);
-        });
-      });
     </script>
 
     <!-- Google Analytics -->
