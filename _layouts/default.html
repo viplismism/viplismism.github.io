@@ -23,6 +23,7 @@ layout: compress
           hamburger.classList.toggle('active');
           menu.classList.toggle('active');
           console.log('Menu toggled, active:', menu.classList.contains('active'));
+          console.log('Menu items found:', menu.querySelectorAll('li').length);
         } else {
           console.log('Elements not found:', hamburger, menu);
         }
@@ -38,6 +39,14 @@ layout: compress
           menu.classList.remove('active');
         }
       }
+
+      // Debug function to check menu content
+      document.addEventListener('DOMContentLoaded', function() {
+        const menu = document.querySelector('.nav-menu');
+        if (menu) {
+          console.log('Navigation menu found with items:', menu.innerHTML);
+        }
+      });
     </script>
 
     <!-- Google Analytics -->

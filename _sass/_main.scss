@@ -221,7 +221,12 @@ main {
         display: flex !important;
     }
 
-    /* Mobile menu styles */
+    /* Hide the original desktop navigation */
+    header > nav > ul:not(.nav-menu) {
+        display: none !important;
+    }
+
+    /* But keep showing our mobile menu */
     .nav-menu {
         position: fixed;
         left: -100%;
@@ -233,11 +238,12 @@ main {
         text-align: center;
         transition: left 0.3s ease;
         z-index: 1000;
-        padding-top: 60px;
+        padding-top: 80px;
         list-style: none;
         margin: 0;
         padding-left: 0;
         padding-right: 0;
+        display: flex !important;
     }
 
     .nav-menu.active {
@@ -246,7 +252,7 @@ main {
 
     .nav-menu li {
         margin: 0;
-        display: block;
+        display: block !important;
         text-align: center;
     }
 
@@ -254,29 +260,31 @@ main {
         font-size: 18px;
         font-weight: normal;
         padding: 15px 20px;
-        display: block;
+        display: block !important;
         text-decoration: none;
         border-bottom: 1px solid #eee;
-        color: #333;
+        color: #333 !important;
     }
 
     .nav-menu a:hover, .nav-menu a.active {
         background-color: #f0f0f0;
     }
 
-    /* Hide desktop navigation completely */
-    header li {
+    /* Hide any other navigation elements */
+    header li:not(.nav-menu li) {
         display: none !important;
     }
 
-    header ul {
+    header ul:not(.nav-menu) {
         border-bottom: none;
         padding-bottom: 0;
         border-right: none;
+        display: none !important;
     }
 
-    nav ul {
+    nav ul:not(.nav-menu) {
         border-right: 0;
+        display: none !important;
     }
 
     .photos ul {
