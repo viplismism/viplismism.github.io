@@ -12,6 +12,38 @@ layout: compress
 
 
 
+    <!-- Mobile menu JavaScript -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+        const navMenu = document.querySelector('.nav-menu');
+
+        if (mobileMenuToggle && navMenu) {
+          // Toggle menu when hamburger is clicked
+          mobileMenuToggle.addEventListener('click', function() {
+            mobileMenuToggle.classList.toggle('active');
+            navMenu.classList.toggle('active');
+          });
+
+          // Close menu when a link is clicked
+          navMenu.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A') {
+              mobileMenuToggle.classList.remove('active');
+              navMenu.classList.remove('active');
+            }
+          });
+
+          // Close menu when clicking outside
+          document.addEventListener('click', function(e) {
+            if (!navMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+              mobileMenuToggle.classList.remove('active');
+              navMenu.classList.remove('active');
+            }
+          });
+        }
+      });
+    </script>
+
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JBZRCCYMBP"></script>
     <script>
