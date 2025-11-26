@@ -5,3 +5,21 @@ tmp
 .DS_Store
 .jekyll-cache
 .git
+
+# Jekyll build output
+_site/
+_site
+
+# Bundler
+vendor/
+.bundle/
+
+# Jekyll metadata
+.jekyll-metadata
+
+# Ruby
+.rbenv-version
+.ruby-version
+
+# OS generated files
+Thumbs.db

@@ -238,7 +238,7 @@ class PropertyRecommendationTool(Tool):
         profile_prompt = f"""
         Extract user preferences from this query, such as budget, family size, commute preferences, or lifestyle (e.g., urban, family-friendly).
         Query: "{query}"
-        Return a JSON object with inferred preferences (e.g., {{"budget": 800000, "family_size": 4}}). If none, return {{}}.
+        Return a JSON object with inferred preferences (e.g., {% raw %}{{"budget": 800000, "family_size": 4}}{% endraw %}). If none, return {% raw %}{{}}{% endraw %}.
         """
         try:
             profile_response = openai_client.chat.completions.create(
