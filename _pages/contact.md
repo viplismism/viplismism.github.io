@@ -5,11 +5,11 @@ title: Contact
 
 Cuss words, feedback, collaborations, freelancing, gigs—anything, just shoot! I am all ears!
 
-- [Email](mailto:vim.code.level@gmail.com)
+- [Email](mailto:jyosalabs@gmail.com)
   
 - [WhatsApp](https://wa.me/918949823510)
 
-- [Twitter](https://x.com/broskidotai)
+- [Twitter](https://x.com/vipli_)
   
 - [LinkedIn](https://www.linkedin.com/in/vipulmaheshwarii/)
 
