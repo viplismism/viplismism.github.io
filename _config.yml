@@ -1,5 +1,5 @@
 site: Jyosa Labs Blogs
-url: https://vipul-maheshwari.github.io/
+url: https://viplisimism.github.io/
 title: Jyosa Labs Blogs
 description: Everything related to AI
 twitter:
@@ -11,7 +11,7 @@ author:
   name: Vipul Maheshwari
   avatar:
   email: jyosalabs@gmail.com
-  url: https://vipul-maheshwari.github.io/
+  url: https://viplisimism.github.io
 permalink: pretty
 
 baseurl: ""
