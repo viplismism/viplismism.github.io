@@ -9,7 +9,7 @@ Cuss words, feedback, collaborations, freelancing, gigs—anything, just shoot! 
   
 - [WhatsApp](https://wa.me/918949823510)
 
-- [Twitter](https://x.com/vipli_)
+- [Twitter](https://x.com/viplismism)
   
 - [LinkedIn](https://www.linkedin.com/in/vipulmaheshwarii/)
 
