@@ -13,6 +13,6 @@ Cuss words, feedback, collaborations, freelancing, gigs—anything, just shoot! 
   
 - [LinkedIn](https://www.linkedin.com/in/vipulmaheshwarii/)
 
-Looking forward to connecting with you! Book a slot here : [Call](https://cal.com/vipulmaheshwari)
+Looking forward to connecting with you! Book a slot here : [Call](https://cal.com/jyosalabs-vipulmaheshwari)
 
 
