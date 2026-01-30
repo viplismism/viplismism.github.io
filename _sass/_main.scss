@@ -70,20 +70,6 @@ pre {
 	overflow-x: auto;
 }
 
-/* Mobile: wrap long code blocks instead of horizontal scroll */
-@media screen and (max-width: 45rem) {
-	pre {
-		white-space: pre-wrap;
-		word-wrap: break-word;
-		word-break: break-word;
-	}
-	
-	pre code {
-		white-space: pre-wrap;
-		word-wrap: break-word;
-	}
-}
-
 
 img {
 	max-width:100%;
