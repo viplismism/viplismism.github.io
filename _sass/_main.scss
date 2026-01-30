@@ -266,9 +266,10 @@ main {
         display: flex;
     }
 
-    /* Add top padding to main to account for fixed header */
+    /* Remove top margin/padding on mobile */
     main {
         padding-top: 0;
+        margin-top: 0;
     }
 
     /* Hide Graph link on mobile */
