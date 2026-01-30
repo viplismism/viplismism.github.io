@@ -5,14 +5,16 @@ layout: compress
 <html lang="en">
   {% include head.html %}  
   <body>
-    <!-- Mobile hamburger button - OUTSIDE main for proper fixed positioning -->
-    <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" onclick="toggleMobileMenu()">
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-    </button>
+    <!-- Fixed mobile header bar -->
+    <div class="mobile-header">
+      <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" onclick="toggleMobileMenu()">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
     
-    <!-- Mobile nav menu - also outside main -->
+    <!-- Mobile nav menu -->
     <ul class="nav-menu">
       {% for item in site.data.navigation.links %}
         {% unless item.title == "Jyosa Labs" %}
@@ -52,7 +54,6 @@ layout: compress
       }
 
       function closeMobileMenu() {
-        console.log('Closing menu');
         const hamburger = document.querySelector('.mobile-menu-toggle');
         const menu = document.querySelector('.nav-menu');
 
@@ -61,30 +62,6 @@ layout: compress
           menu.classList.remove('active');
         }
       }
-
-      // iOS Safari fix: Use absolute positioning + scroll listener
-      document.addEventListener('DOMContentLoaded', function() {
-        const hamburger = document.querySelector('.mobile-menu-toggle');
-        const menu = document.querySelector('.nav-menu');
-        
-        if (hamburger && window.innerWidth <= 720) {
-          // Switch to absolute positioning and update on scroll
-          hamburger.style.position = 'absolute';
-          
-          function updateHamburgerPosition() {
-            hamburger.style.top = (window.pageYOffset + 20) + 'px';
-            if (menu && menu.classList.contains('active')) {
-              menu.style.top = window.pageYOffset + 'px';
-            }
-          }
-          
-          // Update position on scroll
-          window.addEventListener('scroll', updateHamburgerPosition, { passive: true });
-          
-          // Initial position
-          updateHamburgerPosition();
-        }
-      });
     </script>
 
     <!-- Google Analytics -->
