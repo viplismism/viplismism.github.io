@@ -2,7 +2,7 @@
 layout: post
 title: Convert any Image dataset to Lance
 description: This post gives a detailed overview of how we can convert any image dataset to lance
-tags: [LanceDB, Dataset]
+tags: [LanceDB, Data Engineering, Computer Vision]
 version: Published
 release: 09-04-2024
 ---

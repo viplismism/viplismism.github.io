@@ -2,7 +2,7 @@
 layout: post
 title: Multi Document Agentic RAG
 description: This post shows how you can create a Multi Document Agentic RAG using LanceDB.
-tags: [LLM,  RAG, LanceDB]
+tags: [RAG, AI Agents, LanceDB]
 version: Released
 release: 16-08-2024
 ---
@@ -531,4 +531,4 @@ The best part is that it passed the relevant parameters—problems extracted fro
 
 Btw, If you want the agent to retain the context of previous conversations, replace `.query` with `.chat` to ensure context is preserved. Keep in mind that the context size is limited by the information you provide when calling the retrievers. Watch out for the `max_context_information` parameter in the retrievers to avoid exceeding the token limits for the LLMs.
 
-And that's it! You've successfully created an agentic RAG that not only understands the user's query but also delivers a well-reasoned and contextually accurate answer. Here is the colab for this example: ![colab](https://colab.research.google.com/github/lancedb/vectordb-recipes/blob/main/examples/multi-document-agentic-rag/main.ipynb?ref=blog.lancedb.com#scrollTo=Q1Z8S3epC5So)
+And that's it! You've successfully created an agentic RAG that not only understands the user's query but also delivers a well-reasoned and contextually accurate answer. Here is the [colab](https://colab.research.google.com/github/lancedb/vectordb-recipes/blob/main/examples/multi-document-agentic-rag/main.ipynb) for this example.

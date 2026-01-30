@@ -2,7 +2,7 @@
 layout: post
 title: Databases for ML Worflows
 description: How LanceDB is beating ass of every other Embedded Database
-tags: [LLM, Embedded Databases, LanceDB]
+tags: [LanceDB, Vector Database, MLOps]
 version: Published
 release: 15-03-2024
 ---

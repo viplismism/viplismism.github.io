@@ -2,7 +2,7 @@
 layout: post
 title: Create LLM apps using RAG
 description: RAG and Langcahin for creating the personalized bots
-tags: [LLM,  Deep Learning]
+tags: [RAG, LangChain, LLM]
 version: Published
 release: 14-02-2024
 ---

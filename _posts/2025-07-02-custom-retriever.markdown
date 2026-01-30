@@ -2,7 +2,7 @@
 layout: post
 title: Create a custom retriever
 description: This post is all about creating a custom retriever.
-tags: [Retriever, Superlinked]
+tags: [RAG, Superlinked, Retriever]
 version: Released
 release: 02-07-2025
 ---

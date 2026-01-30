@@ -2,7 +2,7 @@
 layout: post
 title: Create a Movie Recommendation System using RAG and Genre Classification
 description: This post gives a detailed view on how you can use the embeddings to create a Movie Recommendation sys
-tags: [LLM, RAG]
+tags: [RAG, Embeddings, Recommendation System]
 version: Published
 release: 31-05-2024
 ---

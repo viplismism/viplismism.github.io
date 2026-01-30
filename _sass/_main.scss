@@ -20,9 +20,13 @@ nav ul {
 }
 
 a {
-    color: #000;
+    color: #2563eb;
     text-decoration-skip-ink: auto;
     text-decoration: underline;
+}
+
+a:hover {
+    color: #1d4ed8;
 }
 
 pre {
@@ -43,7 +47,7 @@ pre {
 }
 
 .meta {
-	margin: 2rem 0;
+	margin: 1rem 0;
 }
 
 code,pre {
@@ -88,6 +92,11 @@ header {
 
 header a {
 	text-decoration: none;
+	color: #000;
+}
+
+header a:hover {
+	color: #000;
 }
 
 header li {
@@ -152,6 +161,11 @@ strong, b {
 	overflow:hidden;
 	text-overflow:ellipsis;
 	text-decoration: none;
+	color: #000;
+}
+
+.posts li a:hover, .projects li a:hover {
+	color: #333;
 }
 
 .posts li time, .projects li time {
@@ -167,9 +181,10 @@ strong, b {
 main {
 	display:flex;
 	flex-wrap:wrap;
-	max-width:60rem;
+	max-width:75rem;
 	margin:2rem auto;
 	padding:1rem;
+	justify-content: center;
 }
 
 
@@ -345,4 +360,26 @@ figcaption {
     border-radius: 5px;
     display: block; /* Initially hidden */
     margin-right: 20%; /* Adjust the margin to move the icon closer to the post content */
+}
+
+/* Tag styles */
+.post-tag-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.post-tag-link:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.post-tags {
+    margin-top: 0.25rem;
+}
+
+.post-footer {
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: none;
 }
