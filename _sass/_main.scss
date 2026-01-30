@@ -200,7 +200,7 @@ main {
 }
 
 
-/* Fixed mobile header bar */
+/* Fixed mobile header bar - hidden on desktop */
 .mobile-header {
     display: none;
     position: fixed;
@@ -214,7 +214,12 @@ main {
     backdrop-filter: blur(10px);
 }
 
-/* Mobile hamburger menu */
+/* Mobile nav menu - hidden on desktop */
+.nav-menu {
+    display: none;
+}
+
+/* Mobile hamburger menu - hidden on desktop */
 .mobile-menu-toggle {
     display: none;
     background: none;
