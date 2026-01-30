@@ -6,6 +6,11 @@
 	padding:0;
 }
 
+html {
+	height: 100%;
+	overflow-x: hidden;
+}
+
 body {
 	font-family: system-ui, sans-serif;
 	-webkit-font-smoothing: antialiased;
@@ -13,6 +18,8 @@ body {
 	line-height:1.5;
 	font-size: 1rem;
 	color: rgb(22, 23, 26);
+	min-height: 100%;
+	-webkit-overflow-scrolling: touch;
 }
 
 nav ul {
@@ -199,12 +206,17 @@ main {
     flex-direction: column;
     padding: 10px !important;
     position: fixed !important;
-    top: 20px;
-    right: 20px;
+    -webkit-position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
     z-index: 9999 !important;
     width: auto !important;
     height: auto !important;
     touch-action: manipulation;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 .hamburger-line {
