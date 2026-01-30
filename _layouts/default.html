@@ -62,11 +62,27 @@ layout: compress
         }
       }
 
-      // Debug function to check menu content
+      // iOS Safari fix: Use absolute positioning + scroll listener
       document.addEventListener('DOMContentLoaded', function() {
+        const hamburger = document.querySelector('.mobile-menu-toggle');
         const menu = document.querySelector('.nav-menu');
-        if (menu) {
-          console.log('Navigation menu found with items:', menu.innerHTML);
+        
+        if (hamburger && window.innerWidth <= 720) {
+          // Switch to absolute positioning and update on scroll
+          hamburger.style.position = 'absolute';
+          
+          function updateHamburgerPosition() {
+            hamburger.style.top = (window.pageYOffset + 20) + 'px';
+            if (menu && menu.classList.contains('active')) {
+              menu.style.top = window.pageYOffset + 'px';
+            }
+          }
+          
+          // Update position on scroll
+          window.addEventListener('scroll', updateHamburgerPosition, { passive: true });
+          
+          // Initial position
+          updateHamburgerPosition();
         }
       });
     </script>
