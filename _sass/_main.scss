@@ -261,8 +261,9 @@ main {
         overflow: hidden !important;
     }
 
-    /* Hide the original desktop navigation */
-    header > nav > ul:not(.nav-menu) {
+    /* Hide the entire desktop navigation header on mobile */
+    .desktop-nav,
+    header.desktop-nav {
         display: none !important;
     }
 

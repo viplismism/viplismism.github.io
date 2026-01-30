@@ -1,24 +1,17 @@
-<!-- Mobile hamburger button - OUTSIDE header for proper fixed positioning -->
-<button class="mobile-menu-toggle" aria-label="Toggle navigation menu" onclick="toggleMobileMenu()">
-  <span class="hamburger-line"></span>
-  <span class="hamburger-line"></span>
-  <span class="hamburger-line"></span>
-</button>
-
-<header aria-hidden="true" class="no-print">
+<header aria-hidden="true" class="no-print desktop-nav">
       <!--<h1 class="logo">{{ site.title }}</h1>-->
       <nav role="navigation" aria-hidden="true">
-        <!-- Navigation menu -->
-        <ul class="nav-menu">
+        <!-- Desktop Navigation menu -->
+        <ul>
            {% for item in site.data.navigation.links %}
               {% unless item.title == "Jyosa Labs" %}
-              <li{% if item.title == "Graph" %} class="hide-mobile"{% endif %}><a href="{{ item.url }}" {% if item.url == page.url %} class="active"{% endif %} onclick="closeMobileMenu()">{{ item.title }}</a></li>
+              <li><a href="{{ item.url }}" {% if item.url == page.url %} class="active"{% endif %}>{{ item.title }}</a></li>
               {% endunless %}
            {% endfor %}
-        <li><a href="/search" {% if page.url == "/search" %} class="active"{% endif %} onclick="closeMobileMenu()">Search</a></li>
+        <li><a href="/search" {% if page.url == "/search" %} class="active"{% endif %}>Search</a></li>
            {% for item in site.data.navigation.links %}
               {% if item.title == "Jyosa Labs" %}
-              <li><a href="{{ item.url }}" target="_blank" onclick="closeMobileMenu()">{{ item.title }}</a></li>
+              <li><a href="{{ item.url }}" target="_blank">{{ item.title }}</a></li>
               {% endif %}
            {% endfor %}
         </ul>
