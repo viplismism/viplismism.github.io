@@ -5,6 +5,28 @@ layout: compress
 <html lang="en">
   {% include head.html %}  
   <body>
+    <!-- Mobile hamburger button - OUTSIDE main for proper fixed positioning -->
+    <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" onclick="toggleMobileMenu()">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+    
+    <!-- Mobile nav menu - also outside main -->
+    <ul class="nav-menu">
+      {% for item in site.data.navigation.links %}
+        {% unless item.title == "Jyosa Labs" %}
+        <li{% if item.title == "Graph" %} class="hide-mobile"{% endif %}><a href="{{ item.url }}" {% if item.url == page.url %} class="active"{% endif %} onclick="closeMobileMenu()">{{ item.title }}</a></li>
+        {% endunless %}
+      {% endfor %}
+      <li><a href="/search" {% if page.url == "/search" %} class="active"{% endif %} onclick="closeMobileMenu()">Search</a></li>
+      {% for item in site.data.navigation.links %}
+        {% if item.title == "Jyosa Labs" %}
+        <li><a href="{{ item.url }}" target="_blank" onclick="closeMobileMenu()">{{ item.title }}</a></li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+
     <main>
       {% include navigation.html %}
       {{ content }}
