@@ -196,12 +196,11 @@ main {
 /* Fixed mobile header bar - hidden on desktop */
 .mobile-header {
     display: none;
-    position: -webkit-sticky;
-    position: sticky;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: 20px;
+    height: 50px;
     background: #fff;
     z-index: 9999;
     width: 100%;
@@ -224,7 +223,7 @@ main {
     flex-direction: column;
     padding: 10px;
     position: absolute;
-    top: 10px;
+    top: 3px;
     right: 20px;
     width: 44px;
     height: 44px;
@@ -268,7 +267,7 @@ main {
 
     /* Remove top margin/padding on mobile */
     main {
-        padding-top: 0;
+        padding-top: 50px;
         margin-top: 0;
     }
 
