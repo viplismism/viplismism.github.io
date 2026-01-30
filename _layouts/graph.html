@@ -97,7 +97,7 @@
     const tags = Array.from(tagSet).map((t, i) => ({
       id: `tag-${i}`,
       title: t,
-      url: `/tag/${encodeURIComponent(t)}/`,
+      url: `/tag/${t.toLowerCase().replace(/ /g, '-')}/`,
       type: "tag"
     }));
 

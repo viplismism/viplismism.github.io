@@ -14,7 +14,7 @@ module Jekyll
     def initialize(site, base, tag)
       @site = site
       @base = base
-      @dir  = File.join('tag', tag)
+      @dir  = File.join('tag', tag.downcase.gsub(' ', '-'))
       @name = 'index.html'
 
       self.process(@name)
