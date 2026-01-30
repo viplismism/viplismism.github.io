@@ -200,23 +200,36 @@ main {
 }
 
 
-/* Mobile hamburger menu - CLEAN VERSION */
+/* Fixed mobile header bar */
+.mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 9999;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+/* Mobile hamburger menu */
 .mobile-menu-toggle {
-    display: none !important;
-    background: none !important;
-    background-color: transparent !important;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
+    display: none;
+    background: none;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    box-shadow: none;
     cursor: pointer;
     flex-direction: column;
-    padding: 10px !important;
-    position: fixed !important;
-    top: 20px !important;
-    right: 20px !important;
-    z-index: 9999 !important;
-    width: 44px !important;
-    height: 44px !important;
+    padding: 10px;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    width: 44px;
+    height: 44px;
     touch-action: manipulation;
     -webkit-transform: translate3d(0,0,0);
     transform: translate3d(0,0,0);
@@ -245,13 +258,19 @@ main {
 }
 
 @media screen and (max-width: 45rem) {
-    /* Show hamburger on mobile - ensure it stays fixed */
+    /* Show fixed mobile header bar */
+    .mobile-header {
+        display: block;
+    }
+
+    /* Show hamburger inside the fixed header */
     .mobile-menu-toggle {
-        display: flex !important;
-        position: fixed !important;
-        top: 20px !important;
-        right: 20px !important;
-        z-index: 9999 !important;
+        display: flex;
+    }
+
+    /* Add top padding to main to account for fixed header */
+    main {
+        padding-top: 70px;
     }
 
     /* Hide Graph link on mobile */
