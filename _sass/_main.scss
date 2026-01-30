@@ -212,10 +212,10 @@ main {
     cursor: pointer;
     flex-direction: column;
     padding: 10px !important;
-    position: fixed;
-    top: 50px;
+    position: fixed !important;
+    top: 20px;
     right: 20px;
-    z-index: 1001;
+    z-index: 9999 !important;
     width: auto !important;
     height: auto !important;
     touch-action: manipulation;
@@ -250,12 +250,15 @@ main {
         position: fixed !important;
         top: 20px !important;
         right: 20px !important;
-        z-index: 1001 !important;
+        z-index: 9999 !important;
     }
 
     /* Hide Graph link on mobile */
     .hide-mobile {
         display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
     }
 
     /* Hide the original desktop navigation */
@@ -275,7 +278,7 @@ main {
         height: 100vh;
         text-align: center;
         transition: left 0.3s ease;
-        z-index: 1000;
+        z-index: 9998;
         padding-top: 80px;
         list-style: none;
         margin: 0;
