@@ -9,8 +9,6 @@
 html {
 	height: 100%;
 	overflow-x: hidden;
-	-webkit-transform: none;
-	transform: none;
 }
 
 body {
@@ -21,9 +19,6 @@ body {
 	font-size: 1rem;
 	color: rgb(22, 23, 26);
 	min-height: 100%;
-	-webkit-overflow-scrolling: touch;
-	-webkit-transform: none;
-	transform: none;
 }
 
 nav ul {
@@ -195,23 +190,21 @@ main {
 	max-width:75rem;
 	margin:2rem auto;
 	padding:1rem;
-	-webkit-transform: none;
-	transform: none;
 }
 
 
 /* Fixed mobile header bar - hidden on desktop */
 .mobile-header {
     display: none;
-    position: fixed;
+    position: -webkit-sticky;
+    position: sticky;
     top: 0;
     left: 0;
     right: 0;
     height: 60px;
-    background: rgba(255, 255, 255, 0.95);
+    background: #fff;
     z-index: 9999;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    width: 100%;
 }
 
 /* Mobile nav menu - hidden on desktop */
