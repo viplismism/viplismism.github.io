@@ -182,14 +182,6 @@
     node.on('mouseover', (e, d) => {
       if (isPlaying) return; // Disable hover during animation
       
-      // Only show tooltip for posts, not tags (tags already have visible labels)
-      if (d.type !== 'tag') {
-        tooltip.style('display', 'block')
-          .style('left', (e.clientX + 15) + 'px')
-          .style('top', (e.clientY - 10) + 'px')
-          .html(`<strong>${d.title}</strong>`);
-      }
-      
       const connected = new Set([d.id]);
       links.forEach(l => {
         if (l.source.id === d.id) connected.add(l.target.id);
