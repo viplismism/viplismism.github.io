@@ -2,7 +2,7 @@
 layout: post
 title: Real Estate Natural Language Querying Agent
 description: This post is all about creating an agent which can help you to figure out what you really want in the Real Estate
-tags: [Agent, Superlinked]
+tags: [AI Agents, Superlinked, NLQ]
 version: Released
 release: 07-06-2025
 ---

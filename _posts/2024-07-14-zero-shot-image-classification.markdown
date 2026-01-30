@@ -2,7 +2,7 @@
 layout: post
 title: Zero Shot Image Classification with LanceDB and OpenAI's CLIP
 description: This post shows how you can do the image classification without training a image model
-tags: [LLM,  Deep Learning, LanceDB]
+tags: [LanceDB, CLIP, Computer Vision]
 version: Published
 release: 14-07-2024
 ---

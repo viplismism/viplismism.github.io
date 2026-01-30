@@ -2,7 +2,7 @@
 layout: post
 title: Creating a Fintech AI agent without any framework
 description: This post gives a detailed introduction on how agents work and how we can create one using the simple Python
-tags: [AI Agents, Python Agent from Scratch]
+tags: [AI Agents, Python, From Scratch]
 version: Released
 release: 23-02-2025
 ---

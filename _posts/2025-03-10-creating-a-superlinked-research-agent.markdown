@@ -2,7 +2,7 @@
 layout: post
 title: An agent to read research papers better
 description: This post is all about creating a superlinked research paper agent which can help you out to do research better.
-tags: [Agent, Superlinked]
+tags: [AI Agents, Superlinked, RAG]
 version: Released
 release: 10-03-2025
 ---

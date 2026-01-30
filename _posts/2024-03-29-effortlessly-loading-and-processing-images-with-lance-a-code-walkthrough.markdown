@@ -2,7 +2,7 @@
 layout: post
 title: Effortlessly Loading and Processing Images with Lance
 description: How you can use the lance format to work with big sized data
-tags: [LanceDB]
+tags: [LanceDB, Data Engineering, Computer Vision]
 version: Published
 release: 29-03-2024
 ---

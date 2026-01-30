@@ -1,0 +1,307 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Graph</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body { font-family: system-ui, sans-serif; background: #fff; }
+    #graph-container {
+      width: 100%;
+      height: 100vh;
+      background: #fff;
+      overflow: hidden;
+    }
+    #graph-container svg {
+      display: block;
+      cursor: grab;
+    }
+    #graph-container svg:active { cursor: grabbing; }
+    .node { cursor: pointer; }
+    .node:hover circle { stroke: #333; stroke-width: 3px; }
+    #tooltip {
+      display: none;
+      position: fixed;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .home-btn, .play-btn {
+      position: fixed;
+      top: 20px;
+      z-index: 100;
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #555;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .home-btn { left: 20px; }
+    .play-btn { left: 60px; }
+    .home-btn:hover, .play-btn:hover {
+      color: #000;
+    }
+    .home-btn svg, .play-btn svg {
+      width: 28px;
+      height: 28px;
+    }
+  </style>
+</head>
+<body>
+  <a href="/" class="home-btn" title="Home">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+    </svg>
+  </a>
+  <button class="play-btn" id="playBtn" title="Watch timeline">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+      <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  </button>
+  <div id="graph-container"></div>
+  <div id="tooltip"></div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    const posts = [
+      {% for post in site.posts reversed %}
+      {
+        id: "post-{{ forloop.index }}",
+        title: {{ post.title | jsonify }},
+        url: "{{ post.url }}",
+        tags: {{ post.tags | jsonify }},
+        date: "{{ post.date | date: '%Y-%m-%d' }}",
+        type: "post"
+      }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ];
+
+    const tagSet = new Set();
+    posts.forEach(p => p.tags.forEach(t => tagSet.add(t)));
+    const tags = Array.from(tagSet).map((t, i) => ({
+      id: `tag-${i}`,
+      title: t,
+      url: `/tag/${encodeURIComponent(t)}/`,
+      type: "tag"
+    }));
+
+    const nodes = [...posts, ...tags];
+    const links = [];
+    posts.forEach(p => {
+      p.tags.forEach(t => {
+        const tagNode = tags.find(x => x.title === t);
+        if (tagNode) links.push({ source: p.id, target: tagNode.id });
+      });
+    });
+
+    const container = document.getElementById('graph-container');
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const padding = 60;
+
+    const svg = d3.select('#graph-container')
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height);
+
+    const g = svg.append('g');
+
+    svg.call(d3.zoom()
+      .scaleExtent([0.3, 3])
+      .on('zoom', e => g.attr('transform', e.transform)));
+
+    const simulation = d3.forceSimulation(nodes)
+      .force('link', d3.forceLink(links).id(d => d.id).distance(100))
+      .force('charge', d3.forceManyBody().strength(-250))
+      .force('center', d3.forceCenter(width / 2, height / 2))
+      .force('collision', d3.forceCollide().radius(40))
+      .force('x', d3.forceX(width / 2).strength(0.03))
+      .force('y', d3.forceY(height / 2).strength(0.03));
+
+    const colors = d3.scaleOrdinal(d3.schemeTableau10);
+
+    const link = g.append('g')
+      .selectAll('line')
+      .data(links)
+      .join('line')
+      .attr('stroke', '#ccc')
+      .attr('stroke-width', 1.5);
+
+    const node = g.append('g')
+      .selectAll('g')
+      .data(nodes)
+      .join('g')
+      .attr('class', 'node')
+      .call(d3.drag()
+        .on('start', (e, d) => {
+          if (!e.active) simulation.alphaTarget(0.3).restart();
+          d.fx = d.x; d.fy = d.y;
+        })
+        .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+        .on('end', (e, d) => {
+          if (!e.active) simulation.alphaTarget(0);
+          d.fx = null; d.fy = null;
+        }));
+
+    node.append('circle')
+      .attr('r', d => d.type === 'tag' ? 14 : 8)
+      .attr('fill', d => d.type === 'tag' ? colors(d.title) : '#2563eb')
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 2);
+
+    node.append('text')
+      .text(d => d.title.length > 22 ? d.title.slice(0, 22) + '…' : d.title)
+      .attr('x', d => d.type === 'tag' ? 18 : 12)
+      .attr('y', 4)
+      .attr('font-size', d => d.type === 'tag' ? '11px' : '9px')
+      .attr('font-weight', d => d.type === 'tag' ? 'bold' : 'normal')
+      .attr('fill', '#333');
+
+    const tooltip = d3.select('#tooltip');
+
+    node.on('mouseover', (e, d) => {
+      if (isPlaying) return; // Disable hover during animation
+      tooltip.style('display', 'block')
+        .style('left', (e.clientX + 15) + 'px')
+        .style('top', (e.clientY - 10) + 'px')
+        .html(`<strong>${d.title}</strong>`);
+      
+      const connected = new Set([d.id]);
+      links.forEach(l => {
+        if (l.source.id === d.id) connected.add(l.target.id);
+        if (l.target.id === d.id) connected.add(l.source.id);
+      });
+      node.style('opacity', n => connected.has(n.id) ? 1 : 0.15);
+      link.style('opacity', l => l.source.id === d.id || l.target.id === d.id ? 1 : 0.1);
+    })
+    .on('mouseout', () => {
+      if (isPlaying) return; // Disable hover during animation
+      tooltip.style('display', 'none');
+      node.style('opacity', 1);
+      link.style('opacity', 1);
+    })
+    .on('click', (e, d) => window.location.href = d.url);
+
+    simulation.on('tick', () => {
+      nodes.forEach(d => {
+        d.x = Math.max(padding, Math.min(width - padding, d.x));
+        d.y = Math.max(padding, Math.min(height - padding, d.y));
+      });
+
+      link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+          .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+      node.attr('transform', d => `translate(${d.x},${d.y})`);
+    });
+
+    window.addEventListener('resize', () => {
+      const newWidth = window.innerWidth;
+      const newHeight = window.innerHeight;
+      svg.attr('width', newWidth).attr('height', newHeight);
+      simulation.force('center', d3.forceCenter(newWidth / 2, newHeight / 2));
+      simulation.force('x', d3.forceX(newWidth / 2).strength(0.03));
+      simulation.force('y', d3.forceY(newHeight / 2).strength(0.03));
+      simulation.alpha(0.3).restart();
+    });
+
+    // Timeline animation
+    let isPlaying = false;
+    const playBtn = document.getElementById('playBtn');
+    
+    function playTimeline() {
+      if (isPlaying) return;
+      isPlaying = true;
+      
+      // Hide all nodes and links first
+      node.style('opacity', 0).style('pointer-events', 'none');
+      link.style('opacity', 0).attr('stroke-dasharray', function() {
+        return this.getTotalLength();
+      }).attr('stroke-dashoffset', function() {
+        return this.getTotalLength();
+      });
+      
+      // Sort posts by date (oldest first)
+      const sortedPosts = [...posts].sort((a, b) => new Date(a.date) - new Date(b.date));
+      const revealedTags = new Set();
+      
+      let delay = 0;
+      const interval = 600; // ms between each post appearing
+      
+      sortedPosts.forEach((post, i) => {
+        setTimeout(() => {
+          // Show the post node with a pop effect
+          const postNode = node.filter(d => d.id === post.id);
+          postNode
+            .style('opacity', 1)
+            .select('circle')
+            .attr('r', 0)
+            .transition()
+            .duration(400)
+            .ease(d3.easeElastic.amplitude(1).period(0.4))
+            .attr('r', 8);
+          
+          // Show connected tags and links
+          post.tags.forEach(tagName => {
+            const tagData = tags.find(t => t.title === tagName);
+            if (tagData) {
+              // Show tag node if not already shown
+              if (!revealedTags.has(tagData.id)) {
+                revealedTags.add(tagData.id);
+                const tagNode = node.filter(d => d.id === tagData.id);
+                tagNode
+                  .style('opacity', 1)
+                  .select('circle')
+                  .attr('r', 0)
+                  .transition()
+                  .duration(400)
+                  .ease(d3.easeElastic.amplitude(1).period(0.4))
+                  .attr('r', 14);
+              }
+              
+              // Animate the link drawing
+              link.filter(l => l.source.id === post.id && l.target.id === tagData.id)
+                .style('opacity', 1)
+                .transition()
+                .duration(500)
+                .ease(d3.easeQuadOut)
+                .attr('stroke-dashoffset', 0);
+            }
+          });
+          
+          // Restart simulation gently
+          simulation.alpha(0.15).restart();
+          
+          // Reset when done
+          if (i === sortedPosts.length - 1) {
+            setTimeout(() => {
+              isPlaying = false;
+              // Re-enable hover
+              node.style('pointer-events', 'auto');
+              // Reset dash array
+              link.attr('stroke-dasharray', null).attr('stroke-dashoffset', null);
+            }, 800);
+          }
+        }, delay);
+        delay += interval;
+      });
+    }
+    
+    playBtn.addEventListener('click', playTimeline);
+  </script>
+</body>
+</html>

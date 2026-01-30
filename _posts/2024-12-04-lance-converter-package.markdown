@@ -2,7 +2,7 @@
 layout: post
 title: Python Package to convert image datasets to lance type
 description: This post gives a detailed overview of how we can convert any image dataset to lance using a python package
-tags: [LanceDB, Dataset, Python, Package]
+tags: [LanceDB, Python, Open Source]
 version: Released
 release: 11-12-2024
 ---

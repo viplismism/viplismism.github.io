@@ -2,7 +2,7 @@
 layout: post
 title: Train a CNN classification model with Lance Dataset
 description: This post shows how you can train a CNN model with Lance Dataset
-tags: [LLM,  Deep Learning, LanceDB]
+tags: [LanceDB, Deep Learning, Computer Vision]
 version: Published
 release: 26-06-2024
 ---

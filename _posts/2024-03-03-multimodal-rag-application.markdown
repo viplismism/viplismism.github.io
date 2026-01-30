@@ -2,7 +2,7 @@
 layout: post
 title: Create a Multimodal GTA-V RAG application
 description: Multimodal RAG applications using lanceDB
-tags: [LLM,  Deep Learning]
+tags: [RAG, Multimodal, LanceDB]
 version: Published
 release: 03-03-2024
 ---

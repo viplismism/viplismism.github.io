@@ -2,7 +2,7 @@
 layout: post
 title: Improving RAG with RAPTOR
 description: This post shows how you can improve a RAG application using the RAPTOR
-tags: [LLM,  RAG]
+tags: [RAG, RAPTOR, LLM]
 version: Released
 release: 30-10-2024
 ---
