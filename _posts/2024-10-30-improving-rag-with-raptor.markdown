@@ -7,7 +7,7 @@ version: Released
 release: 30-10-2024
 ---
 
-![title-image](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/improving-raptor-with-rag/raptor-title.png?raw=true)
+![title-image](/images/improving-raptor-with-rag/raptor-title.png)
 
 Traditional [RAG](https://vipul-maheshwari.github.io/2024/02/14/rag-application-with-langchain) setups often split documents into fixed-size chunks, but this can lead to problems in maintaining the semantic coherence of the text. If a key concept spans multiple chunks, and we only retrieve one chunk, the LLM might lack the full understanding of the idea, leading to incomplete or misleading responses. As a result, crucial ideas and relationships between concepts may be overlooked, leading to incomplete or inaccurate responses.
 
@@ -37,7 +37,7 @@ Now that you’re familiar with the key terms (and if not, no worries—you’ll
 - **Summarizing Clusters**: Once clustered, these groups of similar chunks are summarized into higher-level abstractions nodes. Each cluster acts like a basket for similar documents, and the individual summaries encapsulate the essence of all nodes within that cluster. This process builds from the bottom up, where nodes are clustered together to create summaries that are then passed up the hierarchy.
 - **Recursive Process**: This entire procedure is recursive, resulting in a tree structure that transitions from raw documents (the leaves) to more abstract summaries, with each summary derived from the clusters of various nodes.
 
-![RAPTOR-workflow](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/improving-raptor-with-rag/raptor-workflow.png?raw=true)
+![RAPTOR-workflow](/images/improving-raptor-with-rag/raptor-workflow.png)
 
 ### Building the RAPTOR
 
@@ -425,7 +425,7 @@ def process_text_hierarchy(
 results = process_text_hierarchy(chunks, number_of_levels=3)
 ```
 
-![self-made-flow](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/improving-raptor-with-rag/building-a-raptor-tree.png?raw=true)
+![self-made-flow](/images/improving-raptor-with-rag/building-a-raptor-tree.png)
 
 ### Inference
 
@@ -434,7 +434,7 @@ Now that we have our tree structure with leaf nodes at the bottom and summarized
 1. **Tree Traversal Retrieval:** This method systematically explores the tree, starting from the root node. It first selects the top-k most relevant root nodes based on their cosine similarity to the query embedding. Then, for each selected root node, its children are considered in the next layer, where the top-k nodes are again selected based on their cosine similarity to the query vector. This process repeats until we reach the leaf nodes. Finally, the text from all the selected nodes is concatenated to form the retrieved context.
 2. **Collapsed Tree Retrieval:** This approach simplifies things by viewing the tree as a single layer. Here, it directly compares the query embedding to the vector embeddings of all the leaf nodes (the original text chunks) and summary nodes. This method works best for factual, keyword-based queries where you need specific details.
 
-![raptor-methods](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/improving-raptor-with-rag/raptor-reference.png?raw=true)
+![raptor-methods](/images/improving-raptor-with-rag/raptor-reference.png)
 
 In the collapsed tree retrieval, we flatten the tree into one layer, retrieving nodes based on cosine similarity until we reach a specified number of ***top k documents***. In our code, we’ll gather the textual chunks from earlier, along with the summarized nodes at each level for all the clusters, to create one big list of texts that includes both the root documents and the summarized nodes.  
 
@@ -542,7 +542,7 @@ normal_table.create_fts_index("texts", replace=True)
 
 With RAPTOR, we now have an increased number of chunks due to the addition of cluster-level summary nodes alongside the default chunks we had earlier.
 
-![comparison-of-raptor-chunks](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/improving-raptor-with-rag/chunk-comparison.png?raw=true)
+![comparison-of-raptor-chunks](/images/improving-raptor-with-rag/chunk-comparison.png)
 
 ### D-Day
 
@@ -559,7 +559,7 @@ raptor_answer = generate_results(query, raptor_context_text)
 normal_answer = generate_results(query, normal_context_text)
 ```
 
-![difference-between-raptor-and-vanilla](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/improving-raptor-with-rag/raptor-vs-vanilla.png?raw=true)
+![difference-between-raptor-and-vanilla](/images/improving-raptor-with-rag/raptor-vs-vanilla.png)
 
 When we are comparing RAPTOR RAG with Vanilla RAG, it’s clear that RAPTOR performs better. Not only does RAPTOR retrieve details about the financial growth, but it also effectively connects this growth to the broader acquisition strategy, pulling relevant context from multiple sources. It excels in situations like this, where the query requires insights from various pages, making it more adept at handling complex, layered information retrieval.  
 

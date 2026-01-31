@@ -9,7 +9,7 @@ release: 03-03-2024
 
 *Artificial Intelligence (AI) has been actively working with text for quite some time, but the world isn't solely centered around words. If you take a moment to look around, you'll find a mix of text, images, videos, audios, and their combinations.*
 
-![boomer_ai](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/Renevant%20Cheetah-66.jpg?raw=true)
+![boomer_ai](/images/multimodal_rag/Renevant%20Cheetah-66.jpg)
 
 Today we are going to work on Multimodality which is basically a concept that essentially empowers AI models with the capacity to perceive, listen, and comprehend data in diverse formats together with the text. Pretty much like how we do!
 
@@ -21,7 +21,7 @@ But the challenge here is to make a computer understand one data format with its
 
 Let's think of the text components for now, so we are currently aiming that our model should learn that words like "Dog" and "Cat" are closely linked to the word "Pet." Now this understanding is easily achievable by using an embedding model which will convert these text words into their respective embeddings first and then the model is trained to follow a straightforward logic: if words are related, they are close together in the vector space, if not, they would be separated by the adequate distance.
 
-![embeddings](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/embeddings.png?raw=true)
+![embeddings](/images/multimodal_rag/embeddings.png)
 
 But to help a model recognize that an image of a "Cat" and the word "Cat" are similar, we rely on Multimodal Embeddings. To simplify things a bit, imagine there is a magic box which is capable of handling various inputs – images, audios, text, and more.
 
@@ -43,13 +43,13 @@ Before we dive in, remember that Multimodality isn't limited to just text-to-ima
 
 Now the question is, What exactly was that box doing? The magic it performs is known as Contrastive Learning. While the term might sound complex, it's not that tricky. To simplify, consider a dataset with images, along with a caption describing what the image represents.
 
-![clipmodel](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/clipmodel.png?raw=true)
+![clipmodel](/images/multimodal_rag/clipmodel.png)
 
 Alright, now what happens is: we give our text-image model with these Positive and Negative samples, where each sample consists of an image and a descriptive text. Positive samples are those where the image and text are correctly aligned – for instance, a picture of a cat matched with the text "this is an image of a cat." Conversely, negative samples involve a mismatch, like presenting an image of a dog alongside the text "this is an image of a cat."  
 
 Now we train our text-image model to recognize that positive samples offer accurate interpretations, while negative samples are misleading and should be disregarded during training. In formal terms this technique is called [CLIP](https://openai.com/research/clip) (Contrastive Language-Image Pre-training) introduced by OpenAI where authors trained an image-text model on something around 400 million image caption pairs taken from the internet and everytime model makes a mistake, the contrastive loss function increases and penalize it to make sure the model trains well. The same kind of principles are applied to the other modality combinations as well, so the voice of cat with the word cat is a positive sample for speech-text model, a video of cat with the descriptive text "this is a cat" is a positive sample for video-text model. 
 
-![easy](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/easy.png?raw=true)
+![easy](/images/multimodal_rag/easy.png)
 
 ### Show time
 
@@ -143,7 +143,7 @@ plot_images(random_images, random_captions)
 plt.show()
 ```
 
-![output3](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/output3.png?raw=true)
+![output3](/images/multimodal_rag/output3.png)
 
 ### Storing the Embeddings
 
@@ -245,7 +245,7 @@ display(ds["train"][data_id]['image'])
 print(ds["train"][data_id]['text'])
 ```
 
-![output_final](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/output_final.png?raw=true)
+![output_final](/images/multimodal_rag/output_final.png)
 ```python
 there is a truck driving down a street with a stop sign
 ```
@@ -256,4 +256,4 @@ To make things more interesting, I'm currently working on creating an extensive 
 
 Here's how everything comes together in one frame and this is the [Collab](https://colab.research.google.com/drive/1LM-WrDSBXpiMZ94CtaMCaGHlkxqGR6WK?usp=sharing) for your reference
 
-![multimodal_rag](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multimodal_rag/multimodalrag.png?raw=true)
+![multimodal_rag](/images/multimodal_rag/multimodalrag.png)

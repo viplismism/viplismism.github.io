@@ -10,7 +10,7 @@ release: 29-03-2024
 
 Working with large image datasets in machine learning can be challenging, often requiring significant computational resources and efficient data-handling techniques. While widely used for image storage, traditional file formats like JPEG or PNG are not optimized for efficient data loading and processing in Machine learning workflows. This is where the Lance format shines, offering a modern, columnar data storage solution designed specifically for machine learning applications.
 
-![meme_for_ml_workloads](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/loading_and_processing_image_with_lance/image.png?raw=true)
+![meme_for_ml_workloads](/images/loading_and_processing_image_with_lance/image.png)
 
 The Lance format stores data in a compressed columnar format, enabling efficient storage, fast data loading, and fast random access to data subsets. Additionally, the Lance format is maintained on disk, which provides a couple of advantages: It will persist through a system failure and doesn’t rely on keeping everything in memory, which can run out. This also lends itself to enhanced data privacy and security, as the data doesn’t need to be transferred over a network.
 

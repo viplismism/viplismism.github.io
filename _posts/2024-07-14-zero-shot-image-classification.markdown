@@ -7,7 +7,7 @@ version: Published
 release: 14-07-2024
 ---
 
-![cat-woah](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/cat.png?raw=true)
+![cat-woah](/images/zero-shot-image-classification-with-lancedb/cat.png)
 
 Imagine an AI having a conversation in a language it was never explicitly taught or suddenly playing a new game without any practice. In essence, if an AI can handle a task it hasn't been directly trained for, that's what we call zero-shot capability.
 
@@ -19,7 +19,7 @@ Fine-tuning can be challenging; it requires a well-labeled dataset, and if your 
 
 So, what does "Zero-Shot image classification" really means? Imagine a deep learning model trained only to distinguish between cats and dogs. Now, if you show it a picture of a person lounging on the couch playing video games, and the model identifies it as a "corporate employee enjoying a Sunday afternoon," that's zero-shot image classification. It means the model can correctly identify something it was never specifically trained to recognize. To help you follow along, here is the complete architecture..
 
-![architecture](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/zero-shot-image-classification.png?raw=true)
+![architecture](/images/zero-shot-image-classification-with-lancedb/zero-shot-image-classification.png)
 
 ### Fundamentals
 
@@ -36,7 +36,7 @@ So, here's what we get from using CLIP:
 
 The authors of CLIP demonstrated its superior zero-shot classification performance by comparing it to the ResNet-101 model trained specifically on ImageNet. When both models were tested on other datasets derived from ImageNet, CLIP outperformed the state-of-the-art ResNet-101, showing a better understanding of the dataset than the fine-tuned version of ResNet-101 trained on ImageNet data.
 
-![image-classification-matrix](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/comparison-matrix.png?raw=true)
+![image-classification-matrix](/images/zero-shot-image-classification-with-lancedb/comparison-matrix.png)
 
 ### Reasoning of CLIP
 
@@ -48,7 +48,7 @@ However, zero-shot classification takes this concept further by utilizing two ke
 
 By leveraging this shared vector space, zero-shot classification enables the model to classify images into categories it hasn't explicitly seen during training. Instead of relying solely on predefined class labels, the model can compare the vector representation of a new image to vector representations of textual descriptions of various categories. 
 
-![same-vector-space.png](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/same-vector-space.png?raw=true)
+![same-vector-space.png](/images/zero-shot-image-classification-with-lancedb/same-vector-space.png)
 
 To enhance the effectiveness of our zero-shot classification, we should transform our class labels from simple words like "cat," "dog," and "horse" into more descriptive phrases such as "a photo of a cat," "a photo of a dog," or "a photo of a horse." This transformation is crucial because it mirrors the text-image pairs used during the model's pretraining phase. OpenAI used prompts like `"a photo of a {label}"` paired with each label to create these image-text pairs.[[1]](https://openai.com/index/clip/) 
 
@@ -264,7 +264,7 @@ selected_image
 
 When you execute this code, you'll be presented with a visual representation of a data point from our dataset. In my case, the output displayed a pixelated image of a whale.
 
-![whale](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/zero-shot-image-classification-with-lancedb/whale.png?raw=true)
+![whale](/images/zero-shot-image-classification-with-lancedb/whale.png)
 
 Before we can analyze our image with CLIP, we need to preprocess it properly. First, we'll run the image through our CLIP processor. This step ensures the image is resized first, then the pixels are normalized, then converting it into the tensor and finally adding a batch dimension. All of these things are settled up for the model. 
 

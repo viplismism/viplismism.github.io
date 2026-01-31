@@ -436,3 +436,67 @@ figcaption {
     padding-top: 0.5rem;
     border-top: none;
 }
+
+/* GIF controls - pause/play functionality */
+.gif-container {
+    position: relative;
+    display: block;
+    cursor: pointer;
+    margin: 1rem auto;
+    width: 100%;
+}
+
+.gif-container img {
+    display: block;
+    width: 100%;
+}
+
+.gif-container .gif-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 100;
+}
+
+.gif-overlay .play-pause-btn {
+    width: 44px;
+    height: 44px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    border: 2px solid #fff;
+}
+
+.gif-container:hover .play-pause-btn {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.gif-container .gif-status {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    z-index: 100;
+}
+
+/* Math formula styling in code blocks */
+.math-formula {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    margin: 0.5rem 0;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono', monospace;
+    font-size: 0.95rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+}
