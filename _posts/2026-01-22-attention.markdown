@@ -7,15 +7,15 @@ version: Released
 release: 22-01-2026
 ---
 
-> ☕ **heads up!** this is a long one - around 6,000 words and 34k characters. grab a coffee (or two), find a quiet spot, and give it your undivided attention (pun intended). 
->
-> yeah, I know what you're thinking - "I'll just throw this at Claude and get the summary." sure, you could do that. but if you actually want to *understand* attention from first principles, there's no shortcut. trust me, the 30 minutes you spend here will save you hours of confusion later. your call though!
+**heads up!** this is a long one - around 6,000 words and 34k characters. grab a coffee (or two), find a quiet spot, and give it your undivided attention (pun intended). 
 
----
+yeah, I know what you're thinking - "I'll just throw this at Claude and get the summary." sure, you could do that. but if you actually want to *understand* attention from first principles, there's no shortcut. trust me, the 30 minutes you spend here will save you hours of confusion later. your call though!
+
+## here we go!
 
 i know there are ton of explanations of the transformers on the web but after reading it for 18th time (yeah, I read that "attention" paper back in my 2nd year) and until recently, I quite got all the gist of it, so i mean i think it's a good time to put that into words here.
 
-tldr : this might be the only explanation you will ever need to actually understand attention from first principles.
+tldr : this might be the only explanation you will ever need to actually understand attention from first principles, and i hope you have some idea of rnns, lstms and a bit of how the gradient descent works, yeah the og algo, if not, would suggest you to just have a quick read (yeah, spin your claude now!). ok so.. 
 
 ### the sequence problem or why rnns kinda suck
 
