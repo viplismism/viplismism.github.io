@@ -15,7 +15,7 @@ Think of it as a shift from simple tools to smarter, more capable systems. Agent
 
 To understand Agentic RAG, let's first break down what an "agent" is. Simply put, an agent is a smart system capable of making decisions on its own. When given a question or task, it figures out the best way to handle it by breaking the task into smaller steps and using the right tools to complete it.
 
-![Multi Document Agentic RAG](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/multi-document-agentic-rag/whole-process.png?raw=true)
+![Multi Document Agentic RAG](/images/multi-document-agentic-rag/whole-process.png)
 
 Now, when we talk about Agentic RAG, we’re taking this concept further. Instead of just retrieving information like regular RAG, Agentic RAG uses intelligent strategies to ensure the system provides the best possible response. It doesn't stop at giving a basic, context-aware reply. Instead, these agents think through the query, select the right approach, and deliver a more thoughtful and refined answer. It's like having a team of smart agents working together to solve a problem, one step at a time.
 

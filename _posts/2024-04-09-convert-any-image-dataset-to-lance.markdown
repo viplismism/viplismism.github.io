@@ -9,7 +9,7 @@ release: 09-04-2024
 
 In our [previous](https://vipul-maheshwari.github.io/2024/03/29/effortlessly-loading-and-processing-images-with-lance-a-code-walkthrough) article, we explored the remarkable capabilities of the Lance format, a modern, columnar data storage solution designed to revolutionize the way we work with large image datasets in machine learning. For the same purpose, I have converted the `cinic` and `mini-imagenet` datasets to their lance versions. For this write-up, I will use the example of `cinic` dataset to explain how to convert any image dataset into the Lance format with a single script and  unlocking the full potential of this powerful technology.
 
-![lance_converter](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/convert-any-image-dataset-to-lance/meme_reaction.png?raw=true)
+![lance_converter](/images/convert-any-image-dataset-to-lance/meme_reaction.png)
 
 just in case, here are the [cinic](https://www.kaggle.com/datasets/vipulmaheshwarii/cinic-10-lance-dataset) and [mini-imagenet](https://www.kaggle.com/datasets/vipulmaheshwarii/mini-imagenet-lance-dataset) datasets in lance.
 
@@ -135,7 +135,7 @@ Moreover, the function stores the DataFrames in a list, indexed by the data type
 ### Putting It All Together
 By running the provided script, you can convert your image datasets, whether they are industry-standard benchmarks or your own custom collections, into the powerful Lance format. This transformation unlocks a new level of efficiency and performance, empowering you to supercharge your machine learning projects.  I have used the same script for the `mini-imagenet` too, make sure your data directory looks like this
 
-![data_folders](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/convert-any-image-dataset-to-lance/cinic_image.png?raw=true)
+![data_folders](/images/convert-any-image-dataset-to-lance/cinic_image.png)
 
 here is the complete script for your reference..
 

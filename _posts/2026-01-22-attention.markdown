@@ -27,7 +27,14 @@ so imagine you're reading a really long paragraph word by word, and you're tryin
 
 rnns would process sentences one word at a time, maintaining this "mental note" about everything they'd seen so far. sounds reasonable, right? except they had this massive problem: the further back in the sentence you went, the more the information would just fade away. it's because of this thing called vanishing gradients, yeah the og problem.
 
-![Vanishing Gradients](/videos/attention-is-all-you-need-guys/VanishingGradients.gif)
+
+<img src="/videos/attention-is-all-you-need-guys/VanishingGradients.gif" alt="Vanishing Gradients" id="gif1">
+
+
+
+
+
+
 
 basically during backpropagation (when the model weights are updated), the error signal has to travel backwards through time to update all those weights. the issue is that the gradients get multiplied at each timestep, and since these values are typically fractions, they shrink crazy fast.
 
@@ -77,15 +84,23 @@ this is where positional embeddings come in.
 
 ### positional embeddings : gives you the wings
 
-![Positional Embeddings](/videos/attention-is-all-you-need-guys/PositionalEmbeddings.gif)
+
+<img src="/videos/attention-is-all-you-need-guys/PositionalEmbeddings.gif" alt="Positional Embeddings" id="gif2">
+
+
+
+
+
+
 
 before anything else happens, we take each word and turn it into a vector (word embedding - pretty standard stuff). but then we add positional information directly to these embeddings. position 1 gets one pattern added, position 2 gets another, and so on. imagine it as something which is just basic as telling the model where a specific word really is, that's what positional embeddings do.
 
 the transformer uses these specific formulas to create position patterns:
 
-• PE(pos, 2i) = sin(pos / 10000^(2i/d))
-
-• PE(pos, 2i+1) = cos(pos / 10000^(2i/d))
+```
+PE(pos, 2i) = sin(pos / 10000^(2i/d))
+PE(pos, 2i+1) = cos(pos / 10000^(2i/d))
+```
 
 let me break it down so that it doesn't look freaky. pos is the position number in the sequence (1st word, 2nd word, etc). i is the dimension index we're calculating (0, 1, 2... up to d/2-1) as each i value creates two dimension values, 2i through sin and 2i+1 through cos. d is the total embedding size which is 512 for the original transformer. if d is 512, then i only needs to go from 0 to 255:
 
@@ -101,31 +116,27 @@ let me calculate actual values for different positions with d=512. say we have a
 
 for position 1 (pos=1):
 
-• for dimension i=0:
-  
-  • PE(1, 0) = sin(1/10000^(0/512)) = sin(1/1) = sin(1) = 0.84
+```
+for dimension i=0:
+  PE(1, 0) = sin(1/10000^(0/512)) = sin(1/1) = sin(1) = 0.84
+  PE(1, 1) = cos(1/10000^(0/512)) = cos(1/1) = cos(1) = 0.54
 
-  • PE(1, 1) = cos(1/10000^(0/512)) = cos(1/1) = cos(1) = 0.54
-
-• for dimension i=1:
-  
-  • PE(1, 2) = sin(1/10000^(2/512)) = sin(1/1.0027) = sin(0.997) = 0.84
-  
-  • PE(1, 3) = cos(1/10000^(2/512)) = cos(1/1.0027) = cos(0.997) = 0.55
+for dimension i=1:
+  PE(1, 2) = sin(1/10000^(2/512)) = sin(1/1.0027) = sin(0.997) = 0.84
+  PE(1, 3) = cos(1/10000^(2/512)) = cos(1/1.0027) = cos(0.997) = 0.55
+```
 
 for position 2 (pos=2):
 
-• for dimension i=0:
-  
-  • PE(2, 0) = sin(2/10000^(0/512)) = sin(2/1) = sin(2) = 0.91
-  
-  • PE(2, 1) = cos(2/10000^(0/512)) = cos(2/1) = cos(2) = -0.42
+```
+for dimension i=0:
+  PE(2, 0) = sin(2/10000^(0/512)) = sin(2/1) = sin(2) = 0.91
+  PE(2, 1) = cos(2/10000^(0/512)) = cos(2/1) = cos(2) = -0.42
 
-• for dimension i=1:
-  
-  • PE(2, 2) = sin(2/10000^(2/512)) = sin(2/1.0027) = sin(1.994) = 0.91
-  
-  • PE(2, 3) = cos(2/10000^(2/512)) = cos(2/1.0027) = cos(1.994) = -0.41
+for dimension i=1:
+  PE(2, 2) = sin(2/10000^(2/512)) = sin(2/1.0027) = sin(1.994) = 0.91
+  PE(2, 3) = cos(2/10000^(2/512)) = cos(2/1.0027) = cos(1.994) = -0.41
+```
 
 as you can see, each position gets a completely unique vector of 512 values. position 1's vector starts with [0.84, 0.54, 0.84, 0.55...] while position 2's starts with [0.91, -0.42, 0.91, -0.41...].
 
@@ -157,22 +168,38 @@ you have your input - let's say "cat sat mat" (3 words). each word gets converte
 
 **step 1: creating queries, keys, values through projection**
 
-![QKV Mechanism](/videos/attention-is-all-you-need-guys/QKVMechanism.gif)
+
+<img src="/videos/attention-is-all-you-need-guys/QKVMechanism.gif" alt="QKV Mechanism" id="gif3">
+
+
+
+
+
+
 
 here's the thing people often skip - Q, K, V aren't just magically there. you CREATE them by multiplying your input by learned weight matrices. so basically you have three matrices:
 W_Q, W_K, W_V (each of size 512 × 64)
 
 for each position i:
 
-- q_i = x_i × W_Q (this is your query)
-- k_i = x_i × W_K (this is your key)
-- v_i = x_i × W_V (this is your value)
+```
+q_i = x_i × W_Q  (this is your query)
+k_i = x_i × W_K  (this is your key)
+v_i = x_i × W_V  (this is your value)
+```
 
 these matrices are learned during training as different tasks need different kinds of attention, so the model learns what transformations produce useful queries, keys, and values through learning those weights.
 
 **step 2: compute attention scores (scaled dot product)**
 
-![Attention Scores](/videos/attention-is-all-you-need-guys/AttentionScores.gif)
+
+<img src="/videos/attention-is-all-you-need-guys/AttentionScores.gif" alt="Attention Scores" id="gif4">
+
+
+
+
+
+
 
 okay quick recap of where we are: we started with word embeddings, added positional encodings, and now we have our input matrix. each word is a vector. then we projected these through weight matrices (W_Q, W_K, W_V) to create queries, keys, and values for each token.
 
@@ -192,15 +219,24 @@ and now you get some scores.
 
 these scores give an impression of how much one word is important to another in terms of attention. higher score = more relevant. but here's the critical part which often doesn't get enough recognition - we scale these scores by dividing by √d_k, where d_k is the dimension of the keys (64 in our example, since we're looking at one head).
 
-![Scaled Dot Product](/videos/attention-is-all-you-need-guys/ScaledDotProduct.gif)
+
+<img src="/videos/attention-is-all-you-need-guys/ScaledDotProduct.gif" alt="Scaled Dot Product" id="gif5">
+
+
+
+
+
+
 
 why? because without scaling, when d_k is large (think about the big architectures which have more dimensions per head), the dot products get really big. think about it - you're adding up 64 products of numbers. the more numbers you add, the bigger the sum gets on average. and when you put really big numbers into softmax, it becomes super peaky - basically all attention goes to one position (like 0.99, 0.005, 0.005). in that case, it's like saying only this position matters in the whole sequence, which is kinda wrong right? that's where dividing by √d_k keeps the variance stable and the softmax reasonable. this is a bit tricky at first glance but when you think about it for some time, you will actually give more respect to this small operation. i [posted more about this on my x](https://x.com/viplismism/status/2003807608571076782?s=20), would be helpful if you want to dig a bit deeper.
 
 ok so now the actual scores are:
 
-- score₁ = (q₂ · k₁) / √64 = (q₂ · k₁) / 8
-- score₂ = (q₂ · k₂) / 8
-- score₃ = (q₂ · k₃) / 8
+```
+score₁ = (q₂ · k₁) / √64 = (q₂ · k₁) / 8
+score₂ = (q₂ · k₂) / 8
+score₃ = (q₂ · k₃) / 8
+```
 
 this scaled dot-product attention is the core mechanism. simple but super effective.
 
@@ -252,7 +288,14 @@ boom, you've computed attention for all positions in parallel. no sequential pro
 
 ### multi-head attention (because one perspective isn't enough)
 
-![Multi-Head Attention](/videos/attention-is-all-you-need-guys/MultiHeadAttention.gif)
+
+<img src="/videos/attention-is-all-you-need-guys/MultiHeadAttention.gif" alt="Multi-Head Attention" id="gif6">
+
+
+
+
+
+
 
 okay so here's where it gets even cooler. what if we had multiple attention mechanisms running in parallel, each learning to focus on different aspects? remember earlier I said something about the number of heads?
 
@@ -262,10 +305,12 @@ just think about how you read a sentence yourself. you're simultaneously trackin
 
 that's multi-head attention. instead of one set of W_Q, W_K, W_V matrices, you have h sets (the paper uses h=8). so you have:
 
-- head 1: W_Q¹, W_K¹, W_V¹ → produces attention output₁
-- head 2: W_Q², W_K², W_V² → produces attention output₂
-- ...
-- head 8: W_Q⁸, W_K⁸, W_V⁸ → produces attention output₈
+```
+head 1: W_Q¹, W_K¹, W_V¹ → produces attention output₁
+head 2: W_Q², W_K², W_V² → produces attention output₂
+...
+head 8: W_Q⁸, W_K⁸, W_V⁸ → produces attention output₈
+```
 
 each head is smaller (if total dimension is 512 and you have 8 heads, each head works with 64 dimensions). they all run the same attention mechanism, just with different learned projections.
 
@@ -299,7 +344,14 @@ but before we get there, we need to talk about two things that happen between at
 
 **residual connections (aka skip connections)**
 
-![Residual Connections](/videos/attention-is-all-you-need-guys/ResidualConnections.gif)
+
+<img src="/videos/attention-is-all-you-need-guys/ResidualConnections.gif" alt="Residual Connections" id="gif7">
+
+
+
+
+
+
 
 okay so remember the vanishing gradient problem from rnns? turns out when you stack many layers of any neural network, you can run into similar issues. when i say many layers here, i'm talking about the entire transformer block (attention + ffn and other linear projections) getting repeated multiple times. (more on ffn in a bit) the original paper stacks 6 of these blocks, GPT-3 has 96, and we'll get into why and how this stacking works later. but for now, just know that if you have many of these blocks stacked on top of each other, during backprop the gradient gets weaker and weaker as it travels backwards.
 
@@ -317,12 +369,12 @@ and btw the math behind residual connections is beautifully simple (i know it's 
 
 ```
 y = x + F(x)
-```
 
 where:
-- x is your input (like the word embeddings + positional embeddings)
-- F(x) is the transformation (attention layer)
-- y is your output
+  x = your input (like the word embeddings + positional embeddings)
+  F(x) = the transformation (attention layer)
+  y = your output
+```
 
 during backpropagation, we calculate ∂L/∂x - the gradient of loss with respect to input:
 
@@ -336,7 +388,14 @@ with standard networks (y = F(x)), your gradient is just ∂L/∂y × ∂F(x)/�
 
 **layer normalization**
 
-![Layer Normalization](/videos/attention-is-all-you-need-guys/LayerNormalization.gif)
+
+<img src="/videos/attention-is-all-you-need-guys/LayerNormalization.gif" alt="Layer Normalization" id="gif8">
+
+
+
+
+
+
 
 after each sub-layer (attention or feed-forward), we apply something called layer normalization.
 
@@ -358,10 +417,12 @@ in our case, layer norm looks at each position's vector (512 dimensions) and nor
 
 mathematically, for each position's vector, we:
 
-- calculate the mean (μ) and standard deviation (σ) across all feature dimensions (all 512 columns)
-- subtract the mean from each value: (x - μ)
-- divide by standard deviation: (x - μ)/σ
-- apply learnable scale (γ) and shift (β) parameters: γ × ((x - μ)/σ) + β
+```
+1. calculate the mean (μ) and standard deviation (σ) across all feature dimensions
+2. subtract the mean from each value: (x - μ)
+3. divide by standard deviation: (x - μ)/σ
+4. apply learnable scale (γ) and shift (β) parameters: γ × ((x - μ)/σ) + β
+```
 
 this is it. doing this makes sure the mean is 0 and the variance is 1 across the feature dimension.
 
@@ -369,7 +430,14 @@ in transformers specifically, layer norm is critical because attention weights c
 
 **now to the feed-forward network**
 
-![Feed Forward Network](/videos/attention-is-all-you-need-guys/FeedForwardNetwork.gif)
+
+<img src="/videos/attention-is-all-you-need-guys/FeedForwardNetwork.gif" alt="Feed Forward Network" id="gif9">
+
+
+
+
+
+
 
 alright, so after multi-head attention → residual connection → layer norm, you've got a normalized output which is still a matrix of shape (sequence_length × 512).
 
@@ -383,11 +451,13 @@ ffn(x) = max(0, xW₁ + b₁)W₂ + b₂
 
 let's break down what's actually happening with the dimensions.
 
-- input to ffn: one position's vector, size 512
-- W₁: weight matrix of size 512 × 2048 (expands to 4x larger)
-- after W₁ + bias + ReLU: you get a 2048-dimensional vector
-- W₂: weight matrix of size 2048 × 512 (compresses back down)
-- output: back to 512 dimensions
+```
+input to ffn: one position's vector, size 512
+W₁: weight matrix of size 512 × 2048 (expands to 4x larger)
+after W₁ + bias + ReLU: you get a 2048-dimensional vector
+W₂: weight matrix of size 2048 × 512 (compresses back down)
+output: back to 512 dimensions
+```
 
 so you're expanding each position's representation to a much higher dimension (2048), applying non-linearity with ReLU, then compressing back to the original size. this happens identically for every position in the sequence. expanding to higher dimensions is like giving the model a bigger "workspace" to compute complex transformations that wouldn't be possible in the original 512-dim space.
 
@@ -399,10 +469,12 @@ and yeah, W₁ and W₂ are learned during training just like the attention matr
 
 so putting it all together, one transformer layer looks like:
 
+```
 1. multi-head attention (mix information across positions)
 2. add & norm (residual connection + layer normalization)
 3. feed-forward network (process each position independently)
 4. add & norm again (another residual + layer norm)
+```
 
 then you stack like 6 or 12 or 96 of these layers depending on how big you want your model. more layers means more parameters to train, and each layer refines the representations further. the first layer might capture basic patterns, middle layers get more abstract relationships, and later layers handle really high-level understanding.
 
@@ -410,7 +482,14 @@ that's it, that's your attention thing!
 
 ### the autoregressive thing (why decoders are slightly different)
 
-![Causal Masking](/videos/attention-is-all-you-need-guys/CausalMasking.gif)
+
+<img src="/videos/attention-is-all-you-need-guys/CausalMasking.gif" alt="Causal Masking" id="gif10">
+
+
+
+
+
+
 
 okay so remember i said encoders and decoders are basically the same? here's the one difference: when you're generating text (like in GPT or any modern LLM), you can't look at future words because they don't exist yet. you're predicting the next word based only on previous words.
 

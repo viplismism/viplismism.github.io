@@ -7,7 +7,7 @@ version: Published
 release: 15-03-2024
 ---
 
-![production_fucked](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/production_fucked.png?raw=true)
+![production_fucked](/images/embedded_databases/production_fucked.png)
 
 In today's world, when everyone's curious about trying out generative AI tools and how they work, you've probably heard about embedded databases. Most of us tend to think about client-server based setups when databases come to mind. And honestly, that's somewhat accurate.
 
@@ -41,7 +41,7 @@ The other important thing LanceDB provides is the usage of Zero-copy versioning,
 
 Before understanding what Embedded Systems really do, First, we need to understand what a database management system (DBMS) is in Layman. Now in simple terms a DBMS is a software system that allows you to create, manage, and interact with databases (obviously duhh). I mean It provides a way to store, retrieve, and manipulate data in an organized and more efficient manner.
 
-![inprocess_setting](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/in_process_setting.png?raw=true)
+![inprocess_setting](/images/embedded_databases/in_process_setting.png)
 
 Now, an embedded database is a type of DBMS that is tightly integrated with the application layer. This means that the database that you are working with is not a separate process or service running on its own; instead, it runs within the same process as the application itself.
 
@@ -65,7 +65,7 @@ And btw, when we are talking about the Serverless model, it is often associated 
 
 ### Scalability
 
-![lancedb_scaled](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/lancedb_scaled.png?raw=true)
+![lancedb_scaled](/images/embedded_databases/lancedb_scaled.png)
 
 Ok so you decided to work on the simple RAG system and wanted to test it out or just maybe play with it and came up with the various vector databases, you did your experiment,  you are happy and done. Now when you got serious and came up with something and wanted to scale your RAG system for let’s say 1 billion embeddings, you open up your earlier setup, ingested more data, created more embeddings and when the time came, your traditional embedding database gave you nightmares in terms of the latency as well as stability.
 
@@ -73,7 +73,7 @@ Now, Think of an open-source embedding database designed to seamlessly handle a 
 
 ### Multimodality
 
-![multimodality](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/multimodality_in_lancedb.png?raw=true)
+![multimodality](/images/embedded_databases/multimodality_in_lancedb.png)
 
 The current embedded databases should not only support textual data but also be compatible with various file formats. It's no longer just about text ingestion. Some time ago, I developed a GTA-5 multimodal RAG application that displays the GTA5 landscape upon entering a query. I highly recommend giving it a [read](https://vipul-maheshwari.github.io/2024/03/03/multimodal-rag-application) to understand why the Multimodal RAG system is the new hotshot and why companies are eager to integrate it into their core. Honestly, I haven't come across any embedded vector database other than LanceDB that can effortlessly ingest any kind of file format.
 
@@ -85,7 +85,7 @@ Ok, so we stored the Embeddings, we scaled our RAG too, now for a given query, w
 
 But it's not just about searching guys, it integrates well enough with native Python, JavaScript/TypeScript, Pandas, Pydantic, that means you can easily integrate it with your favorite programming languages, in addition to that, it has direct integrations with cloud storage providers like AWS S3 and Azure Blob Storage. This means that we can directly query data stored on the cloud, without any added ETL steps. 
 
-![grandma_knows](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/grandma_knows.png?raw=true)
+![grandma_knows](/images/embedded_databases/grandma_knows.png)
 
 Woah, I do love LanceDB 
 ### More or less, we looked at these things right :
@@ -100,6 +100,6 @@ Woah, I do love LanceDB
 8. Multimodality
 9. Searching and Integrations
 
-![gen_ai_application](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/embedded_databases/gen_ai_applications.png?raw=true)
+![gen_ai_application](/images/embedded_databases/gen_ai_applications.png)
 
 Well all of them are bundled together with no cost upfront, ready to serve in one installation click and voila baby, you have your new best friend, maybe more than that, who knows? So what are you waiting for? Here is the [reference](https://lancedb.com/), see you soon.

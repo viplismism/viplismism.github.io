@@ -7,7 +7,7 @@ version: Released
 release: 10-03-2025
 ---
 
-![agent-meme](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/superlinked-research-agent/agent-meme.png?raw=true)
+![agent-meme](/images/superlinked-research-agent/agent-meme.png)
 
 I’ve always wanted an AI assistant that could make it easier to go through a collection of research papers, answer my questions, summarize the content, and give me the important points. In short, I wanted a research helper that would make the whole process simpler. That’s when I decided to create it.
 

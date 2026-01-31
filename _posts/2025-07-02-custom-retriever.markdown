@@ -7,7 +7,7 @@ version: Released
 release: 02-07-2025
 ---
 
-![title_image](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/custom-retriever/custom_retriever.png?raw=true)
+![title_image](/images/custom-retriever/custom_retriever.png)
 
 As retrieval-augmented generation (RAG) systems continue to evolve, the need for **custom, domain-specific retrievers** is becoming more and more obvious. Sure, traditional vector databases are great for basic similarity search—but the moment you throw in more complex, context-heavy queries, they start to fall short. Especially when you're working with real-world data that needs richer filtering or semantic understanding.
 
@@ -116,7 +116,7 @@ class SuperlinkedSteamGamesRetriever(BaseRetriever):
 
 **Integration Architecture Deep Dive:**
 
-![architecture.png](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/custom-retriever/architecture.png?raw=true)
+![architecture.png](/images/custom-retriever/architecture.png)
 
 ### Part 3: Superlinked Schema Definition and Setup
 

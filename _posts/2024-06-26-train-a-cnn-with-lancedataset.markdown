@@ -10,7 +10,7 @@ release: 26-06-2024
 
 In this [previous](https://vipul-maheshwari.github.io/2024/04/09/convert-any-image-dataset-to-lance) post, I showed you how you can convert any Image Dataset to Lance format for faster retrieval and faster I/O operations. But can we use the same Lance formatted image dataset to train an image classification model? Well here it comes...
 
-![front-image](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/train-a-cnn-with-lance-dataset/training_a_cnn.png?raw=true)
+![front-image](/images/train-a-cnn-with-lance-dataset/training_a_cnn.png)
 
 ### Lance Format: Saga for efficient image datasets
 
@@ -135,10 +135,10 @@ With this setup, we can train a CNN on our Lance dataset using just a single scr
 
 One key advantage of using Lance-backed training is its performance. Compared to traditional methods, Lance-formatted data offers significant improvements in training speed. Here is the result when I compared the training time for 3 epochs with Lance vs Vanilla dataloaders 
 
-![epoch_duration](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/train-a-cnn-with-lance-dataset/epoch_duration.png?raw=true)
+![epoch_duration](/images/train-a-cnn-with-lance-dataset/epoch_duration.png)
 
 This shows an extensive improvement in training time for the Lance dataloaders as compared to the Vanilla ones. 
 
-![shocking_cat](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/train-a-cnn-with-lance-dataset/shocking_cat.png?raw=true)
+![shocking_cat](/images/train-a-cnn-with-lance-dataset/shocking_cat.png)
 
 Here is the complete [notebook](https://github.com/lancedb/lance-deeplearning-recipes/blob/main/community-examples/cnn-model-with-lance-dataset.ipynb) for the reference. For those wanting to explore further, there's a [repository](https://github.com/lancedb/lance-deeplearning-recipes) showcasing various deep learning techniques that utilize Lance-formatted data. This resource can be valuable for expanding your understanding and application of Lance file format in different machine learning contexts. 

@@ -25,7 +25,7 @@ These embeddings serve dual purposes: they can either be directly used as input 
 
 This architecture offers a holistic understanding of the underlying processes involved.
 
-![image](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/movie-recommendation-using-rag/architecture_recommendation.png?raw=true)
+![image](/images/movie-recommendation-using-rag/architecture_recommendation.png)
 
 ### Data Ingestion and preprocessing techniques for movie metadata
 Our initial task involves gathering and organizing information about movies. This includes gathering extensive details such as the movie's type, plot summary, genres, audience ratings, and more.
@@ -344,7 +344,7 @@ def get_recommendations(title):
 get_recommendations("Toy Story")
 ```
 
-![movie_recommendation](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/movie-recommendation-using-rag/toy_story_recommendation.png?raw=true)
+![movie_recommendation](/images/movie-recommendation-using-rag/toy_story_recommendation.png)
 
 Some of the recommended movies are remarkably close matches. For example, when looking at "Toy Story," which falls under "animation" and "family" movies, our recommendation system can find other movies in the similar genres.
 

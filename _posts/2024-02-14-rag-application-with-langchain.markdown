@@ -7,7 +7,7 @@ version: Published
 release: 14-02-2024
 ---
 
-![cat](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/cat.png?raw=true)
+![cat](/images/make_your_application_with_rag/cat.png)
 
 *If you're considering making a personalized bot for your documents or your website that responds to you, you're in the right spot. I'm here to help you create a bot using Langchain and RAG strategies for this purpose.*
 
@@ -17,7 +17,7 @@ ChatGPTs and other Large Language Models (LLMs) are extensively trained on text 
 
 Imagine requesting the model to enhance your company policies; in such scenarios, ChatGPTs and other Large Language Models might struggle to provide factual responses because they lack training on your company's data. Instead, they may generate nonsensical or irrelevant responses, which can be unhelpful. So, how can we ensure that an LLM comprehends our specific data and generates responses accordingly? This is where techniques like Retrieval Augmentation Generation (RAG) come to the rescue.
 
-![RAG](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/LLM_without_RAG.png?raw=true)
+![RAG](/images/make_your_application_with_rag/LLM_without_RAG.png)
 
 ### What is RAG?
 RAG or Retrieval Augmented Generation uses three main workflows to generate and give the better response
@@ -327,7 +327,7 @@ Secondally, `StrOutputParser` is typically employed in RAG chains to parse the o
 
 ### D-Day
 
-![With_RAG](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/LLM_with_RAG.png?raw=true)
+![With_RAG](/images/make_your_application_with_rag/LLM_with_RAG.png)
 
 To make sure we get the entire idea even if the response gets cut off, I've implemented a function called `get_complete_sentence()`. Basically this function helps extract the last complete sentence from the text. So, even if the response hits the maximum token limit that we set upon and it gets truncated midway, we will still get a coherent understanding of the message.
 
@@ -504,7 +504,7 @@ Execution Timings:
 
 ```
 
-![cat2](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/images/make_your_application_with_rag/cat2.png?raw=true)
+![cat2](/images/make_your_application_with_rag/cat2.png)
 
 Have fun experimenting with various data sources! You can try changing the website addresses, adding new PDF files or maybe change the template a bit. LLMs are fun, you never know what you get! 
 
