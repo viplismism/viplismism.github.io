@@ -52,6 +52,17 @@ pre {
 	margin-top: 0;
 }
 
+.reading-stats {
+	font-size: 0.9rem;
+	color: #666;
+	margin-bottom: 1.5rem;
+	padding-bottom: 1rem;
+	border-bottom: 1px solid #eee;
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
 .meta {
 	margin: 1rem 0;
 }
