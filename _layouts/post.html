@@ -2,6 +2,11 @@
 layout: default
 ---
 
+{% assign words = content | strip_html | number_of_words %}
+{% assign chars = content | strip_html | size %}
+{% assign reading_time = words | divided_by: 200 %}
+{% if reading_time == 0 %}{% assign reading_time = 1 %}{% endif %}
+
 <section class="post">
   <h1>{{ page.title }}</h1>
 
@@ -9,6 +14,14 @@ layout: default
     <p>Version: {{ page.version }}</p>
     <p>Release Date: {{ page.release | date: "%d-%m-%Y" }}</p>
   {% else %}
+    <div class="reading-stats">
+      <span>📖 {{ reading_time }} min read</span>
+      <span>•</span>
+      <span>{{ words }} words</span>
+      <span>•</span>
+      <span>{{ chars | divided_by: 1000 }}k characters</span>
+    </div>
+    
     {{ content }}
     
     <div class="post-footer">
