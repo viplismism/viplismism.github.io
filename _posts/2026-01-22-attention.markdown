@@ -7,7 +7,7 @@ version: Released
 release: 22-01-2026
 ---
 
-**heads up!** this is a long one - around 6,000 words and 34k characters. grab a coffee (or two), find a quiet spot, and give it your undivided attention (pun intended). 
+**heads up!** this is a long one - around 6,000 words and 35k characters. grab a coffee (or two), find a quiet spot, and give it your undivided attention (pun intended), prefer to read it on a laptop or a big screen! 
 
 yeah, I know what you're thinking - "I'll just throw this at Claude and get the summary." sure, you could do that. but if you actually want to *understand* attention from first principles, there's no shortcut. trust me, the 30 minutes you spend here will save you hours of confusion later. your call though!
 
