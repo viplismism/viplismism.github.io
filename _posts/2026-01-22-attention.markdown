@@ -9,9 +9,11 @@ release: 22-01-2026
 
 ![I am once again asking you to understand attention!](/images/attention/attention.png)
 
-**heads up!** this is a long one - around 6,000 words and 35k characters. grab a coffee (or two), find a quiet spot, and give it your undivided attention (pun intended), prefer to read it on a laptop or a big screen!
+**heads up!** this is a long one - around 6,200 words and 37k characters. grab a coffee (or two), find a quiet spot, and give it your undivided attention (pun intended), prefer to read it on a laptop or a big screen!
 
 yeah, I know what you're thinking - "I'll just throw this at Claude and get the summary." sure, you could do that. but if you actually want to *understand* attention from first principles, there's no shortcut. trust me, the 30 minutes you spend here will save you hours of confusion later. your call though!
+
+**reading in two sittings?** if you're short on time, here's a natural break point: read until the end of "positional embeddings" section (the first ~10-12 minutes). that covers *why* transformers exist and the foundations. then come back fresh for the second half which dives into *how* attention actually computes - the Q/K/V mechanics, multi-head attention, and all the juicy details. both parts build on each other, but taking a break there won't break your flow.
 
 ## here we go!
 
