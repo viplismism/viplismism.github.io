@@ -17,7 +17,7 @@ yeah, I know what you're thinking - "I'll just throw this at Claude and get the 
 
 i know there are ton of explanations of the transformers on the web but after reading it for 18th time (yeah, I read that "attention" paper back in my 2nd year) and until recently, I quite got all the gist of it, so i mean i think it's a good time to put that into words here.
 
-tldr : this might be the only explanation you will ever need to actually understand attention from first principles, and i hope you have some idea of rnns, lstms and a bit of how the gradient descent works, yeah the og algo, if not, would suggest you to just have a quick read (yeah, spin your claude now!). ok so.. 
+tldr : this might be the only explanation you will ever need to actually understand attention from first principles, and i hope you have some idea of rnns, lstms and a bit of how the gradient descent works, yeah the og algo, if not, would suggest you to just have a quick read (spin your claude now!). ok so.. 
 
 ### the sequence problem or why rnns kinda suck
 
@@ -26,6 +26,8 @@ okay so let's rewind to like 2015-ish?! back then, if you wanted to do anything 
 so imagine you're reading a really long paragraph word by word, and you're trying to remember everything as you go along. you start with something like "the cat that was sitting on the mat that john bought last week..." and by the time you get to the end of the sentence, you've kinda forgotten what was at the beginning, right? well that's basically what happened with rnns (recurrent neural networks) - the old school way of processing text before transformers.
 
 rnns would process sentences one word at a time, maintaining this "mental note" about everything they'd seen so far. sounds reasonable, right? except they had this massive problem: the further back in the sentence you went, the more the information would just fade away. it's because of this thing called vanishing gradients, yeah the og problem.
+
+now to be fair, vanishing gradients isn't just an rnn thing - it's a fundamental problem in deep learning. even simple convnets or stacked linear layers suffer from this when networks get deep enough. that's exactly why resnets introduced skip connections. but rnns made it worse because the sequential nature meant gradients had to flow through potentially hundreds of timesteps, one after another, that just made it worse!
 
 
 <img src="/videos/attention-is-all-you-need-guys/VanishingGradients.gif" alt="Vanishing Gradients" id="gif1">
@@ -64,9 +66,11 @@ alright so here's where things get interesting. the big breakthrough with transf
 
 in the original transformer paper, they had this encoder-decoder setup for translation. but what does it really mean?! well ok think of two boxes that are connected together - each with a completely different job. the encoder box takes your input sentence (say, english) and processes the whole thing at once to build up this rich understanding of what it means. it's like someone reading and really getting what you wrote - the full context, the relationships between words, everything. and then it passes this deep understanding to the second box.
 
-now the decoder box has the tougher job guys - it generates the output sentence (say, french) one word at a time, using both what it's already generated AND constantly checking back with the encoder's understanding. it's like having a translator who first completely understands your english sentence, then carefully crafts the perfect french translation word by word.
+what does the encoder actually output? it produces a sequence of contextual embeddings - one vector per input token. but these aren't just regular word embeddings. each vector now captures not just what that word means, but how it relates to every other word in the sentence. so the embedding for "cat" in "the cat sat" contains information about sitting, while "cat" in "the cat meowed" would have different contextual information. the encoder is essentially a powerful embedding model that understands context.
 
-so encoder = understanding everything at once, decoder = generating piece by piece while referring back. let's say if you're translating something like "the cat sat on the mat," the encoder processes the whole english sentence in one shot, figuring out that there's a cat, it's sitting, and it's on a specific mat. then the decoder produces "le chat s'est assis sur le tapis" one word after another, checking back with the encoder's understanding to make sure it's capturing everything correctly.
+now the decoder box has the tougher job guys - it generates the output sentence (say, french) one word at a time, using both what it's already generated AND constantly checking back with the encoder's contextual embeddings. it's like having a translator who first completely understands your english sentence, then carefully crafts the perfect french translation word by word.
+
+so encoder = understanding everything at once and producing rich contextual embeddings, decoder = generating piece by piece while referring back to those embeddings. let's say if you're translating something like "the cat sat on the mat," the encoder processes the whole english sentence in one shot, outputting contextualized vectors that capture that there's a cat, it's sitting, and it's on a specific mat. then the decoder produces "le chat s'est assis sur le tapis" one word after another, attending to the encoder's embeddings to make sure it's capturing everything correctly.
 
 and before we dive into encoder vs decoder drama, here's the thing - they're basically the same. like, the core building block is the attention mechanism, and both encoder and decoder use it. the only real difference is that decoders have this "causal masking" thing where each word can only look at previous words (because you're generating text left to right), and this is something called "autoregressive nature" while encoders let you look at the full sentence in both directions. but the actual attention computation? identical. so instead of explaining them separately and repeating myself, let's just understand how attention works, and then the encoder/decoder distinction becomes obvious.. let's goo.
 
@@ -150,7 +154,7 @@ what do we do with them? super simple - we just add them together! that's litera
 
 for each word, we take its word embedding vector, add the positional embedding vector for its position, and that combined vector becomes our input to the attention layers.
 
-don't ask me why adding works... it just does. we're basically smashing together "what" and "where" information and trusting that during training, the model will figure out how to use both signals. seems kinda weird that simple addition works here, but the math checks out and the results speak for themselves. i mean this is the "attention" paper we are talking about.
+why does addition work here? well, both embeddings are vectors, and vector addition is a standard mathematical operation for combining two entities into a new intermediate representation. when you add two vectors, you create a new direction and magnitude that carries information from both sources. think of it geometrically - the word "cat" points in some direction in the embedding space (capturing its meaning), and position 3 points in another direction (capturing location info). adding them gives you a new vector that encodes both pieces of information.
 
 during training, the model learns to interpret these combined vectors and somehow extract both the meaning of words and their positions when needed. it's one of those "surprisingly simple but effective" tricks in deep learning that just works!
 
