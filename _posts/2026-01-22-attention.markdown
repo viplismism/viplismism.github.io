@@ -4,10 +4,10 @@ title: Attention is all you need guys
 description: a deep dive into transformers and the attention mechanism from first principles - covering positional embeddings, Q/K/V projections, multi-head attention, residual connections, layer normalization, and feed-forward networks.
 tags: [Transformers, Deep Learning, NLP]
 version: Released
-release: 22-01-2026
+release: 06-02-2026
 ---
 
-![I am once again asking you to understand attention!](/images/attention/attention.png)
+![Attention is all you need guys!!](/images/attention/attention_title.jpeg)
 
 **heads up!** this is a long one - around 6,200 words and 37k characters. grab a coffee (or two), find a quiet spot, and give it your undivided attention (pun intended), prefer to read it on a laptop or a big screen!
 
@@ -18,6 +18,8 @@ yeah, I know what you're thinking - "I'll just throw this at Claude and get the 
 ## here we go!
 
 i know there are ton of explanations of the transformers on the web but after reading it for 18th time (yeah, I read that "attention" paper back in my 2nd year) and until recently, I quite got all the gist of it, so i mean i think it's a good time to put that into words here.
+
+![I am once again asking you to understand attention!](/images/attention/attention.png)
 
 tldr : this might be the only explanation you will ever need to actually understand attention from first principles, and i hope you have some idea of rnns, lstms and a bit of how the gradient descent works, yeah the og algo, if not, would suggest you to just have a quick read (spin your claude now!). ok so.. 
 
