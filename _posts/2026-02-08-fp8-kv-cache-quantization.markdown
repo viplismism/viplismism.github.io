@@ -4,7 +4,7 @@ title: FP8, KV Cache Quantization, and the "!!!!" Bug
 description: a deep dive into floating point fundamentals, FP8 quantization, and how a subtle scale miscalibration in vLLM's KV cache causes garbage output - tracing the full causal chain from bit patterns to NaN propagation.
 tags: [vLLM, Quantization, Inference, Deep Learning]
 version: Released
-release: 08-02-2026
+release: 07-02-2026
 ---
 
 so at the end of my [attention post](https://viplismism.github.io/2026/01/22/attention), i teased about kv-cache and inference optimizations. well, here's that follow up - except it turned into something way bigger than i planned. what started as "let me explain kv-cache quantization" became a full investigation into a production bug where a multimodal model just... starts outputting `"!!!!!!!!!!!!!!!!"`. yeah, literally exclamation marks. nothing else.
