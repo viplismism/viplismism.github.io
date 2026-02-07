@@ -7,7 +7,7 @@ version: Released
 release: 07-02-2026
 ---
 
-so at the end of my [attention post](https://viplismism.github.io/2026/01/22/attention), i teased about kv-cache and inference optimizations. well, here's that follow up - except it turned into something way bigger than i planned. what started as "let me explain kv-cache quantization" became a full investigation into a production bug where a multimodal model just... starts outputting `"!!!!!!!!!!!!!!!!"`. yeah, literally exclamation marks. nothing else.
+so at the end of my [attention post](https://viplismism.github.io/2026/02/06/attention), i teased about kv-cache and inference optimizations. well, here's that follow up - except it turned into something way bigger than i planned. what started as "let me explain kv-cache quantization" became a full investigation into a production bug where a multimodal model just... starts outputting `"!!!!!!!!!!!!!!!!"`. yeah, literally exclamation marks. nothing else.
 
 to actually understand *why* that happens, we need to go deep - like, all the way down to individual bits in a floating point number. i know that sounds excessive, but i promise every piece connects. we'll build up from binary fractions to FP8 format to quantization scales, and then watch the whole thing collapse like dominoes when one design decision goes wrong.
 
@@ -318,26 +318,81 @@ two flags. that's all it took to create a cascading failure. let me show you exa
 
 so here's the deal with FP8 quantization - you can't just shove FP16 values into FP8 directly. you need a **scale factor** to map the range of your actual values into the representable range of FP8 (which maxes out at 448, remember?).
 
-vLLM computes these scales dynamically during the first forward pass:
+vLLM computes these scales dynamically during the first forward pass. every time `forward()` is called on an attention layer, it first checks whether scales need computing:
 
 ```python
-# from vllm/attention/layer.py
-def calc_kv_scales(self, key: torch.Tensor, value: torch.Tensor):
-    if self.calculate_kv_scales:
-        # compute scale based on current values
-        # ...
+# from vllm/model_executor/layers/attention/attention.py
+
+class Attention(nn.Module, AttentionLayerBase):
+    def forward(self, query, key, value, ...):
+        if self.calculate_kv_scales:
+            torch.ops.vllm.maybe_calc_kv_scales(
+                query, key, value, self.layer_name
+            )
+        # ... rest of attention computation
 ```
 
-the scale constants from the environment:
+that `maybe_calc_kv_scales` is a gate - it only runs once:
+
+```python
+# from vllm/model_executor/layers/attention/attention.py
+
+def maybe_calc_kv_scales(query, key, value, layer_name):
+    forward_context = get_forward_context()
+    self = forward_context.no_compile_layers[layer_name]
+
+    # Only calculate if the layer's flag is True
+    # This flag gets set to False after the first forward pass
+    if not self.calculate_kv_scales:
+        return
+
+    self.calc_kv_scales(query, key, value)
+```
+
+and here's the actual scale computation - the part that does the math:
+
+```python
+# from vllm/model_executor/layers/attention/attention.py
+
+def calc_kv_scales(self, query, key, value):
+    self._q_scale.copy_(torch.abs(query).max() / self.q_range)
+    self._k_scale.copy_(torch.abs(key).max() / self.k_range)
+    self._v_scale.copy_(torch.abs(value).max() / self.v_range)
+    self._q_scale_float = self._q_scale.item()
+    self._k_scale_float = self._k_scale.item()
+    self._v_scale_float = self._v_scale.item()
+    # We only calculate the scales once
+    self.calculate_kv_scales = False  # ← LOCKED FOREVER
+```
+
+see that last line? `self.calculate_kv_scales = False`. once. done. never again. the `q_range`, `k_range`, and `v_range` divisors come from environment constants:
 
 ```python
 # from vllm/envs.py
+
+# Divisor for dynamic query scale factor calculation for FP8 KV Cache
 Q_SCALE_CONSTANT: int = 200
+# Divisor for dynamic key scale factor calculation for FP8 KV Cache
 K_SCALE_CONSTANT: int = 200
+# Divisor for dynamic value scale factor calculation for FP8 KV Cache
 V_SCALE_CONSTANT: int = 100
 ```
 
-the quantization and dequantization is straightforward:
+and those constants get turned into tensors during initialization:
+
+```python
+# from vllm/model_executor/layers/attention/attention.py
+
+def set_default_quant_scales(layer, ...):
+    # Initialize q/k/v range constants used by calc_kv_scales
+    layer.q_range = torch.tensor(envs.Q_SCALE_CONSTANT, dtype=torch.float32)
+    layer.k_range = torch.tensor(envs.K_SCALE_CONSTANT, dtype=torch.float32)
+    layer.v_range = torch.tensor(envs.V_SCALE_CONSTANT, dtype=torch.float32)
+```
+
+so the scale formula is: `k_scale = max(abs(key_values)) / 200`. if the max absolute key value in the first request is 5.0, then `k_scale = 5.0 / 200 = 0.025`.
+
+the quantization and dequantization using this scale is straightforward:
 
 ```
 quantization (storing to cache):
@@ -347,11 +402,29 @@ dequantization (reading from cache):
   original_value = fp8_value × k_scale
 ```
 
-seems reasonable so far. but here's the critical issue - after the first forward pass:
+and here's the actual dequantization in vLLM's Triton attention kernel:
 
 ```python
-self.calculate_kv_scales = False  # never recalculate!
+# from vllm/v1/attention/ops/chunked_prefill_paged_decode.py
+
+# K : (HEAD_SIZE, BLOCK_SIZE)
+K_load = tl.load(key_cache_ptr + k_offset, ...)
+
+if K_load.dtype.is_fp8():
+    K = (K_load.to(tl.float32) * tl.load(k_scale)).to(Q.dtype)
+else:
+    K = K_load
+
+# V : (BLOCK_SIZE, HEAD_SIZE)
+V_load = tl.load(value_cache_ptr + v_offset, ...)
+
+if V_load.dtype.is_fp8():
+    V = (V_load.to(tl.float32) * tl.load(v_scale)).to(Q.dtype)
+else:
+    V = V_load
 ```
+
+see? load the FP8 value, cast to float32, multiply by the scale. simple. but the scale is LOCKED from the first request.
 
 **the scale computed on the first request is used for ALL subsequent requests, regardless of their value distributions.** let that sink in for a second.
 
@@ -394,7 +467,23 @@ the first scenario (clipping) is what causes our bug. the second scenario (preci
 
 ### the clipping: where things start going wrong
 
-the clipping happens at the hardware level. NVIDIA's CUDA instruction uses `__NV_SATFINITE` mode, which automatically clips values exceeding the FP8 range to 448 (the max). it's a safety mechanism - but in this case, "safety" creates a much worse problem.
+the clipping happens at the hardware level. here's the actual CUDA code that does the FP8 conversion:
+
+```cpp
+// from vllm/csrc/quantization/w8a8/fp8/nvidia/quant_utils.cuh
+
+// float -> fp8
+template <>
+__inline__ __device__ uint8_t scaled_vec_conversion<uint8_t, float>(
+    const float& a, const float scale,
+    const __nv_fp8_interpretation_t fp8_type) {
+  __nv_fp8_storage_t res =
+      __nv_cvt_float_to_fp8(a / scale, __NV_SATFINITE, fp8_type);
+  return (uint8_t)res;
+}
+```
+
+see that `__NV_SATFINITE`? that's NVIDIA's saturation mode - it automatically clips values exceeding the FP8 range to 448 (the max) instead of producing infinity or NaN. it's a safety mechanism - but in this case, "safety" creates a much worse problem.
 
 here's what the error looks like at different value levels. the error formula is simple - how far off is the retrieved value from the original, as a percentage:
 
