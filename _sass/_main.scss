@@ -422,6 +422,40 @@ figcaption {
     font-size: 1rem;
 }
 
+/* Table styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+    overflow-x: auto;
+    display: block;
+
+    @media screen and (min-width: 45rem) {
+        display: table;
+    }
+}
+
+thead {
+    background-color: #f0f0f0;
+}
+
+th {
+    font-weight: 600;
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 2px solid #ccc;
+}
+
+td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
 .post-tag-link:hover {
     color: #0000CC;
     text-decoration: underline;

@@ -7,7 +7,7 @@ version: Released
 release: 08-02-2026
 ---
 
-so at the end of my [attention post](/2026/01/22/attention-is-all-you-need-guys/), i teased about kv-cache and inference optimizations. well, here's that follow up - except it turned into something way bigger than i planned. what started as "let me explain kv-cache quantization" became a full investigation into a production bug where a multimodal model just... starts outputting `"!!!!!!!!!!!!!!!!"`. yeah, literally exclamation marks. nothing else.
+so at the end of my [attention post](https://viplismism.github.io/2026/01/22/attention), i teased about kv-cache and inference optimizations. well, here's that follow up - except it turned into something way bigger than i planned. what started as "let me explain kv-cache quantization" became a full investigation into a production bug where a multimodal model just... starts outputting `"!!!!!!!!!!!!!!!!"`. yeah, literally exclamation marks. nothing else.
 
 to actually understand *why* that happens, we need to go deep - like, all the way down to individual bits in a floating point number. i know that sounds excessive, but i promise every piece connects. we'll build up from binary fractions to FP8 format to quantization scales, and then watch the whole thing collapse like dominoes when one design decision goes wrong.
 
@@ -18,10 +18,10 @@ fair warning - this is a long one and it's dense. the first half covers floating
 okay so you know how decimal works, right? digits after the decimal point represent powers of 10:
 
 ```
-  0 . 3   5   7
-      ↓   ↓   ↓
-     1/10 1/100 1/1000
-     10⁻¹ 10⁻² 10⁻³
+0 . 3   5   7
+    ↓   ↓   ↓
+    1/10 1/100 1/1000
+    10⁻¹ 10⁻² 10⁻³
 
 0.357 = 3×(1/10) + 5×(1/100) + 7×(1/1000)
       = 0.3 + 0.05 + 0.007
@@ -32,10 +32,10 @@ each position is the previous position ÷ 10. simple enough.
 well binary works the exact same way, just with base 2 instead of base 10:
 
 ```
-  0 . 1   0   1
-      ↓   ↓   ↓
-     1/2  1/4  1/8
-     2⁻¹  2⁻²  2⁻³
+0 . 1   0   1
+    ↓   ↓   ↓
+    1/2  1/4  1/8
+    2⁻¹  2⁻²  2⁻³
 
 0.101 (binary) = 1×(1/2) + 0×(1/4) + 1×(1/8)
                = 0.5 + 0 + 0.125
@@ -161,11 +161,11 @@ that leaves a huge gap between 0 and 0.015625. you literally can't represent 0.0
 
 ```
 without subnormals:
-   0 ──────────────────────────── 0.015625 ────→
-     ↑                               ↑
-     zero                        smallest normal
+0 ──────────────────────────── 0.015625 ────→
+↑                               ↑
+zero                        smallest normal
 
-     can't represent anything in between!
+can't represent anything in between!
 ```
 
 the fix is subnormal mode. when the exponent bits are all zeros (`0000`), special rules kick in:
@@ -589,13 +589,265 @@ result: "!!!!!!!!!!!!!!!!!!!"
 
 the model is effectively poisoned until you restart the whole inference server. both text requests and image requests fail. it doesn't matter how simple or valid the new input is - the cached NaN values will corrupt everything through the attention mechanism.
 
-**but why "!" specifically?** okay so by this point, every single logit (the score the model gives to each possible next token) is NaN. the model needs to pick a token to output, so it does `argmax` over all those logits to find the "best" one.
+**but why "!" specifically?** this part is actually pretty interesting. two things line up perfectly to produce exclamation marks.
 
-but here's the thing about NaN - any comparison with NaN returns false. `NaN > 5.0`? false. `NaN > -1000.0`? false. `NaN > NaN`? also false. so when argmax scans through the list looking for the biggest value, it compares each element to its current best. since every comparison returns false, nothing ever beats the initial candidate. and what's the initial candidate? **index 0** - the very first element. that's just how PyTorch's argmax works when everything is NaN - it returns 0 by default.
+**thing 1: NaN breaks argmax.** by this point, every single logit (the score the model gives to each possible next token) is NaN. the model needs to pick a token to output, so it runs `argmax` to find the highest-scoring one.
 
-so the model picks token ID 0. and in Qwen3-VL's tokenizer, token ID 0 happens to be `"!"`. that's it. it's not that the model "chose" exclamation marks - it's that NaN logits make argmax fall back to the first token in the vocabulary, and "!" is sitting right there at index 0.
+but NaN has a weird property - any comparison with it returns false. always.
 
-(if this were a different model with a different tokenizer, you might see a different garbage character - whatever token sits at index 0 in *that* vocabulary. but the pattern is always the same: one token repeated forever.)
+```
+NaN > 5.0?      false
+NaN > -1000.0?  false
+NaN > NaN?      also false
+```
+
+so when argmax scans through the list looking for the biggest value, it goes element by element comparing each one to the current best. since every comparison returns false, nothing ever "wins." the current best never gets updated. and since argmax starts at index 0, it just... stays there. returns 0. done.
+
+```
+logits = [NaN, NaN, NaN, NaN, NaN, ...]
+
+argmax scanning:
+  start: best = index 0 (NaN)
+  index 1: NaN > NaN? false. best stays 0
+  index 2: NaN > NaN? false. best stays 0
+  ...
+  result: 0
+```
+
+**thing 2: token ID 0 is "!" in Qwen's vocabulary.** okay but why is "!" at index 0? it's not random - it comes from how the tokenizer was built. and to understand that, we need a quick detour into how tokenizers actually work. i promise this connects back.
+
+**bytes: the foundation.** a byte is 8 bits - eight slots that can each be 0 or 1. how many combinations is that? 2 × 2 × 2 × 2 × 2 × 2 × 2 × 2 = 2⁸ = 256. so a byte can be any value from 0 to 255. every single thing on your computer - text, images, code - is stored as a sequence of bytes. when you type "hello", your computer stores 5 bytes:
+
+```
+h → byte 104
+e → byte 101
+l → byte 108
+l → byte 108
+o → byte 111
+```
+
+the first 128 of these (bytes 0-127) follow a standard called ASCII - a lookup table from the 1960s where somebody just decided: byte 33 = `!`, byte 34 = `"`, byte 65 = `A`, byte 97 = `a`, etc. there's nothing mathematical about it - byte 33 is `!` for the same reason your phone number is your phone number. someone assigned it. the remaining 128 byte values (128-255) were never standardized the same way, but they exist and show up in text, so the tokenizer needs to handle them too.
+
+**the tokenizer's starting point.** a tokenizer needs to convert any text into numbers (token IDs) that the model can process. the simplest approach: make each of the 256 possible byte (buckets) values a token.
+
+but wait - 256 tokens for *every language on earth*? how? because every character, in any language, is ultimately stored as a sequence of bytes via UTF-8 encoding:
+
+```
+"h"    = 1 byte:  [104]
+"é"    = 2 bytes: [195, 169]
+"🎉"  = 4 bytes: [240, 159, 142, 137]
+"你"   = 3 bytes: [228, 189, 160]
+```
+
+every single one of those byte values falls between 0 and 255. always. so if you have a token for each of the 256 possible byte values, you can break *any* input into byte tokens:
+
+```
+"🎉" = bytes [240, 159, 142, 137]
+     → token for 240, token for 159, token for 142, token for 137
+     → 4 tokens. not efficient, but it works!
+```
+
+nothing is ever "unknown." think about it - any text you throw at the tokenizer, whether it's english, chinese, arabic, emoji, or some random binary garbage, is ultimately just a sequence of bytes. and every byte is a value between 0 and 255. since we have a token for each of those 256 values, we can *always* break the input down. worst case, every character becomes multiple tokens (like 🎉 = 4 tokens). but it always works. no "out of vocabulary" errors, ever.
+
+is 4 tokens for one emoji efficient? no. but that's where BPE comes in later - it learns that bytes `[240, 159, 142, 137]` always appear together, so it merges them into a single "🎉" token. the 256 byte tokens are the safety net. BPE is the optimization on top.
+
+but how does UTF-8 squeeze ~1.1 million possible characters into byte values that only go up to 255? the trick is that not all 256 byte values work the same way. UTF-8 splits the range into roles:
+
+```
+bytes 0-127:    standalone characters (ASCII)
+                each one IS a character by itself.
+                "h" = byte 104. done. one byte, one character.
+
+bytes 128-191:  continuation bytes (10xxxxxx)
+                NEVER start a sequence - they're always
+                the 2nd, 3rd, or 4th byte in a multi-byte character.
+
+bytes 192-255:  leading bytes (11xxxxxx)
+                START a multi-byte sequence. their prefix tells
+                you how many continuation bytes follow:
+                110xxxxx (192-223) → "1 more byte coming"  → 2-byte char
+                1110xxxx (224-239) → "2 more bytes coming" → 3-byte char
+                11110xxx (240-247) → "3 more bytes coming" → 4-byte char
+```
+
+so when you see byte 195 followed by byte 169, UTF-8 reads it as:
+
+```
+195 = 11000011 → starts with 110, so "1 continuation byte follows"
+169 = 10101001 → starts with 10, confirmed continuation byte
+
+extract the free bits: 00011 + 101001 = 00011101001 = 233 → that's "é"
+```
+
+it's not "256 values for 256 characters" - it's "128 values for ASCII characters + 128 values for building multi-byte sequences that cover the rest of the world." the upper half are puzzle pieces that only work in combinations.
+
+and those **structure bits** in each byte are what limit the total. the first byte's leading bits signal how many bytes follow, and each continuation byte starts with `10`:
+
+```
+1-byte char:  0xxxxxxx                            → 7 free bits  → 128 chars
+2-byte char:  110xxxxx 10xxxxxx                   → 11 free bits → 1,920 chars
+3-byte char:  1110xxxx 10xxxxxx 10xxxxxx          → 16 free bits → 61,440 chars
+4-byte char:  11110xxx 10xxxxxx 10xxxxxx 10xxxxxx → 21 free bits → 1,048,576 chars
+```
+
+see the `110`, `1110`, `11110` prefixes? those eat up bits to say "this is a 2/3/4-byte sequence." and every continuation byte wastes 2 bits on the `10` prefix. so in a 4-byte character, out of 32 total bits, only 21 are free to encode the actual character. 2²¹ ≈ 2 million, minus reserved ranges gives you ~1.1 million usable slots.
+
+and this means byte 240 (binary `11110000`) will never appear alone in valid UTF-8 - its leading `1111` tells you "3 more bytes are coming." so while it has its own base token, that token only ever appears as part of a 4-byte sequence like `[240, 159, 142, 137]` (🎉).
+
+this also means the system never breaks. when a new emoji like 🫠 gets added to Unicode in 2024, the tokenizer doesn't need updating - 🫠 is just bytes `[240, 159, 171, 160]`, and those byte tokens already exist. initially it's 4 tokens (one per byte), but if the model gets retrained on data full of 🫠, BPE will merge those bytes into a single token. new characters are just new combinations of the same 256 bytes.
+
+but there's a catch. bytes 0 through 32 are "control characters" - invisible things:
+
+```
+byte 0  = NULL (literally nothing)
+byte 9  = TAB
+byte 10 = NEWLINE
+byte 32 = SPACE
+```
+
+you can't see these. if you try to print them, they either do nothing or move your cursor around. you wouldn't want these as token names in your vocabulary because you couldn't even look at them to debug things.
+
+**the invisible byte problem.** these invisible bytes absolutely show up in real text - newlines and tabs are everywhere. so the tokenizer *will* encounter them. the problem isn't processing them, it's *displaying* them. if token 10 in your vocabulary is labeled with a newline character... you literally can't see it in a vocabulary list.
+
+GPT-2's fix: take those ~68 invisible bytes and remap them to obscure unicode characters that *weren't already used*. they picked characters starting at unicode code point 256 (`Ā`):
+
+```
+invisible bytes get visible stand-ins:
+
+byte 0   (NULL)    → "Ā"  (unicode 256)
+byte 9   (TAB)     → "ĉ"  (unicode 265)
+byte 10  (NEWLINE) → "Ċ"  (unicode 266)
+byte 32  (SPACE)   → "Ġ"  (unicode 288)
+```
+
+so if you ever see `Ġ` in a tokenizer dump and get confused - that's just a space wearing a costume. nothing is lost. all 256 bytes are still represented, just with visible labels.
+
+**BPE: building words from bytes.** those 256 base tokens are your starting alphabet. now BPE (Byte Pair Encoding) builds the rest of the vocabulary on top. it's surprisingly simple - it always merges **two tokens at a time**, pairing the most frequent neighbors.
+
+take your entire training dataset (billions of words) and split every word into individual byte tokens:
+
+```
+"the"   → ["t", "h", "e"]
+"cat"   → ["c", "a", "t"]
+"that"  → ["t", "h", "a", "t"]
+"this"  → ["t", "h", "i", "s"]
+...millions more words, all split into bytes
+```
+
+now scan through *all of it* and count every adjacent pair. not in one word - across the entire dataset:
+
+```
+"t" + "h" → 9,847,231 times  (from "the", "that", "this", "there", "them"...)
+"h" + "e" → 7,234,102 times  (from "the", "he", "her", "here"...)
+"i" + "n" → 5,891,445 times  (from "in", "ing", "into", "inside"...)
+"a" + "t" → 4,200,000 times  (from "at", "cat", "that", "what"...)
+"f" + "o" → 1,300,000 times  (from "for", "food", "before"...)
+```
+
+whichever pair has the **highest count** wins. that's the entire decision. no AI, no heuristics - just "which two neighbors appeared together the most?" `"t"+"h"` at 9.8 million? it wins round 1.
+
+and here's the important bit - after each merge, BPE **recounts everything** because the data has changed:
+
+```
+before merging "t"+"h":
+  "the" was ["t", "h", "e"]  →  pairs: "t"+"h", "h"+"e"
+
+after merging "t"+"h" into "th":
+  "the" is now ["th", "e"]   →  pairs: "th"+"e"
+
+  "h"+"e" no longer exists in "the"!
+  "th"+"e" is a brand new pair to count.
+```
+
+so round 2 counts all pairs again with the updated tokens. now `"th"+"e"` might have the highest count (because "the" is the most common english word), so it wins:
+
+```
+round 1: "t" + "h" appear together 9.8M times → merge into "th" (token 256)
+  "the"  → ["th", "e"]       ← merged!
+  "that" → ["th", "a", "t"]  ← merged!
+  "cat"  → ["c", "a", "t"]   ← no "t"+"h", unchanged
+
+round 2: "th" + "e" is now most frequent → merge into "the" (token 257)
+  "the"  → ["the"]           ← one token!
+  "that" → ["th", "a", "t"]  ← "th"+"a" not frequent enough yet
+
+round 3: "i" + "n" → merge into "in" (token 258)
+
+round 4: "in" + "g" → merge into "ing" (token 259)
+```
+
+notice - it's always two things merging into one. never three at once. but because "th" is already a token from round 1, merging "th" + "e" in round 2 creates a 3-character token. it's like LEGO - you snap two pieces together to make a bigger piece, then snap that bigger piece with another piece:
+
+```
+building "therefore":
+
+bytes:   t  h  e  r  e  f  o  r  e
+           ↘↙
+merge:    th  e  r  e  f  o  r  e
+            ↘↙            ↘↙
+merge:    the    r  e  f  o  re
+               ↘↙    ↘↙
+merge:    the  re    fo   re
+                     ↘↙
+merge:    the  re   fore
+            ↘↙
+merge:    there  fore
+             ↘↙
+merge:    therefore
+
+always two in, one out. the tokens just get bigger.
+```
+
+keep going for tens of thousands of merges and you end up with a vocabulary of ~150,000 tokens. common words like "the" and "and" are single tokens. less common words get split into pieces. rare words fall all the way back to individual bytes. nothing is ever "unknown" because those 256 byte tokens can spell out literally anything:
+
+```
+"the"          → [token 257]                    ← common, one token
+"hello"        → [token 5000]                   ← fairly common, one token
+"quantization" → [token 8821, token 1924]       ← split into two pieces
+"vLLM"         → ["v", "L", "L", "M"]          ← rare, back to bytes
+```
+
+**okay, back to why "!" is token 0.** now you know the 256 base byte tokens are just a mapping table. the question is: what order do they go in? GPT-2's designers started with the printable ASCII characters, beginning at byte 33 - which is `"!"`:
+
+```python
+# from the tokenizer source (bytes_to_unicode function)
+bs = list(range(ord("!"), ord("~") + 1))  # starts at "!" (33)
+
+# so the base vocabulary looks like:
+# token 0 → "!"  (byte 33)
+# token 1 → '"'  (byte 34)
+# token 2 → "#"  (byte 35)
+# token 3 → "$"  (byte 36)
+# ...and so on
+```
+
+important thing to notice: **token ID ≠ byte value**. token 0 is byte 33, not byte 0. the ordering in the vocabulary is completely independent of the byte values themselves - the designers just chose to list printable characters first (starting at `!`), then other printable Latin characters, then the invisible bytes (remapped to unicode stand-ins) last. all 256 bytes are in the vocabulary, but their *positions* (token IDs) don't match their byte values.
+
+and remember how BPE merges frequent byte pairs into bigger tokens? those merged tokens get added *after* the 256 base bytes. so the full vocabulary ends up looking like this:
+
+```python
+# token 0   → "!"           (base byte 33)
+# token 1   → '"'           (base byte 34)
+# ...
+# token 255 → last base byte
+# ─── BPE merges start here ───
+# token 256 → "th"          (merged from "t" + "h")
+# token 257 → "the"         (merged from "th" + "e")
+# ...
+# token 5000  → "hello"     (common word, merged over many rounds)
+# token 8821  → "quant"     (part of "quantization")
+# ...
+# token 155000 → "🎉"       (merged from bytes 240+159+142+137)
+# token 155001 → "🫠"        (merged from bytes 240+159+171+160)
+```
+
+so emoji tokens exist too! they're just way up in the higher token IDs because they were created by BPE merging 4 base byte tokens into one. when someone types 🎉, the tokenizer doesn't use 4 separate byte tokens - it recognizes the byte sequence `[240, 159, 142, 137]` and maps it to a single token (like token 155000). that's the whole point of BPE: common sequences, whether they're english words or popular emojis, get their own token ID.
+
+so "!" isn't special or meaningful - it's just the first printable ASCII character, which makes it the first entry in the byte-level vocabulary, which makes it token ID 0. and when argmax defaults to index 0 because everything is NaN, you get "!". every single time. forever.
+
+that's the full picture: NaN logits → argmax returns 0 → token 0 is "!" → `"!!!!!!!!!!!!!!!!!!!"`
+
+(if this were a model with a different tokenizer that puts, say, `"<pad>"` at index 0, you'd get a different garbage output. but with GPT-2 style tokenizers - which Qwen, LLaMA, and many others use - it's always "!".)
 
 oh, and it gets even worse if **prefix caching** is enabled. vLLM can cache KV entries for common prompt prefixes so they don't need to be recomputed. if the NaN-corrupted KV entries get saved as a prefix cache entry, then *any future request with a matching prefix* will reuse those poisoned entries directly - without even going through the computation that would normally trigger the bug. the corruption essentially gets "baked in" to the cache. even without prefix caching though, the corruption persists within the running server's memory until restart.
 
