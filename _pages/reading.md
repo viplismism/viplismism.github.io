@@ -198,7 +198,7 @@ title: Reading
       desc: "this book by matthew walker, a berkeley sleep scientist, completely changed how i think about sleep. it's not just some optional thing we do - it's super important for staying healthy and literally not dying early. if you sleep less than 6 hours, you're basically screwed with way higher risks of cancer and alzheimer's, plus your brain works like you're drunk. the book explains how the first half of sleep stores facts while the second half connects ideas and helps creativity. walker says we need 7-9 hours and should avoid screens before bed, keep rooms cool, stop caffeine after noon, and stay consistent with sleep times even on weekends. some people say he exaggerates stuff a bit, but honestly it made me realize sleep matters way more than i ever thought."
     },
     {
-      title: "Artificial Intelligence",
+      title: "Artificial Intelligence : A Guide for Thinking Humans",
       author: "Melanie Mitchell",
       isbn: "9780241404836",
       spineColor: "#86b8ca",
