@@ -33,7 +33,7 @@ So we made our model to comprehend the association between "Cat" images and the 
 
 ### RAG is here..
 
-Well if you don't know what RAG means, I would highly advise you to read this article [here](https://vipul-maheshwari.github.io/2024/02/14/rag-application-with-langchain) which I wrote some days back and loved by tons of people, not exaggerating it but yeah, it's good to get the balls rolling..
+Well if you don't know what RAG means, I would highly advise you to read this article [here](https://viplismism.github.io/2024/02/14/rag-application-with-langchain) which I wrote some days back and loved by tons of people, not exaggerating it but yeah, it's good to get the balls rolling..
 
 So there are impressive models like DALLE-2 that provide text-to-image functionality. Essentially, you input text, and the model generates relevant images for you. But can we create a system similar to Multimodal RAG, where the model produces output images based on our own data? Alright, so the goal for today is to create an AI model that when asked something like, "How many girls were there in my party?" 💀 not only provides textual information but also includes a relevant image related to it. Think of it as an extension of a simple RAG system, but now incorporating images.
 

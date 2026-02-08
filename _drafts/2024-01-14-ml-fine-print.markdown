@@ -73,7 +73,7 @@ Techniques like One-Hot encoding and the Label encoding helps to create the mean
 
 If you have a dataset with 1,000,000 different street names for the _street_name_ feature, creating a binary vector with true or false for each name is inefficient in terms of storage and computation. Instead, a common approach is to use a sparse representation, storing only nonzero values.  That is if we have 35 _street_name_ and our house belongs to the _street_ 24 then instead of storing the 35 different bits as the indicators we could store the 24 
 
-![sparse representation](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/assets/images/sparse_representation.png?raw=true)
+![sparse representation](https://github.com/viplismism/viplismism.github.io/blob/main/assets/images/sparse_representation.png?raw=true)
 
 Sometimes, taking the logarithm of a distribution address long tail issues, especially in data analysis and statistics. The long tail typically refers to a distribution where a few values occur frequently (the "head" of the distribution), while many other values occur infrequently (the "tail" of the distribution). By taking the logarithm, we can compress the range of values, which can be particularly helpful when dealing with data that has a wide spread. This transformation is especially useful when the data has a positive skewness, meaning that the tail is on the right side of the distribution.
 
@@ -141,7 +141,7 @@ Let's consider an example of a medical diagnostic test for a rare disease. Suppo
 
 Now, let's imagine we have a simple classifier that predicts everyone as negative. Here's how the confusion matrix would look like:
 
-![accuracy](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/assets/images/tptn.png?raw=true)
+![accuracy](https://github.com/viplismism/viplismism.github.io/blob/main/assets/images/tptn.png?raw=true)
 
 Now, let's calculate the accuracy:
 
@@ -168,7 +168,7 @@ In this example, accuracy is misleading because the dataset is imbalanced, and t
 
 ROC (Receiver Operating Characteristic) and AUC (Area Under the Curve) are closely related concepts used to evaluate the performance of classification models, particularly binary classifiers. Here are the key differences between ROC and AUC:
 
-![rocauccurve](https://github.com/vipul-maheshwari/vipul-maheshwari.github.io/blob/main/assets/images/ROC_Curve.png?raw=true)
+![rocauccurve](https://github.com/viplismism/viplismism.github.io/blob/main/assets/images/ROC_Curve.png?raw=true)
 
 1. **ROC (Receiver Operating Characteristic):**
    - **Definition:** The ROC curve is a graphical representation of the trade-off between the true positive rate (sensitivity) and the false positive rate (1 - specificity) at various thresholds.
