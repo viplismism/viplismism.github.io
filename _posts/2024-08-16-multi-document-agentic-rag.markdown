@@ -7,7 +7,7 @@ version: Released
 release: 16-08-2024
 ---
 
-Agentic RAG (Retrieval-Augmented Generation) represents a significant leap in how we handle information. Traditional [RAG](https://vipul-maheshwari.github.io/2024/02/14/rag-application-with-langchain) systems are built to retrieve information and relevant context which are then passively send that to a language model (LLM) to generate responses. However, Agentic RAG takes this further by adding more independence. Now, the system can not only gather data but also make decisions and take actions on its own.
+Agentic RAG (Retrieval-Augmented Generation) represents a significant leap in how we handle information. Traditional [RAG](https://viplismism.github.io/2024/02/14/rag-application-with-langchain) systems are built to retrieve information and relevant context which are then passively send that to a language model (LLM) to generate responses. However, Agentic RAG takes this further by adding more independence. Now, the system can not only gather data but also make decisions and take actions on its own.
 
 Think of it as a shift from simple tools to smarter, more capable systems. Agentic RAG transforms what was once a passive process into an active one, where AI can work towards specific goals without needing constant guidance.
 
@@ -31,7 +31,7 @@ Let’s dive into developing an automotive-themed RAG agent based on our current
 
 Consider a scenario where you own a vehicle and require assistance with tasks ranging from diagnosing issues to planning routine maintenance. Now imagine a specialized agent designed specifically for this purpose. This agent should be capable of interpreting your car’s symptoms, analyzing the issue, and delivering a detailed diagnosis, including potential causes.
 
-Furthermore, the bot should assist with identifying specific parts, estimating repair costs, or creating a personalized maintenance schedule based on your vehicle’s mileage and model. This agent must effectively manage a range of tasks by utilizing relevant context from various datasources, employing different tools, and reasoning with the available information to provide accurate and meaningful responses. Given the complexity of these tasks, which involves multiple retrieval and reasoning steps, I am going to use [LanceDB](https://vipul-maheshwari.github.io/2024/03/15/embedded-databases) to ensure fast retrieval by storing relevant embedded data chunks into it.
+Furthermore, the bot should assist with identifying specific parts, estimating repair costs, or creating a personalized maintenance schedule based on your vehicle’s mileage and model. This agent must effectively manage a range of tasks by utilizing relevant context from various datasources, employing different tools, and reasoning with the available information to provide accurate and meaningful responses. Given the complexity of these tasks, which involves multiple retrieval and reasoning steps, I am going to use [LanceDB](https://viplismism.github.io/2024/03/15/embedded-databases) to ensure fast retrieval by storing relevant embedded data chunks into it.
 
 To meet our data needs, I will use six JSON files, each containing specific types of information for querying. You can get these JSON files here : [Data](https://github.com/lancedb/vectordb-recipes/tree/main/examples/multi-document-agentic-rag/json_files?ref=blog.lancedb.com)
 

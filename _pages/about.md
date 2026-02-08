@@ -40,11 +40,11 @@ On top of that, I made a [Lancify package](https://www.lancedb.com/blog/python-p
 
 To demonstrate real-world use cases, I built and documented several examples:
 
-- [Multimodal GTA V RAG](https://vipul-maheshwari.github.io/2024/03/03/multimodal-rag-application)— combining text and images for retrieval and grounding with LanceDB.
-- [Training CNNs with LanceDataset](https://vipul-maheshwari.github.io/2024/06/26/train-a-cnn-with-lancedataset) — showcasing end-to-end model training pipelines powered by Lance dataloaders.
-- [Zero-shot image classification with CLIP + LanceDB](https://vipul-maheshwari.github.io/2024/07/14/zero-shot-image-classification) — leveraging Lance for scalable multimodal search and classification tasks.
+- [Multimodal GTA V RAG](https://viplismism.github.io/2024/03/03/multimodal-rag-application)— combining text and images for retrieval and grounding with LanceDB.
+- [Training CNNs with LanceDataset](https://viplismism.github.io/2024/06/26/train-a-cnn-with-lancedataset) — showcasing end-to-end model training pipelines powered by Lance dataloaders.
+- [Zero-shot image classification with CLIP + LanceDB](https://viplismism.github.io/2024/07/14/zero-shot-image-classification) — leveraging Lance for scalable multimodal search and classification tasks.
 
-And a few more along the same lines, always with the goal of showing how LanceDB can fit directly into deep learning workflows and not just as a standalone vector database. Check more of these [here](https://vipul-maheshwari.github.io/)
+And a few more along the same lines, always with the goal of showing how LanceDB can fit directly into deep learning workflows and not just as a standalone vector database. Check more of these [here](https://viplismism.github.io/)
 
 Additionally, I've collaborated with several companies on specialized AI projects. At [Figr](https://figr.design/), I worked on zero-shot and few-shot learning approaches to generate Figma components for text-to-Figma code, contributing to a custom library. With [Superlinked](https://superlinked.com/), I built production-grade retrieval systems including: a Steam game recommender using Superlinked's vector compute with LlamaIndex for multi-field semantic indexing; a real estate NLQ agent with weighted vector spaces (100x price weighting) for fuzzy matching on complex queries; a research paper agent leveraging TextSimilaritySpace and RecencySpace for balanced retrieval; and a fintech agent integrating RandomForestClassifier for loan predictions with LanceDB-powered semantic insurance claim validation. These projects involved creating custom rerankers, designing specialized agents, and optimizing vector search pipelines for production use cases.
 

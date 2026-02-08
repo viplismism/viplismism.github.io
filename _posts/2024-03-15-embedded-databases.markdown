@@ -75,7 +75,7 @@ Now, Think of an open-source embedding database designed to seamlessly handle a 
 
 ![multimodality](/images/embedded_databases/multimodality_in_lancedb.png)
 
-The current embedded databases should not only support textual data but also be compatible with various file formats. It's no longer just about text ingestion. Some time ago, I developed a GTA-5 multimodal RAG application that displays the GTA5 landscape upon entering a query. I highly recommend giving it a [read](https://vipul-maheshwari.github.io/2024/03/03/multimodal-rag-application) to understand why the Multimodal RAG system is the new hotshot and why companies are eager to integrate it into their core. Honestly, I haven't come across any embedded vector database other than LanceDB that can effortlessly ingest any kind of file format.
+The current embedded databases should not only support textual data but also be compatible with various file formats. It's no longer just about text ingestion. Some time ago, I developed a GTA-5 multimodal RAG application that displays the GTA5 landscape upon entering a query. I highly recommend giving it a [read](https://viplismism.github.io/2024/03/03/multimodal-rag-application) to understand why the Multimodal RAG system is the new hotshot and why companies are eager to integrate it into their core. Honestly, I haven't come across any embedded vector database other than LanceDB that can effortlessly ingest any kind of file format.
 
 By the way, multimodality does make sense because LanceDB is built on top of the Lance format. As mentioned earlier, it supports diverse data types, including images, audio, and text, making it incredibly flexible for applications with various data formats.
 

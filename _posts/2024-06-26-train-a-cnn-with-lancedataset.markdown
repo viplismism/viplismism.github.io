@@ -8,7 +8,7 @@ release: 26-06-2024
 ---
 
 
-In this [previous](https://vipul-maheshwari.github.io/2024/04/09/convert-any-image-dataset-to-lance) post, I showed you how you can convert any Image Dataset to Lance format for faster retrieval and faster I/O operations. But can we use the same Lance formatted image dataset to train an image classification model? Well here it comes...
+In this [previous](https://viplismism.github.io/2024/04/09/convert-any-image-dataset-to-lance) post, I showed you how you can convert any Image Dataset to Lance format for faster retrieval and faster I/O operations. But can we use the same Lance formatted image dataset to train an image classification model? Well here it comes...
 
 ![front-image](/images/train-a-cnn-with-lance-dataset/training_a_cnn.png)
 

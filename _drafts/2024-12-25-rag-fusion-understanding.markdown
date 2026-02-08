@@ -7,7 +7,7 @@ version: Released
 release: 12-25-2024
 ---
 
-If you don't have any clue on what RAG is, please go through this [one](https://vipul-maheshwari.github.io/2024/02/14/rag-application-with-langchain) to get a brief on what this is all about. 
+If you don't have any clue on what RAG is, please go through this [one](https://viplismism.github.io/2024/02/14/rag-application-with-langchain) to get a brief on what this is all about. 
 
 So when the RAG model ends, RAG Fusion picks up by adding more layers that improve the RAG retrieval phase, particularly by adding more sophisticated mechanisms for interpretation and integration of the retrieval output. RAG Fusion tries to combat some of the weaknesses inherent also to RAG, including better response to ambiguous queries and returning more relevant, accurate information by improving the retrieval-to-generation loop.
 

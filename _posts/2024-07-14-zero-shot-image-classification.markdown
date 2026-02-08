@@ -70,7 +70,7 @@ To bring our zero-shot classification system to life, we need a robust Vector Da
 
 For this crucial task, I've opted for LanceDB, an impressive open-source vector database that's like a super-smart data lake for managing complex information. LanceDB shines when we are handling complex data like our vector embeddings with an exceptional performance in fetching and storage, and the best part? It won't cost you a dime. 
 
-But LanceDB's appeal goes beyond just being free and open-source. Its unparalleled scalability, efficient on-disk storage, and serverless capabilities make it a standout choice. These features are part of a broader trend of columnar databases that are rapidly transforming ML workflows. I've actually written an in-depth [article](https://vipul-maheshwari.github.io/2024/03/15/embedded-databases) exploring the game-changing capabilities of these kind of databases. If you're curious about how they're revolutionizing the field, I highly recommend giving it a read!
+But LanceDB's appeal goes beyond just being free and open-source. Its unparalleled scalability, efficient on-disk storage, and serverless capabilities make it a standout choice. These features are part of a broader trend of columnar databases that are rapidly transforming ML workflows. I've actually written an in-depth [article](https://viplismism.github.io/2024/03/15/embedded-databases) exploring the game-changing capabilities of these kind of databases. If you're curious about how they're revolutionizing the field, I highly recommend giving it a read!
 
 ### Implementation
 
