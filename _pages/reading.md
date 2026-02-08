@@ -156,8 +156,8 @@ title: Reading
 }
 
 #book-detail.show {
-  max-height: 60vh !important;
-  overflow-y: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
   opacity: 1 !important;
   margin-top: 24px !important;
   padding-top: 24px !important;
