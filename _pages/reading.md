@@ -190,6 +190,14 @@ title: Reading
 (function() {
   var books = [
     {
+      title: "Sapiens A Brief History of Humankind",
+      author: "Yuval Noah Harari",
+      isbn: "9780062316110",
+      spineColor: "#faf9f2",
+      textColor: "#3f3428",
+      desc: "yuval noah harari is this israeli historian who basically wrote the book on how we went from being just another ape to running the whole planet. the core idea that blew my mind is that humans dominate because we can cooperate in massive numbers through shared myths - things like money, nations, religions, corporations - none of these actually exist except in our collective imagination. he calls it the cognitive revolution, when we started telling stories and believing in things we can't see or touch. the agricultural revolution gets absolutely roasted - he calls it history's biggest fraud because we thought we domesticated wheat but wheat actually domesticated us, chaining us to backbreaking farm work and worse diets. he goes through empires, science, capitalism, all of it, showing how these imagined orders shape everything. some people say he oversimplifies stuff and cherry-picks evidence, which is fair, but honestly it completely changed how i think about why society works the way it does. like once you see that money is just a shared story we all believe in, you can't unsee it."
+    },
+    {
       title: "Why We Sleep",
       author: "Matthew Walker",
       isbn: "9780141983776",
