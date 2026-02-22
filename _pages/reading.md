@@ -212,6 +212,14 @@ title: Reading
       spineColor: "#86b8ca",
       textColor: "#1a1a1a",
       desc: "melanie mitchell is this computer scientist who teaches at portland state and does research at the santa fe institute. in this book, she breaks down how ai actually works versus all the crazy hype we hear about it. she digs into machine learning, neural nets, deep learning and all that, but keeps coming back to this idea that current ai is just really good pattern matching without any real understanding. like it can do impressive stuff but has no clue what it's actually doing. she calls this the barrier of meaning - where ai can't really understand context or common sense or make the kind of connections humans easily do. she points out how brittle these systems are and how they can fail in super weird ways. the book was written before chatgpt but it's still super relevant and honestly makes complex stuff easy to get without dumbing it down too much."
+    },
+    {
+      title: "In Search of Lost Time",
+      author: "Marcel Proust",
+      isbn: "9780713996043",
+      spineColor: "#cda57c",
+      textColor: "#2e2426",
+      desc: "marcel proust was this french writer who basically created the ultimate novel about memory and time - like, this thing is seven volumes and over 4,000 pages total, and the first volume alone is a masterpiece. the whole thing starts with the famous madeleine cookie scene where the narrator dips a cookie in tea and suddenly remembers his entire childhood, which launches this massive exploration of how memory works and how the past lives inside us. proust's big insight is that our real life exists in these moments when the past suddenly comes flooding back through random triggers - a smell, a taste, a sound - and time basically collapses. he calls it involuntary memory, and it's way more powerful than just trying to remember stuff on purpose. the writing is super dense and the sentences go on forever, which some people find exhausting, but honestly it's like being inside someone's mind as they're actually thinking and remembering. the book completely changed how i understand that memories aren't just stored facts but living things that reshape who we are, and that the present moment is always layered with all these invisible connections to our past."
     }
   ];
 
