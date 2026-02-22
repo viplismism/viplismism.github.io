@@ -4,7 +4,7 @@ title: Attention is all you need guys
 description: a deep dive into transformers and the attention mechanism from first principles - covering positional embeddings, Q/K/V projections, multi-head attention, residual connections, layer normalization, and feed-forward networks.
 tags: [Transformers, Deep Learning, NLP]
 version: Released
-release: 06-02-2026
+release: 22-02-2026
 ---
 
 ![Attention is all you need guys!!](/images/attention/attention_title.jpeg)
