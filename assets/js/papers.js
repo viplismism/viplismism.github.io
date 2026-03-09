@@ -86,13 +86,30 @@
 
   var paperShelf = document.getElementById("paper-shelf");
   var overlay = document.getElementById("paper-modal-overlay");
-  var thumbCache = {};
+  var CACHE_KEY = "paper-thumbs-v1";
+
+  function getThumbCache() {
+    try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || {}; } catch(e) { return {}; }
+  }
+
+  function setThumbCache(key, dataUrl) {
+    try {
+      var cache = getThumbCache();
+      cache[key] = dataUrl;
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+    } catch(e) { /* storage full, skip */ }
+  }
 
   function renderThumb(canvas, pdfUrl) {
-    if (thumbCache[pdfUrl]) {
-      canvas.width = thumbCache[pdfUrl].width;
-      canvas.height = thumbCache[pdfUrl].height;
-      canvas.getContext("2d").drawImage(thumbCache[pdfUrl], 0, 0);
+    var cached = getThumbCache()[pdfUrl];
+    if (cached) {
+      var img = new Image();
+      img.onload = function() {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        canvas.getContext("2d").drawImage(img, 0, 0);
+      };
+      img.src = cached;
       return;
     }
     pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
@@ -104,7 +121,7 @@
         canvas.width = viewport.width;
         canvas.height = viewport.height;
         page.render({ canvasContext: canvas.getContext("2d"), viewport: viewport }).promise.then(function() {
-          thumbCache[pdfUrl] = canvas;
+          setThumbCache(pdfUrl, canvas.toDataURL("image/jpeg", 0.6));
         });
       });
     });
