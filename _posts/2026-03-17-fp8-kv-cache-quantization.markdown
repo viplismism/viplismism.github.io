@@ -7,7 +7,7 @@ version: Released
 release: 17-03-2026
 ---
 
-so at the end of my [attention post](https://viplismism.github.io/2026/02/06/attention), i teased about kv-cache and inference optimizations. well, here's that follow up - except it turned into something way bigger than i planned. what started as "let me explain kv-cache quantization" became a full investigation into a production bug where a multimodal model just... starts outputting `"!!!!!!!!!!!!!!!!"`. yeah, literally exclamation marks. nothing else.
+so at the end of my [attention post](https://viplismism.github.io/2026/02/22/attention), i teased about kv-cache and inference optimizations. well, here's that follow up - except it turned into something way bigger than i planned. what started as "let me explain kv-cache quantization" became a full investigation into a production bug where a multimodal model just... starts outputting `"!!!!!!!!!!!!!!!!"`. yeah, literally exclamation marks. nothing else.
 
 to actually understand *why* that happens, we need to go deep - like, all the way down to individual bits in a floating point number. i know that sounds excessive, but i promise every piece connects. we'll build up from binary fractions to FP8 format to quantization scales, and then watch the whole thing collapse like dominoes when one design decision goes wrong.
 
