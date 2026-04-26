@@ -2,6 +2,7 @@ site: Jyosa Labs Blogs
 url: https://viplisimism.github.io/
 title: Jyosa Labs Blogs
 description: Everything related to AI
+timezone: Asia/Kolkata
 twitter:
   username: viplismism
   card: summary
