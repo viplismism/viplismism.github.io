@@ -3,6 +3,7 @@ layout: post
 title: Why file search is secretly a big deal for coding agents
 description: a benchmark of file retrieval for coding agents, comparing grep, BM25, reciprocal rank fusion, and LLM-selected keywords on SWE-bench multilingual.
 tags: [AI Agents, Retriever, Benchmarks, Evals]
+date: 2026-04-27 00:00:00 +0530
 version: Released
 release: 27-04-2026
 ---
