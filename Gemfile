@@ -1,5 +1,6 @@
 source "https://rubygems.org"
 gem 'jekyll'
+gem 'jekyll-sass-converter', '~> 2.2'
 gem 'jekyll-paginate'
 gem 'jekyll-seo-tag'
 gem 'jekyll-sitemap'
