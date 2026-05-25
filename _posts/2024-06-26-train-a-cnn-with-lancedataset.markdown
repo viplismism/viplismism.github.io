@@ -141,4 +141,4 @@ This shows an extensive improvement in training time for the Lance dataloaders a
 
 ![shocking_cat](/images/train-a-cnn-with-lance-dataset/shocking_cat.png)
 
-Here is the complete [notebook](https://github.com/lancedb/lance-deeplearning-recipes/blob/main/community-examples/cnn-model-with-lance-dataset.ipynb) for the reference. For those wanting to explore further, there's a [repository](https://github.com/lancedb/lance-deeplearning-recipes) showcasing various deep learning techniques that utilize Lance-formatted data. This resource can be valuable for expanding your understanding and application of Lance file format in different machine learning contexts. 
+Here is the complete [notebook](https://github.com/lancedb/lance-deeplearning-recipes/blob/main/community-examples/cnn-model-with-lance-dataset.ipynb) for the reference. For those wanting to explore further, there's a [repository](https://github.com/lancedb/lance-deeplearning-recipes) showcasing various deep learning techniques that utilize Lance-formatted data. This resource can be valuable for expanding your understanding and application of Lance file format in different machine learning contexts.
