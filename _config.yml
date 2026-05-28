@@ -42,6 +42,9 @@ collections:
   posts:
     output: true
     permalink: /:year/:month/:day/:slug
+  glossary:
+    output: true
+    permalink: /glossary/:name
   
 defaults:
   -
@@ -61,3 +64,9 @@ defaults:
       type: "posts"
     values:
       layout: "post"
+  -
+    scope:
+      path: ""
+      type: "glossary"
+    values:
+      layout: "glossary_entry"

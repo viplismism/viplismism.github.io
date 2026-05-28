@@ -193,6 +193,39 @@ strong, b {
     padding-left: 1rem;
 }
 
+.glossary-index ul {
+    columns: 2;
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0;
+}
+
+.glossary-index li {
+    break-inside: avoid;
+    margin-bottom: .35rem;
+}
+
+.glossary-index a {
+    color: #000;
+    text-decoration: none;
+}
+
+.glossary-index a:hover {
+    color: #333;
+}
+
+.glossary-entry {
+    flex-basis: 0;
+    flex-grow: 999;
+    min-width: 70%;
+}
+
+@media screen and (max-width: 45rem) {
+    .glossary-index ul {
+        columns: 1;
+    }
+}
+
 main {
 	display:flex;
 	flex-wrap:wrap;
