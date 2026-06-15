@@ -11,8 +11,15 @@ layout: default
   <h1>{{ page.title }}</h1>
 
   {% if page.version == "Draft" %}
-    <p>Version: {{ page.version }}</p>
-    <p>Release Date: {{ page.release | date: "%d-%m-%Y" }}</p>
+    <div class="reading-stats">
+      <span>Draft (local preview)</span>
+      <span>•</span>
+      <span>Release Date: {{ page.release | date: "%d-%m-%Y" }}</span>
+      <span>•</span>
+      <span>{{ reading_time }} min read</span>
+      <span>•</span>
+      <span>{{ words }} words</span>
+    </div>
   {% else %}
     <div class="reading-stats">
       <span>{{ reading_time }} min read</span>
@@ -21,21 +28,21 @@ layout: default
       <span>•</span>
       <span>{{ chars | divided_by: 1000 }}k characters</span>
     </div>
-    
-    {{ content }}
-    
-    <div class="post-footer">
-      <span class="meta"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time></span>
-      
-      {% if page.tags.size > 0 %}
-      <div class="post-tags">
-        {% for tag in page.tags %}
-          <a href="{{ site.baseurl }}/tag/{{ tag | downcase | replace: ' ', '-' }}/" class="post-tag-link">{{ tag }}</a>{% unless forloop.last %}, {% endunless %}
-        {% endfor %}
-      </div>
-      {% endif %}
-    </div>
   {% endif %}
+
+  {{ content }}
+
+  <div class="post-footer">
+    <span class="meta"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time></span>
+
+    {% if page.tags.size > 0 %}
+    <div class="post-tags">
+      {% for tag in page.tags %}
+        <a href="{{ site.baseurl }}/tag/{{ tag | downcase | replace: ' ', '-' }}/" class="post-tag-link">{{ tag }}</a>{% unless forloop.last %}, {% endunless %}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
 </section>
 
 

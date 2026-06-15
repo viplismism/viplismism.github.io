@@ -5,12 +5,26 @@ layout: default
 <section class="posts">
   <ul>
     {% for post in site.posts %}
+      {% unless post.path contains "_drafts" %}
       <li>
         <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
-        {% if post.version == "Draft" %}
-          <span>Draft</span>
-        {% endif %}
+      </li>
+      {% endunless %}
+    {% endfor %}
+  </ul>
+</section>
+
+{% assign drafts = site.posts | where_exp: "item", "item.path contains '_drafts'" %}
+{% if drafts.size > 0 %}
+<section class="drafts">
+  <h2>drafts <small>(local preview only - never published)</small></h2>
+  <ul>
+    {% for post in drafts %}
+      <li>
+        <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+        <span>Draft</span>
       </li>
     {% endfor %}
   </ul>
 </section>
+{% endif %}
