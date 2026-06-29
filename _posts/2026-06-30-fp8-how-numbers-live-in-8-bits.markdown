@@ -4,7 +4,7 @@ title: "FP8: how a number actually lives in 8 bits"
 description: a from-first-principles walk through floating point - binary fractions, the mantissa, the implicit leading 1, exponent bias, and subnormals - building all the way up to the FP8 E4M3 format and why it maxes out at exactly 448 with no infinity.
 tags: [Quantization, Deep Learning, Floating Point]
 version: Released
-release: 15-03-2026
+release: 30-06-2026
 ---
 
 ![fp8-meme](/images/fp8-how-numbers-live-in-8-bits/fp8-meme.png)

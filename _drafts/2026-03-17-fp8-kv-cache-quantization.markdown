@@ -9,7 +9,7 @@ release: 17-03-2026
 
 so at the end of my [attention post](https://viplismism.github.io/2026/02/22/attention), i mentioned kv-cache and inference optimizations. this is that follow-up - except it turned into something i didn't expect. what started as "let me explain kv-cache quantization" became a real investigation into a production bug where a multimodal model just... starts outputting `"!!!!!!!!!!!!!!!!!!!"`. yeah. literally exclamation marks. nothing else.
 
-i've written a [separate post on FP8 fundamentals](/2026/03/15/fp8-how-numbers-live-in-8-bits) that covers the bit format, exponent bias, subnormals, all of that. if you haven't read it, that's a good starting point. this post assumes you know what FP8 E4M3 is and picks up from there: what happens when you use it to compress a KV cache and something goes wrong.
+i've written a [separate post on FP8 fundamentals](/2026/06/30/fp8-how-numbers-live-in-8-bits) that covers the bit format, exponent bias, subnormals, all of that. if you haven't read it, that's a good starting point. this post assumes you know what FP8 E4M3 is and picks up from there: what happens when you use it to compress a KV cache and something goes wrong.
 
 the shape of the bug is simple, but the details are annoying: FP8 is not the villain by itself. the scale is. if the scale is too small, values clip. if the scale is too large, you waste most of the tiny FP8 grid. and if the scale itself becomes NaN or inf, the model is basically cooked until the server state is reset.
 
@@ -17,7 +17,7 @@ there's also a tokenizer detour near the end explaining why the garbage output i
 
 ## quick FP8 recap
 
-FP8 E4M3 is an 8-bit floating point format: 1 sign bit, 4 exponent bits, 3 mantissa bits. the max representable value is 448 (that's 2⁸ × 1.75 - the full derivation is in [the other post](/2026/03/15/fp8-how-numbers-live-in-8-bits)). the NaN pattern is when the exponent AND mantissa are all ones (`1111 111`), for either sign bit. everything else is a valid number, no infinity.
+FP8 E4M3 is an 8-bit floating point format: 1 sign bit, 4 exponent bits, 3 mantissa bits. the max representable value is 448 (that's 2⁸ × 1.75 - the full derivation is in [the other post](/2026/06/30/fp8-how-numbers-live-in-8-bits)). the NaN pattern is when the exponent AND mantissa are all ones (`1111 111`), for either sign bit. everything else is a valid number, no infinity.
 
 the thing that matters for this post: FP8 has a very narrow range. max 448. if your values are larger than that, they clip. and because the mantissa is only 3 bits, the gap between adjacent representable values near 448 is 32 - meaning 416 and 448 are neighbors with nothing in between.
 
