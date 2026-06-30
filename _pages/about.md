@@ -3,7 +3,7 @@ layout: page
 title: About
 ---
 
-If you're coming from [Jyosa Labs](https://www.jyosalabs.xyz/), you already know what I do—but if not, here's the quick version: I'm the founder of Jyosa Labs, a research lab where I'm building systems and experiments at the intersection of AI, deep learning, and production infrastructure. This website serves as my blog and resource hub, documenting work, experiments, and learnings along the way.
+If you're coming from [Jyosa Labs](https://www.jyosalabs.xyz/), you already know what I do - but if not, here's the quick version: I'm the founder of Jyosa Labs, a research lab where I'm building systems and experiments at the intersection of AI, deep learning, and production infrastructure. This website serves as my blog and resource hub, documenting work, experiments, and learnings along the way.
 
 I'm Vipul Maheshwari from Bharat, and I did my B.Tech in Computer Science.
 
@@ -19,7 +19,7 @@ Soon after this internship, I joined [Saarthi.ai](https://www.saarthi.ai/) speci
 
 Now comes the time when I started to move to some big leagues.
 
-My time with [Endeavor Labs](https://www.endeavorlabs.co/), a New York-based research and consultancy outfit, kicked off in an unexpected way. I posted a casual intro about my goals and what I was hoping to dive into on the MindsDB #general channel, and somehow that caught Nathan’s eye—though I can’t quite recall the exact message, but that lead to me working here.
+My time with [Endeavor Labs](https://www.endeavorlabs.co/), a New York-based research and consultancy outfit, kicked off in an unexpected way. I posted a casual intro about my goals and what I was hoping to dive into on the MindsDB #general channel, and somehow that caught Nathan’s eye - though I can’t quite recall the exact message, but that lead to me working here.
 
 At Endeavor, I jumped into a supervised machine learning project, tackling multiclass classification to boost operational efficiency. I leaned on to the 
 [CatBoost](https://catboost.ai/docs/en/concepts/loss-functions-multiclassification) for build solid models, tweaking it with gradient optimization and some clever feature tweaks to keep overfitting aside. It was a hands-on effort that really sharpened the predictive edge and helped clients make smarter, data-backed calls. I mean the feature engineering was the big part here. The data was messy as **fcuk** but that project was a huge success..
@@ -28,9 +28,9 @@ Along with this project, I also designed and implemented an OCR and NLP-based in
 
 moving ahead, I took up the role of Founding Engineer at [Bolna](https://www.bolna.ai/).
 
-There, I worked on building the [knowledge base feature](https://www.linkedin.com/posts/vipulmaheshwarii_excited-to-share-what-ive-been-working-activity-7241083342593384448-rd4Q?utm_source=share&utm_medium=member_desktop&rcm=ACoAADWFgLQBXZygDPUaqFOS9b7G3wtkLnIxpIs) from the ground up—a RAG integration that plugged directly into our Voice AI orchestration engine. The whole thing came together by wiring up LanceDB as the vector store, using a proxy engine to manage and store knowledge base files, and setting up a queue-based flow so we could stream tokens smoothly from STT → LLM → TTS. That queue part was especially important to make sure the knowledge base responses worked in real-time during calls.
+There, I worked on building the [knowledge base feature](https://www.linkedin.com/posts/vipulmaheshwarii_excited-to-share-what-ive-been-working-activity-7241083342593384448-rd4Q?utm_source=share&utm_medium=member_desktop&rcm=ACoAADWFgLQBXZygDPUaqFOS9b7G3wtkLnIxpIs) from the ground up - a RAG integration that plugged directly into our Voice AI orchestration engine. The whole thing came together by wiring up LanceDB as the vector store, using a proxy engine to manage and store knowledge base files, and setting up a queue-based flow so we could stream tokens smoothly from STT → LLM → TTS. That queue part was especially important to make sure the knowledge base responses worked in real-time during calls.
 
-End result: you could basically connect your own knowledge base and have an AI agent handle live inbound and outbound calls with context—pretty close to a Jarvis-like experience. It was a short haul for me at Bolna, but one filled with some really exciting technical challenges.
+End result: you could basically connect your own knowledge base and have an AI agent handle live inbound and outbound calls with context - pretty close to a Jarvis-like experience. It was a short haul for me at Bolna, but one filled with some really exciting technical challenges.
 
 Now comes [LanceDB](https://lancedb.com/).
 
@@ -40,18 +40,18 @@ On top of that, I made a [Lancify package](https://www.lancedb.com/blog/python-p
 
 To demonstrate real-world use cases, I built and documented several examples:
 
-- [Multimodal GTA V RAG](https://viplismism.github.io/2024/03/03/multimodal-rag-application)— combining text and images for retrieval and grounding with LanceDB.
-- [Training CNNs with LanceDataset](https://viplismism.github.io/2024/06/26/train-a-cnn-with-lancedataset) — showcasing end-to-end model training pipelines powered by Lance dataloaders.
-- [Zero-shot image classification with CLIP + LanceDB](https://viplismism.github.io/2024/07/14/zero-shot-image-classification) — leveraging Lance for scalable multimodal search and classification tasks.
+- [Multimodal GTA V RAG](https://viplismism.github.io/2024/03/03/multimodal-rag-application) -  combining text and images for retrieval and grounding with LanceDB.
+- [Training CNNs with LanceDataset](https://viplismism.github.io/2024/06/26/train-a-cnn-with-lancedataset)  -  showcasing end-to-end model training pipelines powered by Lance dataloaders.
+- [Zero-shot image classification with CLIP + LanceDB](https://viplismism.github.io/2024/07/14/zero-shot-image-classification)  -  leveraging Lance for scalable multimodal search and classification tasks.
 
 And a few more along the same lines, always with the goal of showing how LanceDB can fit directly into deep learning workflows and not just as a standalone vector database. Check more of these [here](https://viplismism.github.io/)
 
 Additionally, I've collaborated with several companies on specialized AI projects. At [Figr](https://figr.design/), I worked on zero-shot and few-shot learning approaches to generate Figma components for text-to-Figma code, contributing to a custom library. With [Superlinked](https://superlinked.com/), I built production-grade retrieval systems including: a Steam game recommender using Superlinked's vector compute with LlamaIndex for multi-field semantic indexing; a real estate NLQ agent with weighted vector spaces (100x price weighting) for fuzzy matching on complex queries; a research paper agent leveraging TextSimilaritySpace and RecencySpace for balanced retrieval; and a fintech agent integrating RandomForestClassifier for loan predictions with LanceDB-powered semantic insurance claim validation. These projects involved creating custom rerankers, designing specialized agents, and optimizing vector search pipelines for production use cases.
 
-I worked with [Juspay](https://juspay.io/in) on the [Xyne team](https://xynehq.com/) where I was focused on fine-tuning coder models for autocompletion tasks (fill-in-the-middle), supervised fine-tuning for code-related Q&A, and solving production bugs on the inference side. Previously on this team, I built out the agentic suite for various connector agents—mail, calendar, and other integrations—where the goal was enabling agents to autonomously fetch and act on data across different sources. I also worked on prompt optimizations to improve agent reliability and response quality.
+I worked with [Juspay](https://juspay.io/in) on the [Xyne team](https://xynehq.com/) where I was focused on fine-tuning coder models for autocompletion tasks (fill-in-the-middle), supervised fine-tuning for code-related Q&A, and solving production bugs on the inference side. Previously on this team, I built out the agentic suite for various connector agents (mail, calendar, and other integrations) where the goal was enabling agents to autonomously fetch and act on data across different sources. I also worked on prompt optimizations to improve agent reliability and response quality.
 
-I also worked with [Credilinq](https://credilinq.ai/) on building out multiagentic systems—designing and deploying agents that could coordinate across tasks, handle complex workflows, and operate reliably in production. that was a pretty deep dive into getting multi-agent architectures to actually work at scale, not just in demos.
+I also worked with [Credilinq](https://credilinq.ai/) on building out multiagentic systems, designing and deploying agents that could coordinate across tasks, handle complex workflows, and operate reliably in production. that was a pretty deep dive into getting multi-agent architectures to actually work at scale, not just in demos.
 
-Currently, I am working with [Payoneer](https://www.payoneer.com/) on multiagentic systems—building and scaling agent workflows for real production use cases. some genuinely interesting problems on the coordination and reliability side of things.
+these days i am also helping the team at [Payoneer](https://www.payoneer.com/) with some multiagentic stuff. some genuinely interesting problems on the coordination side of things.
 
-Well that's it.. I am still not sure what I like most. So if you’re looking to collaborate on a project related to AI or ML, feel free to reach out—I’m just a message away!
+Well that's it.. I am still not sure what I like most. So if you’re looking to collaborate on a project related to AI or ML, feel free to reach out - I’m just a message away!
