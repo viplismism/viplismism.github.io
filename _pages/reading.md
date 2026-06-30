@@ -278,14 +278,6 @@ title: Reading
       desc: "frank herbert wrote dune in 1965 and it's still the best science fiction worldbuilding ever put on paper. the planet arrakis is this desert world that produces the most valuable substance in the universe - spice, which extends life, enables space travel, and basically powers the entire galactic economy. the story follows paul atreides, whose family gets sent to arrakis and then gets absolutely destroyed by court politics, but the real subject of the book is power - how it works, how it corrupts, how people become myths and what that costs them. herbert was thinking about ecology, religion, colonialism, and the danger of charismatic leaders decades before those were fashionable topics. the detail is insane - there's a whole appendix on the ecology of arrakis, the religion, the language. it rewards slow reading. the sequels get progressively stranger and more philosophical, but the first book is just a perfect piece of work. once you've read it you understand why every piece of sci-fi since has been in its shadow."
     },
     {
-      title: "Atomic Habits",
-      author: "James Clear",
-      isbn: "9780735211292",
-      spineColor: "#1a3a1a",
-      textColor: "#c8e6c8",
-      desc: "james clear's core argument is that you don't rise to the level of your goals, you fall to the level of your systems. goals are what everyone has. systems are what actually determines what you do every day. the book breaks habits into a four-part loop: cue, craving, response, reward - and shows you how to engineer each part. want to build a habit? make the cue obvious, the craving attractive, the response easy, the reward satisfying. want to break one? invert all four. the 1% better every day compounding argument is the part people quote the most, and it's genuinely motivating when you think about it - small consistent improvements feel negligible in the moment but the curve bends sharply over time. what i found most useful was the identity framing: instead of 'i want to read more' you think 'i am a reader' and then ask what a reader would do right now. it sounds like a small shift but it changes how you make decisions. the book is practical in a way that a lot of self-help isn't - every claim comes with a concrete technique you can use today."
-    },
-    {
       title: "The Hitchhiker's Guide to the Galaxy",
       author: "Douglas Adams",
       isbn: "9780345391803",
