@@ -9,11 +9,11 @@ release: 30-06-2026
 
 ![fp8-meme](/images/fp8-how-numbers-live-in-8-bits/fp8-meme.png)
 
-so okay, i was writing this post about a nasty production bug - a multimodal model that just kinda starts spitting out garbage the second you flip on FP8 KV cache quantization. but halfway through, i hit this wall. i mean i literally couldn't explain the bug without first explaining how FP8 numbers actually work. like all the way down to the individual bits. and that explanation kept growing until yeah, it was clearly its own post. so here we are.
+so okay, i was writing this post about a nasty production bug,  a multimodal model that just kinda starts spitting out garbage the second you flip on FP8 KV cache quantization. but halfway through, i hit this wall. i mean i literally couldn't explain the bug without first explaining how FP8 numbers actually work. like all the way down to the individual bits. and that explanation kept growing until it was clearly its own post. so here we are.
 
-this is that foundation. by the end you'll know exactly how a number lives inside 8 bits - the mantissa, the exponent, the sneaky implicit 1, the subnormal range near zero, the whole FP8 E4M3 format. we'll build it up slowly from binary fractions, and honestly a bunch of design choices that look totally bizarre at first start making complete sense as you go.
+this is that foundation. by the end you'll know exactly how a number lives inside 8 bits (hoping so), the mantissa, the exponent, the sneaky implicit 1, the subnormal range near zero, the whole FP8 E4M3 format. we'll build it up slowly from binary fractions, and honestly a bunch of design choices that look totally bizarre at first start making complete sense as you go along.
 
-i know - "floating point fundamentals" sounds like the most boring possible topic, uggh, i get it. but stick with it, because in the next post every single piece of this comes right back to explain a real failure where one mis-set number snowballs into a model that's completely lost its mind. you can't really appreciate that collapse until you know how the format is *supposed* to work, right? so. the basics.
+i know - "floating point fundamentals" sounds like the most boring possible topic. i get it. but stick with it, because in the next post every single piece of this comes right back to explain a real failure where one mis-set number snowballs into a model that's completely lost its mind. you can't really appreciate that collapse until you know how the format is supposed to work, right? so. the basics.
 
 ## decimal, then binary
 
@@ -44,11 +44,11 @@ binary works the exact same way, just with base 2 instead of base 10:
                = 0.625 (decimal)
 ```
 
-each position is the previous position ÷ 2. that's literally why it's 1/2, 1/4, 1/8 - they're just 2⁻¹, 2⁻², 2⁻³. nothing magical. just like decimal uses powers of 10, binary uses powers of 2.
+each position is the previous position ÷ 2. that's literally why it's 1/2, 1/4, 1/8,  they're just 2⁻¹, 2⁻², 2⁻³. nothing magical. just like decimal uses powers of 10, binary uses powers of 2.
 
 ### the mantissa (where your actual digits live)
 
-the mantissa (some people call it "significand") holds the precision bits - the actual digits of your number. think of it as the "meat" of the number. the exponent just tells you where to put the decimal point.
+the mantissa (some people call it "significand") holds the precision bits. the actual digits of your number. think of it as the "meat" of the number. the exponent just tells you where to put the decimal point.
 
 in FP8 E4M3 (which we'll use throughout), we have 3 mantissa bits. each bit represents a fractional position:
 
@@ -75,11 +75,11 @@ here's all 8 possible values:
 
 3 bits, 8 levels. that's... not a lot. but we're cramming a number into 8 bits total, so sacrifices must be made.
 
-and here's the thing people don't always get right away - these aren't like integers where every value has its own exact slot. these 8 values are more like **buckets**. if your actual number is 0.3? tough luck - there's no bucket for 0.3. your closest options are 0.250 and 0.375, and 0.3 gets snapped to whichever is nearest (0.250 in this case).
+and here's the thing people don't always get right away,  these aren't like integers where every value has its own exact slot. these 8 values are more like **buckets**. if your actual number is 0.3? tough luck , i mean there's no bucket for 0.3. your closest options are 0.250 and 0.375, and 0.3 gets snapped to whichever is nearest (0.250 in this case).
 
-think of it like a ruler that only has marks every 0.125 apart. you can't measure 0.3 exactly - you'd say "it's about at the 0.25 mark." more mantissa bits = finer marks. FP16 has 10 mantissa bits (1024 buckets per range), FP32 has 23 (over 8 million). we have 3 bits. 8 buckets. that's the precision tax you pay for squeezing a number into a single byte.
+think of it like a ruler that only has marks every 0.125 apart. you can't measure 0.3 exactly,  you'd say "it's about at the 0.25 mark." more mantissa bits = finer marks. FP16 has 10 mantissa bits (1024 buckets per range), FP32 has 23 (over 8 million). we have 3 bits. 8 buckets. that's the precision tax you pay for squeezing a number into a single byte.
 
-one more thing worth keeping in mind: these buckets get *wider* as numbers get bigger. near zero, buckets might be 0.00195 apart. but near the max value of 448, adjacent representable numbers are 32 apart (416 and 448 are neighbors, nothing in between). so a value like 430 gets rounded to either 416 or 448 - you lose up to 14 in either direction. same 8 buckets per range, but the buckets themselves stretch. this matters a lot when we get to the quantization part in the next post.
+one more thing worth keeping in mind: these buckets get wider as numbers get bigger. near zero, buckets might be 0.00195 apart. but near the max value of 448, adjacent representable numbers are 32 apart (416 and 448 are neighbors, nothing in between). so a value like 430 gets rounded to either 416 or 448 and you lose up to 14 in either direction. same 8 buckets per range, but the buckets themselves stretch. this matters a lot when we get to the quantization part in the next post.
 
 ### the implicit leading 1 (free bit hack)
 
@@ -135,7 +135,7 @@ example: sign=0, exponent=1001 (9), mantissa=101
 
 ### the exponent bias (why subtract 7?)
 
-quick thing - why is the bias 7? our exponent field stores values 0 to 15 (4 bits, all unsigned). but we want to represent both big numbers (like 256) and tiny numbers (like 0.015). the bias is the trick that buys us both: instead of using the stored value directly, you subtract 7 from it.
+quick thing, why is the bias 7? our exponent field stores values 0 to 15 (4 bits, all unsigned). but we want to represent both big numbers (like 256) and tiny numbers (like 0.015). the bias is the trick that buys us both, so now instead of using the stored value directly, you subtract 7 from it.
 
 ```
 stored 1  → 1 - 7 = -6  → 2⁻⁶ = 0.015  (tiny positive number)
@@ -144,15 +144,17 @@ stored 14 → 14 - 7 = 7  → 2⁷  = 128    (big number)
 stored 15 → 15 - 7 = 8  → 2⁸  = 256    (biggest)
 ```
 
-stored value 7 maps to 2⁰ = 1.0, right in the middle. below 7 you get exponents that shrink numbers (2⁻¹ = 0.5, 2⁻⁶ = 0.015 - still positive, just tiny!), above 7 you get exponents that grow them. it's not about tiny numbers - it's about whether the exponent makes your number bigger or smaller than 1.
+stored value 7 maps to 2⁰ = 1.0, right in the middle. below 7 you get exponents that shrink numbers (2⁻¹ = 0.5, 2⁻⁶ = 0.015 - still positive, just tiny!), above 7 you get exponents that grow them. it's not about tiny numbers,  it's about whether the exponent makes your number bigger or smaller than 1.
 
-why 7 specifically? bias = 2^(bits-1) - 1. for 4 exponent bits: 2³ - 1 = 7. same logic everywhere - FP16 uses bias 15, FP32 uses bias 127. gives you a balanced split.
+why 7 specifically though? 
 
-without a bias, stored exponents 0-15 would directly mean 2⁰ to 2¹⁵. the smallest exponent would be 1, so everything would be ≥ 1.0. huge range on the top end (up to 32,768!), but you'd completely lose the ability to represent anything between 0 and 1. no 0.5, no 0.1, none of it. for neural net activations that are often small fractions, that'd be useless. the bias is what gives us that whole sub-1.0 world.
+ok so see this, now **bias = 2^(bits-1) - 1**. for 4 exponent bits: 2³ - 1 = 7. just use the same logic everywhere,  FP16 uses bias 15, FP32 uses bias 127. gives you a balanced split.
+
+without a bias, stored exponents 0-15 would directly mean 2⁰ to 2¹⁵. the smallest exponent would be 1, so everything would be ≥ 1.0. huge range on the top end (up to 32,768!), but you'd completely lose the ability to represent anything between 0 and 1. no 0.5, no 0.1, none of it. now for neural net activations that are often small fractions, that'd be useless. the bias is what gives us that whole sub-1.0 world.
 
 ### subnormal numbers (filling the gap near zero)
 
-okay so there's a problem. with normal numbers and the implicit leading 1, the smallest positive number we can represent is:
+now there's a small problem. with normal numbers and the implicit leading 1, the smallest positive number we can represent is:
 
 ```
 smallest exponent = 0001 (stored) → actual = 1-7 = -6
@@ -192,7 +194,7 @@ this gives us 7 tiny values between 0 and the smallest normal (mantissa `000` wi
 | 110 | 0.75 | 0.75 × 2⁻⁶ = **0.01172** |
 | 111 | 0.875 | 0.875 × 2⁻⁶ = **0.01367** |
 
-look at how nicely this stitches together. the largest subnormal is 0.01367, and the smallest normal is 0.01563. the gap between them is 0.00195 - same step size as between any two adjacent subnormals. no sudden jump, no weird discontinuity. if they'd picked 2⁻⁷ instead, the boundary gap would be way bigger than the subnormal step size and the whole smooth-ramp thing breaks.
+look at how nicely this stitches together. the largest subnormal is 0.01367, and the smallest normal is 0.01563. the gap between them is 0.00195, it's the same step size as between any two adjacent subnormals. no sudden jump, no weird discontinuity. if they'd picked 2⁻⁷ instead, the boundary gap would be way bigger than the subnormal step size and the whole smooth-ramp thing breaks.
 
 why does it matter?
 
@@ -243,7 +245,7 @@ max exponent = 8, meaning 2⁸ = 256.
 
 3 mantissa bits give us values 000 to 111. with the implicit leading 1, mantissa `110` = 1.75. but what about `111` = 1.875?
 
-here's the catch - at this top exponent, the all-ones exponent+mantissa pattern (exponent `1111` *and* mantissa `111`) is reserved for NaN. the sign bit can be 0 or 1, but either way that exponent+mantissa combo means "this calculation went wrong" - like 0/0 or sqrt(-1). so the biggest usable mantissa at the top is `110` = 1.75.
+here's the catch, now at this top exponent, the all-ones exponent+mantissa pattern (exponent `1111` *and* mantissa `111`) is reserved for NaN. the sign bit can be 0 or 1, but either way that exponent+mantissa combo means "this calculation went wrong" - like 0/0 or sqrt(-1). so the biggest usable mantissa at the top is `110` = 1.75.
 
 (important: `111` is totally fine at *lower* exponents. like 2⁷ × 1.875 = 240 is a perfectly real number. only the all-ones-everything pattern is special. more on this in a second.)
 
@@ -255,7 +257,7 @@ max value = 2^8 × 1.75
           = 448 ✓
 ```
 
-if that top slot weren't reserved for NaN, max would be 256 × 1.875 = 480. we lose 32 of range to have a way to signal "something went wrong." worth it? absolutely - you'll see exactly why in the next post.
+if that top slot weren't reserved for NaN, max would be 256 × 1.875 = 480. we lose 32 of range to have a way to signal "something went wrong." worth it? absolutely hell yeah! well you'll see exactly why in the next post (ragebait, lol!)
 
 ### FP8 E4M3 has NO infinity!
 
@@ -319,12 +321,12 @@ okay so that's basically the whole foundation. let me boil it down to the things
 
 2. **the implicit leading 1 is a free bit** - normalized binary always starts with 1, so we don't store it. 3 mantissa bits buy you 4 bits of precision.
 
-3. **the bias lets exponents go negative** - subtract 7 from the stored exponent so you can represent both tiny fractions (2⁻⁶) and big numbers (2⁸), instead of being stuck at ≥ 1.0.
+3. **the bias lets exponents go negative** - subtract 7 (bias) from the stored exponent (when you have 4 exponent bits) so you can represent both tiny fractions (2⁻⁶) and big numbers (2⁸), instead of being stuck at ≥ 1.0.
 
 4. **subnormals fill the gap near zero** - when exponent bits are all zero, drop the implicit 1, giving a smooth ramp down to actual zero instead of a cliff.
 
 5. **FP8 E4M3 maxes out at 448** - that's 2⁸ × 1.75, with no infinity. the all-ones exponent+mantissa pattern is NaN, for either sign bit.
 
-8 bits. 256 possible values. that's literally the entire toolkit when you quantize a model's KV cache to FP8. and honestly it's a surprisingly sharp tool - right up until the thing you're measuring grows past 448, and then the whole measurement just kinda quietly collapses.
+8 bits. 256 possible values. that's literally the entire toolkit when you quantize a model's KV cache to FP8. and honestly it's a surprisingly sharp tool.  right up until the thing you're measuring grows past 448, and then the whole measurement just kinda quietly collapses.
 
-which is exactly what we'll do to it in the next post. we take this exact format, drop it into vLLM, point it at a multimodal model, and watch one mis-set "ruler" lobotomize the whole thing - no crash, no error, nothing, just confidently wrong output. see you there!
+which is exactly what we'll do to it in the next post. we take this exact format, drop it into vLLM, point it at a multimodal model, and watch one mis-set "ruler" lobotomize the whole thing. damn that was so horrible to watch! it was just no crash, no error, nothing, just confidently wrong output. see you in next one. 
