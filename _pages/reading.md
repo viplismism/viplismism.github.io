@@ -249,8 +249,8 @@ title: Reading
       title: "How to Build a Car",
       author: "Adrian Newey",
       coverId: "13168271",
-      spineColor: "#c0392b",
-      textColor: "#fff0ee",
+      spineColor: "#1a2744",
+      textColor: "#e8edf5",
       desc: "adrian newey is the guy who designed most of the dominant f1 cars of the last thirty years - red bull, mclaren, williams - and this is basically his autobiography told through the cars. what makes it different from a typical sports memoir is that he actually explains the engineering. like genuinely explains it - downforce, aerodynamics, suspension geometry, how changing one part of the car creates three new problems somewhere else. you realize that an f1 car is this impossibly constrained optimization problem where everything trades off against everything else, and the best designers are the ones who can hold the whole system in their head at once. the stories from the paddock are great too - the politics, the crashes, the moments where a design decision you made at the drawing board shows up at 200mph. but the thing that stayed with me is how newey thinks about problems: always going back to first principles, never accepting that something has to be the way it's always been done. honestly reads like a masterclass in engineering thinking wrapped in an f1 story."
     },
     {
