@@ -3,7 +3,7 @@ layout: page
 title: About
 ---
 
-If you're coming from [Jyosa Labs](https://www.jyosalabs.xyz/), you already know what I do - but if not, here's the quick version: I'm the founder of Jyosa Labs, a research lab where I'm building systems and experiments at the intersection of AI, deep learning, and production infrastructure. This website serves as my blog and resource hub, documenting work, experiments, and learnings along the way.
+If you're coming from [Jyosa Labs](https://jyosalabs.ai/), you already know what I do - but if not, here's the quick version: I'm the founder of Jyosa Labs, a research lab where I'm building systems and experiments at the intersection of AI, deep learning, and production infrastructure. This website serves as my blog and resource hub, documenting work, experiments, and learnings along the way.
 
 I'm Vipul Maheshwari from Bharat, and I did my B.Tech in Computer Science.
 
